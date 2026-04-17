@@ -2312,6 +2312,7 @@ def on_changed(selection):
 
 def importData(database, sqzfilename, user):
 
+    tmg_dataset = None
     ######Check if Gramps Family Tree is empty if not stop import
     if not database.get_total() == 0:
         LOG.warning("Create a New Family Tree to import your TMG Backup into.")
@@ -2439,7 +2440,7 @@ def importData(database, sqzfilename, user):
             #Process TMG Project for import
             #------------------------------------------------------
             # determine dataset id if it has not been set by GUI selection
-            if 'tmg_dataset' not in locals() or tmg_dataset is None:
+            if tmg_dataset is None:
                 if only_has_one_dataset():
                     tmg_dataset = only_first_dataset()
                 else:

@@ -38,6 +38,7 @@ from gramps.gen.plug import BasePluginManager
 from gramps.gen.plug.report import CATEGORY_TEXT
 from gramps.gui.utils import open_file_with_default_application
 from gramps.gui.user import User
+from gramps.gui.dialog import ErrorDialog
 from gramps.gui.plug.report._textreportdialog import TextReportDialog
 
 

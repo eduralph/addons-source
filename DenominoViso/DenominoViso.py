@@ -129,6 +129,7 @@ from urllib.parse import quote, splittype
 from urllib.request import pathname2url
 from xml.sax.saxutils import escape, quoteattr
 from math import sin,cos,exp,sqrt,e,pi
+from functools import reduce
 import codecs
 
 #-------------------------------------------------------------------------

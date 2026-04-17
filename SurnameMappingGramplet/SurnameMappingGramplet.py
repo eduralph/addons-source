@@ -140,7 +140,7 @@ class SurnameMappingGramplet(Gramplet):
         response = self.show_dialog(_("Create Mapping"), None, None)
         if response:
             (surname, group) = response
-            self.dbstate.db.set_name_group_mapping(unicode(surname), unicode(group))
+            self.dbstate.db.set_name_group_mapping(str(surname), str(group))
         self.main()
 
     def remove_mapping_clicked(self, event):
@@ -148,7 +148,7 @@ class SurnameMappingGramplet(Gramplet):
         for path in pathlist:
             tree_iter = model.get_iter(path)
             value = model.get_value(tree_iter, 0)
-            self.dbstate.db.set_name_group_mapping(unicode(value), None)
+            self.dbstate.db.set_name_group_mapping(str(value), None)
         self.main()
 
     def edit_row(self, model, path):
@@ -159,10 +159,10 @@ class SurnameMappingGramplet(Gramplet):
         if response:
             (new_surname, new_group) = response
             if new_surname == surname:
-                self.dbstate.db.set_name_group_mapping(unicode(surname), unicode(new_group))
+                self.dbstate.db.set_name_group_mapping(str(surname), str(new_group))
             else:
-                self.dbstate.db.set_name_group_mapping(unicode(surname), None)
-                self.dbstate.db.set_name_group_mapping(unicode(new_surname), unicode(new_group))
+                self.dbstate.db.set_name_group_mapping(str(surname), None)
+                self.dbstate.db.set_name_group_mapping(str(new_surname), str(new_group))
 
     def edit_mapping_clicked(self, event):
         (model, pathlist) = self.treeview.get_selection().get_selected_rows()

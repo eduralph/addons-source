@@ -36,6 +36,7 @@ from gramps.gui.plug.quick import run_quick_report_by_name
 
 from gramps.gen.plug import Gramplet
 import gramps.gen
+import sys
 
 #------------------------------------------------------------------------
 #

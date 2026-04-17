@@ -70,6 +70,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Compile all Python files (excluding .gpr.py)
+        shell: bash
         run: |
           failed=0
           while IFS= read -r f; do
@@ -126,12 +127,15 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
-          python-version: "3.12"
           activate-environment: addons-ci
-          channels: conda-forge
+          environment-file: .github/workflows/environment.yml
+          use-mamba: true
 
-      - name: Install Gramps + test deps
-        run: mamba install -y "gramps>=6.0,<6.1" pygobject gtk3 orjson pytest dbf
+      - name: Verify environment
+        run: |
+          mamba info
+          mamba list | head -30
+          python -c "import pytest, gramps, gi; print('deps OK')"
 
       - name: Run per-addon unit tests
         env:

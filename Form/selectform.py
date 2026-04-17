@@ -43,6 +43,7 @@ from form import get_form_ids, get_form_id, get_form_type
 #
 # ------------------------------------------------------------------------
 from gramps.gen.const import GRAMPS_LOCALE as glocale
+from gramps.gui.display import display_help
 
 try:
     _trans = glocale.get_addon_translator(__file__)

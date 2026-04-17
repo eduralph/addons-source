@@ -68,6 +68,7 @@ from gramps.gen.datehandler import get_date, displayer
 from gramps.gen.display.name import displayer as global_name_display
 from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.sort import Sort
+from gramps.gen.errors import ReportError
 from gramps.gen.utils.db import (get_birth_or_fallback, get_death_or_fallback)
 from gramps.gen.utils.lds import TEMPLES
 from gramps.gen.utils.place import conv_lat_lon

@@ -38,6 +38,7 @@ from gramps.gen.lib import Place, PlaceRef, PlaceName, PlaceType, Tag, Date
 
 from gramps.gui.selectors import SelectorFactory
 from gramps.gui.widgets import MonitoredDate, ValidatableMaskedEntry
+from gramps.gui.editors import EditDate
 
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 try:

@@ -26,6 +26,7 @@ from copy import deepcopy
 from datetime import datetime
 
 from gramps.gen.db.base import DbReadBase
+from gramps.gen.db import DbTxn
 from gramps.gen.merge.diff import diff_dbs
 from gramps.gen.user import User
 
