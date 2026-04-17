@@ -66,9 +66,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gramps 3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-03 08:54-0800\n"
-"PO-Revision-Date: 2026-03-05 22:10+0000\n"
-"Last-Translator: Luigi Toscano <luigi.toscano@tiscali.it>\n"
+"POT-Creation-Date: 2026-04-11 17:13-0700\n"
+"PO-Revision-Date: 2026-04-14 18:01+0000\n"
+"Last-Translator: Fabio Restante <frestante@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/gramps-project/"
 "addons/it/>\n"
 "Language: it\n"
@@ -92,7 +92,7 @@ msgstr "Tipo nome"
 
 #: AllNamesQuickview/AllNames.py:54 PlaceCleanup/placecleanup.glade:52
 msgid "Primary Name"
-msgstr ""
+msgstr "Nome primario"
 
 #: AllNamesQuickview/AllNames.py:71
 #, python-format
@@ -196,6 +196,143 @@ msgstr "Visualizzare o meno il numero teorico di antenati per generazione"
 #: PersonEverything/PersonEverything.py:1028 ToDoReport/TodoReport.py:903
 msgid "The style used for the title of the page."
 msgstr "Lo stile usato per il titolo della pagina."
+
+#: AncestryTableReport.gpr.py:3
+#, fuzzy
+#| msgid "Ancestor Generations"
+msgid "Ancestry Table"
+msgstr "Generazioni ascendenti"
+
+#: AncestryTableReport.gpr.py:4
+#, fuzzy
+#| msgid "Produces descendants lines of a person"
+msgid "Produces a table of ancestry about a person"
+msgstr "Produce le linee dei discendenti di una persona"
+
+#: AncestryTableReport.py:133
+#, python-format
+msgid "Person %(name)s is not in the Database"
+msgstr "Il nome %(name)s della persona non è nel Database"
+
+#: AncestryTableReport.py:277
+#, fuzzy, python-format
+#| msgid "The style used for names"
+msgid "Ancestry Table Report for %(name)s"
+msgstr "Lo stile usato per i nomi"
+
+#: AncestryTableReport.py:311
+#, fuzzy, python-format
+#| msgid "Ancestor Generations"
+msgid "Generation %(gen_number)d"
+msgstr "Generazioni ascendenti"
+
+#: AncestryTableReport.py:360
+#, fuzzy, python-format
+#| msgid "Number of Ancestors found "
+msgid "Number of Ancestors for %(name)s"
+msgstr "Numero di antenati trovati "
+
+#: AncestryTableReport.py:370
+#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
+#, fuzzy
+#| msgid "First generation"
+msgid "Generation"
+msgstr "Prima generazione"
+
+#: AncestryTableReport.py:472
+msgid "To start a new page after each generation."
+msgstr "Iniziare una pagina nuova dopo ogni generazione."
+
+#: AncestryTableReport.py:475
+#, fuzzy
+#| msgid "Number of Ancestors found "
+msgid "Number of ancestors per generation"
+msgstr "Numero di antenati trovati "
+
+#: AncestryTableReport.py:476
+#, fuzzy
+#| msgid "Whether to display the theoretical number of ancestor by generation"
+msgid "Add a page with tne number of ancestors per generation."
+msgstr "Visualizzare o meno il numero teorico di antenati per generazione"
+
+#: AncestryTableReport.py:495
+#, fuzzy
+#| msgid "Color the name to indicate a person's gender in the chart."
+msgid "Mask the name of the calendar in the dates"
+msgstr "Colora il nome per indicare il genere della persona nel grafico."
+
+#: AncestryTableReport.py:496
+msgid ""
+"By default, except for gregorian dates, Gramps shows the name of the "
+"calendar in the dates."
+msgstr ""
+"Di default Gramps mostra il nome del calendario nelle date ad eccezione "
+"delle date del calendario gregoriano."
+
+#: AncestryTableReport.py:519 RepositoriesReport/RepositoriesReport.py:175
+#: RepositoriesReport/RepositoriesReportAlt.py:504
+#: SourcesCitationsReport/SourcesCitationsReport.py:480
+msgid "The style used for the title of the report."
+msgstr "Lo stile usato per il titolo del resoconto."
+
+#: AncestryTableReport.py:541
+#, fuzzy
+#| msgid "The style used for the title of the report."
+msgid "The style used for the Sosa number of the paternal branch."
+msgstr "Lo stile usato per il titolo del resoconto."
+
+#: AncestryTableReport.py:552
+#, fuzzy
+#| msgid "The style used for the title of the report."
+msgid "The style used for the Sosa number of the maternal branch."
+msgstr "Lo stile usato per il titolo del resoconto."
+
+#: AncestryTableReport.py:562
+#, fuzzy
+#| msgid "The style used for the title of the page."
+msgid "The style used for the data of the males."
+msgstr "Lo stile usato per il titolo della pagina."
+
+#: AncestryTableReport.py:572
+#, fuzzy
+#| msgid "The style used for the title of the page."
+msgid "The style used for the data of the females."
+msgstr "Lo stile usato per il titolo della pagina."
+
+#: AncestryTableReport.py:583
+#, fuzzy
+#| msgid "The style used for names."
+msgid "The style used for the marriage."
+msgstr "Lo stile usato per i nomi."
+
+#: AncestryTableReport.py:593
+msgid ""
+"The style used for an empty row.\n"
+"To enlarge the height of the empty row, just increase the size of the font."
+msgstr ""
+"Lo stile usato per una riga vuota.\n"
+"Per aumentare l'altezza di una riga vuota basta aumentare la grandezza del "
+"carattere."
+
+#: AncestryTableReport.py:632
+msgid ""
+"The style used for the header table of the number of ancestors per "
+"generation."
+msgstr ""
+"Lo stile usato per le intestazioni del numero di antenati per generazione."
+
+#: AncestryTableReport.py:643
+msgid "The style used for the number of ancestors per generation."
+msgstr "Lo stile usato per il numero di antenati per generazione."
+
+#: AncestryTableReport.py:654
+msgid ""
+"The style used for the total line of the number of ancestors per generation."
+msgstr ""
+"Lo stile usato per la linea del totale del numero di antenati per "
+"generazione."
 
 #: AssociationsTool/associationstool.gpr.py:36
 msgid "Check Associations data"
@@ -1002,7 +1139,7 @@ msgstr "Ricerca dei nomi"
 
 #: ChangeGivenNames/ChangeGivenNames.py:204
 msgid "Affected Names"
-msgstr ""
+msgstr "Nomi interessati"
 
 #: ChangeGivenNames/changenames.glade:32
 msgid ""
@@ -1052,6 +1189,8 @@ msgid ""
 "The ChatWithTree addon is not yet initialized. Please reload Gramps or "
 "select a database."
 msgstr ""
+"Il componente aggiuntivo ChatWithTree non è stato ancora inizializzato. "
+"Ricarica Gramps o scegli un database."
 
 #: ChatWithTree/chatwithllm.py:78
 msgid "Tree: '{}'"
@@ -1135,7 +1274,7 @@ msgstr ""
 
 #: CliMerge/CliMerge.gpr.py:19
 msgid "Merge primary objects via the command line."
-msgstr ""
+msgstr "Unisci oggetti primari usando la linea dei comandi."
 
 #: ClipboardGramplet/ClipboardGramplet.gpr.py:10
 #: ClipboardGramplet/ClipboardGramplet.gpr.py:18
@@ -1398,7 +1537,7 @@ msgstr ""
 
 #: D3Charts/DescendantIndentedTree.py:1445
 msgid "Default View"
-msgstr ""
+msgstr "Vista predefinita"
 
 #: D3Charts/DescendantIndentedTree.py:1448
 msgid "Expand All"
@@ -1426,7 +1565,7 @@ msgstr ""
 
 #: D3Charts/DescendantIndentedTree.py:1851
 msgid "Expanded Row Background Color"
-msgstr ""
+msgstr "Colore di sfondo della riga espansa"
 
 #: D3Charts/DescendantIndentedTree.py:1852
 msgid "RGB-color for expanded row background."
@@ -1466,11 +1605,11 @@ msgstr ""
 
 #: D3Charts/DescendantIndentedTree.py:1880
 msgid "How to handle living people."
-msgstr ""
+msgstr "Come trattare persone viventi."
 
 #: D3Charts/DescendantIndentedTree.py:1887
 msgid "Whether or not to include people who may have recently died."
-msgstr ""
+msgstr "Includere o meno persone che possono essere morte di recente."
 
 #: D3Charts/DescendantIndentedTree.py:1895
 msgid "Navigation"
@@ -1478,11 +1617,11 @@ msgstr "Navigazione"
 
 #: D3Charts/DescendantIndentedTree.py:1897
 msgid "Contraction/Expansion mechanism"
-msgstr ""
+msgstr "Meccanismo di Contrazione/Espansione"
 
 #: D3Charts/DescendantIndentedTree.py:1900
 msgid "Entire node."
-msgstr ""
+msgstr "Nodo intero."
 
 #: D3Charts/DescendantIndentedTree.py:1901
 msgid "Arrow images at start of node."
@@ -1495,7 +1634,7 @@ msgstr ""
 #: D3Charts/DescendantIndentedTree.py:1903
 #: D3Charts/DescendantIndentedTree.py:1932
 msgid "Where to click to expand/contract nodes."
-msgstr ""
+msgstr "Dove cliccare per espandere/contrarre nodi."
 
 #: D3Charts/DescendantIndentedTree.py:1907
 msgid "Auto-generate HREF links for nodes"
@@ -1523,31 +1662,31 @@ msgstr ""
 
 #: D3Charts/DescendantIndentedTree.py:1925
 msgid "No file extension."
-msgstr ""
+msgstr "Nessuna estensione del file."
 
 #: D3Charts/DescendantIndentedTree.py:1926
 msgid ".html"
-msgstr ""
+msgstr ".html"
 
 #: D3Charts/DescendantIndentedTree.py:1927
 msgid ".htm"
-msgstr ""
+msgstr ".htm"
 
 #: D3Charts/DescendantIndentedTree.py:1928
 msgid ".shtml"
-msgstr ""
+msgstr ".shtml"
 
 #: D3Charts/DescendantIndentedTree.py:1929
 msgid ".php"
-msgstr ""
+msgstr ".php"
 
 #: D3Charts/DescendantIndentedTree.py:1930
 msgid ".php3"
-msgstr ""
+msgstr ".php3"
 
 #: D3Charts/DescendantIndentedTree.py:1931
 msgid ".cgi"
-msgstr ""
+msgstr ".cgi"
 
 #: D3Charts/DescendantIndentedTree.py:1937
 msgid "URL file name delimeter"
@@ -1555,15 +1694,15 @@ msgstr ""
 
 #: D3Charts/DescendantIndentedTree.py:1939
 msgid "Remove all whitespace."
-msgstr ""
+msgstr "Rimuovi tutti gli spazi vuoti."
 
 #: D3Charts/DescendantIndentedTree.py:1940
 msgid "Replace whitespace with dash(-)."
-msgstr ""
+msgstr "Sostituisci gli spazi vuoti con il trattino (-)."
 
 #: D3Charts/DescendantIndentedTree.py:1941
 msgid "Replace whitespace with underscore(_)"
-msgstr ""
+msgstr "Sostituisci gli spazi vuoti con l'underscore (_)"
 
 #: D3Charts/DescendantIndentedTree.py:1942
 msgid "What to use as file name delimiter replacing whitespace."
@@ -1604,7 +1743,7 @@ msgstr "Generare o non generare collegamenti per i coniugi."
 
 #: D3Charts/DescendantIndentedTree.py:1978
 msgid "Biography Content"
-msgstr ""
+msgstr "Contenuto della biografia"
 
 #: D3Charts/DescendantIndentedTree.py:1980
 msgid "Show biography tooltips"
@@ -1661,7 +1800,7 @@ msgstr ""
 #: UKWebConnectPack/UKWebPack.py:35 USWebConnectPack/USWebPack.py:34
 #: USWebConnectPack/USWebPack.py:46
 msgid "FamilySearch.org"
-msgstr ""
+msgstr "FamilySearch.org"
 
 #: DEWebConnectPack/DEWebPack.py:42
 msgid "Google Archives"
@@ -1674,19 +1813,19 @@ msgstr ""
 #: DEWebConnectPack/DEWebPack.py:44 UKWebConnectPack/UKWebPack.py:39
 #: USWebConnectPack/USWebPack.py:42
 msgid "Open Library"
-msgstr ""
+msgstr "Open Library"
 
 #: DEWebConnectPack/DEWebPack.py:45
 msgid "Surname map (1890-1996)"
-msgstr ""
+msgstr "Mappa dei nomi (1890-1996)"
 
 #: DEWebConnectPack/DEWebPack.py:46
 msgid "GenWiki"
-msgstr ""
+msgstr "GenWiki"
 
 #: DEWebConnectPack/DEWebPack.py:47
 msgid "German digital library"
-msgstr ""
+msgstr "Biblioteca digitale tedesca"
 
 #: DNA/dnasegmentmap.gpr.py:26 DNA/dnasegmentmap.gpr.py:35
 msgid "DNA Segment Map"
@@ -17891,14 +18030,6 @@ msgstr "Il numero di generazioni di antenati da includere nell'albero"
 msgid "Number of %s's ancestors"
 msgstr ""
 
-#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
-#, fuzzy
-#| msgid "First generation"
-msgid "Generation"
-msgstr "Prima generazione"
-
 #: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:55
 msgid "Found"
 msgstr ""
@@ -20436,12 +20567,6 @@ msgstr ""
 msgid "Repositories Report"
 msgstr ""
 
-#: RepositoriesReport/RepositoriesReport.py:175
-#: RepositoriesReport/RepositoriesReportAlt.py:504
-#: SourcesCitationsReport/SourcesCitationsReport.py:480
-msgid "The style used for the title of the report."
-msgstr "Lo stile usato per il titolo del resoconto."
-
 #: RepositoriesReport/RepositoriesReport.py:189
 #: RepositoriesReport/RepositoriesReportAlt.py:518
 msgid "The style used for repository title."
@@ -21628,21 +21753,21 @@ msgstr ""
 msgid "No existing associations, so no reciprocal ones needed"
 msgstr ""
 
-#: TMGimporter/importtmg.gpr.py:49
+#: TMGimporter/importtmg.gpr.py:45
 msgid "TMG Project Backup"
 msgstr ""
 
-#: TMGimporter/importtmg.gpr.py:50 TMGimporter/importtmg.gpr.py:66
-#: TMGimporter/importtmg.gpr.py:81 TMGimporter/importtmg.gpr.py:96
+#: TMGimporter/importtmg.gpr.py:46 TMGimporter/importtmg.gpr.py:67
+#: TMGimporter/importtmg.gpr.py:82 TMGimporter/importtmg.gpr.py:97
 msgid "Import TMG project files"
 msgstr ""
 
-#: TMGimporter/importtmg.gpr.py:65 TMGimporter/importtmg.gpr.py:80
-#: TMGimporter/importtmg.gpr.py:95
+#: TMGimporter/importtmg.gpr.py:66 TMGimporter/importtmg.gpr.py:81
+#: TMGimporter/importtmg.gpr.py:96
 msgid "TMG Unsupported"
 msgstr ""
 
-#: TMGimporter/importtmg.py:89
+#: TMGimporter/importtmg.py:84
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supported\n"
@@ -21660,7 +21785,7 @@ msgid ""
 "%(gramps_wiki_import_pjc_direct_url)s"
 msgstr ""
 
-#: TMGimporter/importtmg.py:110
+#: TMGimporter/importtmg.py:105
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -21670,7 +21795,7 @@ msgid ""
 "%(gramps_wiki_import_pjc_direct_url)s"
 msgstr ""
 
-#: TMGimporter/importtmg.py:131
+#: TMGimporter/importtmg.py:126
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -21701,6 +21826,62 @@ msgstr ""
 
 #: TMGimporter/libtmg.glade:148
 msgid "_Import TMG Data Set"
+msgstr ""
+
+#: TMGimporter/libtmg.py:2324 TMGimporter/libtmg.py:2357
+#: TMGimporter/libtmg.py:2439 TMGimporter/libtmg.py:2466
+msgid "TMG import failed"
+msgstr ""
+
+#: TMGimporter/libtmg.py:2325
+msgid ""
+"The current Family Tree is not empty.\n"
+"\n"
+"Please create a new empty Family Tree before importing a TMG backup file."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2358
+msgid ""
+"The TMG backup file could not be read: PJC version information is missing or "
+"unreadable.\n"
+"\n"
+"Please ensure you are using a backup created by TMG 9.02 or later "
+"(PjcVersion >= 11.0)."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2370
+msgid "TMG version not supported"
+msgstr ""
+
+#: TMGimporter/libtmg.py:2371
+#, python-format
+msgid ""
+"This backup was created with an older version of TMG (PjcVersion %(ver)s, "
+"equivalent to TMG 9.01 or earlier).\n"
+"\n"
+"Please upgrade your TMG project to version 9.05 and create a new backup, "
+"then import again.\n"
+"\n"
+"See: https://gramps-project.org/wiki/index.php/"
+"Addon:TMGimporter#Before_Import_From_TMG_Backup_file"
+msgstr ""
+
+#: TMGimporter/libtmg.py:2440
+msgid ""
+"No datasets were found in this TMG backup file.\n"
+"\n"
+"The backup may be corrupt or empty."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2467
+#, python-format
+msgid ""
+"%(filename)s does not appear to be a valid TMG backup file.\n"
+"\n"
+"The file must be a TMG backup archive (*.SQZ) containing a project "
+"configuration file (.PJC).\n"
+"\n"
+"Ensure the file was created by TMG version 5.x or later."
 msgstr ""
 
 #: Themes/themes.gpr.py:29

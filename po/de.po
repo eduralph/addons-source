@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-03 08:54-0800\n"
-"PO-Revision-Date: 2026-03-15 19:09+0000\n"
+"POT-Creation-Date: 2026-04-11 17:13-0700\n"
+"PO-Revision-Date: 2026-04-13 09:10+0000\n"
 "Last-Translator: Mirko Leonhäuser <mirko@leonhaeuser.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/gramps-project/"
 "addons/de/>\n"
@@ -154,6 +154,119 @@ msgstr ""
 #: PersonEverything/PersonEverything.py:1028 ToDoReport/TodoReport.py:903
 msgid "The style used for the title of the page."
 msgstr "Der für den Titel der Seite verwendete Stil."
+
+#: AncestryTableReport.gpr.py:3
+msgid "Ancestry Table"
+msgstr "Abstammungstabelle"
+
+#: AncestryTableReport.gpr.py:4
+msgid "Produces a table of ancestry about a person"
+msgstr "Erstellt eine Ahnentabelle zu einer Person"
+
+#: AncestryTableReport.py:133
+#, python-format
+msgid "Person %(name)s is not in the Database"
+msgstr "Die Person %(name)s ist nicht in der Datenbank enthalten"
+
+#: AncestryTableReport.py:277
+#, python-format
+msgid "Ancestry Table Report for %(name)s"
+msgstr "Abstammungstabelle für %(name)s"
+
+#: AncestryTableReport.py:311
+#, python-format
+msgid "Generation %(gen_number)d"
+msgstr "Generation %(gen_number)d"
+
+#: AncestryTableReport.py:360
+#, python-format
+msgid "Number of Ancestors for %(name)s"
+msgstr "Anzahl der Vorfahren von %(name)s"
+
+#: AncestryTableReport.py:370
+#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
+msgid "Generation"
+msgstr "Generation"
+
+#: AncestryTableReport.py:472
+msgid "To start a new page after each generation."
+msgstr "Nach jeder Generation eine neue Seite beginnen."
+
+#: AncestryTableReport.py:475
+msgid "Number of ancestors per generation"
+msgstr "Anzahl der Vorfahren pro Generation"
+
+#: AncestryTableReport.py:476
+msgid "Add a page with tne number of ancestors per generation."
+msgstr "Eine Seite mit der Anzahl der Vorfahren pro Generation hinzufügen."
+
+#: AncestryTableReport.py:495
+msgid "Mask the name of the calendar in the dates"
+msgstr "Den Namen des Kalenders in den Datumsangaben ausblenden"
+
+#: AncestryTableReport.py:496
+msgid ""
+"By default, except for gregorian dates, Gramps shows the name of the "
+"calendar in the dates."
+msgstr ""
+"Standardmäßig zeigt Gramps – mit Ausnahme von gregorianischen Datumsangaben "
+"– den Namen des Kalenders in den Datumsangaben an."
+
+#: AncestryTableReport.py:519 RepositoriesReport/RepositoriesReport.py:175
+#: RepositoriesReport/RepositoriesReportAlt.py:504
+#: SourcesCitationsReport/SourcesCitationsReport.py:480
+msgid "The style used for the title of the report."
+msgstr "Der für den Titel des Berichts verwendete Stil."
+
+#: AncestryTableReport.py:541
+msgid "The style used for the Sosa number of the paternal branch."
+msgstr "Der für die Sosa-Nummer des väterlichen Zweigs verwendete Stil."
+
+#: AncestryTableReport.py:552
+msgid "The style used for the Sosa number of the maternal branch."
+msgstr "Der für die Sosa-Nummer des mütterlichen Zweigs verwendete Stil."
+
+#: AncestryTableReport.py:562
+msgid "The style used for the data of the males."
+msgstr "Der für die Daten der Männer verwendete Stil."
+
+#: AncestryTableReport.py:572
+msgid "The style used for the data of the females."
+msgstr "Der für die Daten der Frauen verwendete Stil."
+
+#: AncestryTableReport.py:583
+msgid "The style used for the marriage."
+msgstr "Der für die Hochzeit verwendete Stil."
+
+#: AncestryTableReport.py:593
+msgid ""
+"The style used for an empty row.\n"
+"To enlarge the height of the empty row, just increase the size of the font."
+msgstr ""
+"Das für eine leere Zeile verwendete Format.\n"
+"Um die Höhe der leeren Zeile zu vergrößern, vergröße einfach die "
+"Schriftgröße."
+
+#: AncestryTableReport.py:632
+msgid ""
+"The style used for the header table of the number of ancestors per "
+"generation."
+msgstr ""
+"Der für die Kopfzeile der Tabelle mit der Anzahl der Vorfahren pro "
+"Generation verwendete Stil."
+
+#: AncestryTableReport.py:643
+msgid "The style used for the number of ancestors per generation."
+msgstr "Der für die Anzahl der Vorfahren pro Generation verwendete Stil."
+
+#: AncestryTableReport.py:654
+msgid ""
+"The style used for the total line of the number of ancestors per generation."
+msgstr ""
+"Der für die Gesamtzeile der Anzahl der Vorfahren pro Generation verwendete "
+"Stil."
 
 #: AssociationsTool/associationstool.gpr.py:36
 msgid "Check Associations data"
@@ -4811,7 +4924,7 @@ msgstr ""
 
 #: DynamicWeb/dynamicweb.py:5157 Themes/themes.py:175 Themes/themes.py:225
 msgid "Theme"
-msgstr "Erscheinungsbild"
+msgstr "Thema"
 
 #: DynamicWeb/dynamicweb.py:5190
 msgid "Pages"
@@ -18304,12 +18417,6 @@ msgstr "Zeigt die Anzahl der Vorfahren der aktuellen Person an"
 msgid "Number of %s's ancestors"
 msgstr "Anzahl der Vorfahren von %s"
 
-#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
-msgid "Generation"
-msgstr "Generation"
-
 #: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:55
 msgid "Found"
 msgstr "Gefunden"
@@ -20977,12 +21084,6 @@ msgstr "Erstellt einen schriftlichen Aufbewahrungsortebericht"
 msgid "Repositories Report"
 msgstr "Aufbewahrungsortebericht"
 
-#: RepositoriesReport/RepositoriesReport.py:175
-#: RepositoriesReport/RepositoriesReportAlt.py:504
-#: SourcesCitationsReport/SourcesCitationsReport.py:480
-msgid "The style used for the title of the report."
-msgstr "Der für den Titel des Berichts verwendete Stil."
-
 #: RepositoriesReport/RepositoriesReport.py:189
 #: RepositoriesReport/RepositoriesReportAlt.py:518
 msgid "The style used for repository title."
@@ -22164,21 +22265,21 @@ msgstr ""
 "Keine bestehenden Verbindungen, daher keine gegenseitigen Verbindungen "
 "erforderlich"
 
-#: TMGimporter/importtmg.gpr.py:49
+#: TMGimporter/importtmg.gpr.py:45
 msgid "TMG Project Backup"
 msgstr "TMG- Projektsicherung"
 
-#: TMGimporter/importtmg.gpr.py:50 TMGimporter/importtmg.gpr.py:66
-#: TMGimporter/importtmg.gpr.py:81 TMGimporter/importtmg.gpr.py:96
+#: TMGimporter/importtmg.gpr.py:46 TMGimporter/importtmg.gpr.py:67
+#: TMGimporter/importtmg.gpr.py:82 TMGimporter/importtmg.gpr.py:97
 msgid "Import TMG project files"
 msgstr "TMG-Projektdateien importieren"
 
-#: TMGimporter/importtmg.gpr.py:65 TMGimporter/importtmg.gpr.py:80
-#: TMGimporter/importtmg.gpr.py:95
+#: TMGimporter/importtmg.gpr.py:66 TMGimporter/importtmg.gpr.py:81
+#: TMGimporter/importtmg.gpr.py:96
 msgid "TMG Unsupported"
 msgstr "TMG Nicht unterstützt"
 
-#: TMGimporter/importtmg.py:89
+#: TMGimporter/importtmg.py:84
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supported\n"
@@ -22210,7 +22311,7 @@ msgstr ""
 "Siehe auch:\n"
 "%(gramps_wiki_import_pjc_direct_url)s"
 
-#: TMGimporter/importtmg.py:110
+#: TMGimporter/importtmg.py:105
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -22225,7 +22326,7 @@ msgstr ""
 "höher erstellt wurde. Deine Datei: *.TMG – Versionskontrolldatei für TMG 2.0 "
 "bis TMG 4.0d Siehe: %(gramps_wiki_import_pjc_direct_url)s"
 
-#: TMGimporter/importtmg.py:131
+#: TMGimporter/importtmg.py:126
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -22265,6 +22366,88 @@ msgstr "Datensatzname"
 #: TMGimporter/libtmg.glade:148
 msgid "_Import TMG Data Set"
 msgstr "TMG-Datensatz _importieren"
+
+#: TMGimporter/libtmg.py:2324 TMGimporter/libtmg.py:2357
+#: TMGimporter/libtmg.py:2439 TMGimporter/libtmg.py:2466
+msgid "TMG import failed"
+msgstr "TMG-Import ist fehlgeschlagen"
+
+#: TMGimporter/libtmg.py:2325
+msgid ""
+"The current Family Tree is not empty.\n"
+"\n"
+"Please create a new empty Family Tree before importing a TMG backup file."
+msgstr ""
+"Der aktuelle Stammbaum ist nicht leer.\n"
+"\n"
+"Bitte erstelle einen neuen leeren Stammbaum, bevor du eine TMG-"
+"Sicherungsdatei importierst."
+
+#: TMGimporter/libtmg.py:2358
+msgid ""
+"The TMG backup file could not be read: PJC version information is missing or "
+"unreadable.\n"
+"\n"
+"Please ensure you are using a backup created by TMG 9.02 or later "
+"(PjcVersion >= 11.0)."
+msgstr ""
+"Die TMG-Sicherungsdatei konnte nicht gelesen werden: Die PJC-"
+"Versionsinformationen fehlen oder sind unlesbar.\n"
+"\n"
+"Bitte stelle sicher, dass du eine Sicherung verwendest, die mit TMG 9.02 "
+"oder höher erstellt wurde (PjcVersion >= 11.0)."
+
+#: TMGimporter/libtmg.py:2370
+msgid "TMG version not supported"
+msgstr "TMG-Version wird nicht unterstützt"
+
+#: TMGimporter/libtmg.py:2371
+#, python-format
+msgid ""
+"This backup was created with an older version of TMG (PjcVersion %(ver)s, "
+"equivalent to TMG 9.01 or earlier).\n"
+"\n"
+"Please upgrade your TMG project to version 9.05 and create a new backup, "
+"then import again.\n"
+"\n"
+"See: https://gramps-project.org/wiki/index.php/"
+"Addon:TMGimporter#Before_Import_From_TMG_Backup_file"
+msgstr ""
+"Diese Sicherung wurde mit einer älteren Version von TMG erstellt (PjcVersion "
+"%(ver)s, entspricht TMG 9.01 oder früher).\n"
+"\n"
+"Bitte aktualisiere dein TMG-Projekt auf Version 9.05, erstelle eine neue "
+"Sicherung und importiere sie dann erneut.\n"
+"\n"
+"Siehe: https://gramps-project.org/wiki/index.php/"
+"Addon:TMGimporter#Before_Import_From_TMG_Backup_file"
+
+#: TMGimporter/libtmg.py:2440
+msgid ""
+"No datasets were found in this TMG backup file.\n"
+"\n"
+"The backup may be corrupt or empty."
+msgstr ""
+"In dieser TMG-Sicherungsdatei wurden keine Datensätze gefunden.\n"
+"\n"
+"Die Sicherung ist möglicherweise beschädigt oder leer."
+
+#: TMGimporter/libtmg.py:2467
+#, python-format
+msgid ""
+"%(filename)s does not appear to be a valid TMG backup file.\n"
+"\n"
+"The file must be a TMG backup archive (*.SQZ) containing a project "
+"configuration file (.PJC).\n"
+"\n"
+"Ensure the file was created by TMG version 5.x or later."
+msgstr ""
+"%(filename)s scheint keine gültige TMG-Sicherungsdatei zu sein.\n"
+"\n"
+"Die Datei muss ein TMG-Sicherungsarchiv (*.SQZ) sein, das eine "
+"Projektkonfigurationsdatei (.PJC) enthält.\n"
+"\n"
+"Stelle sicher, dass die Datei mit TMG Version 5.x oder höher erstellt wurde."
 
 #: Themes/themes.gpr.py:29
 msgid "Theme preferences"

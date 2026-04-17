@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gramps50\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-03 08:54-0800\n"
+"POT-Creation-Date: 2026-04-11 17:13-0700\n"
 "PO-Revision-Date: 2025-10-31 18:03+0000\n"
 "Last-Translator: Mikhail Burkasov <mburkasov@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/gramps-project/"
@@ -148,6 +148,139 @@ msgstr "Показывать ли теоретическое количеств�
 #: PersonEverything/PersonEverything.py:1028 ToDoReport/TodoReport.py:903
 msgid "The style used for the title of the page."
 msgstr "Стиль заголовка страницы."
+
+#: AncestryTableReport.gpr.py:3
+#, fuzzy
+#| msgid "Ancestry"
+msgid "Ancestry Table"
+msgstr "Родословная"
+
+#: AncestryTableReport.gpr.py:4
+#, fuzzy
+#| msgid "Produces descendants lines of a person"
+msgid "Produces a table of ancestry about a person"
+msgstr "Создаёт линии потомков для лица"
+
+#: AncestryTableReport.py:133
+#, python-format
+msgid "Person %(name)s is not in the Database"
+msgstr ""
+
+#: AncestryTableReport.py:277
+#, fuzzy, python-format
+#| msgid "The style used for names"
+msgid "Ancestry Table Report for %(name)s"
+msgstr "Стиль для имён"
+
+#: AncestryTableReport.py:311
+#, fuzzy, python-format
+#| msgid "Generations up"
+msgid "Generation %(gen_number)d"
+msgstr "Поколение вверх"
+
+#: AncestryTableReport.py:360
+#, fuzzy, python-format
+#| msgid "Number of Ancestors found "
+msgid "Number of Ancestors for %(name)s"
+msgstr "Количество найденных предков "
+
+#: AncestryTableReport.py:370
+#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
+msgid "Generation"
+msgstr "Поколение"
+
+#: AncestryTableReport.py:472
+msgid "To start a new page after each generation."
+msgstr ""
+
+#: AncestryTableReport.py:475
+#, fuzzy
+#| msgid "Number of ancestors"
+msgid "Number of ancestors per generation"
+msgstr "Количество предков"
+
+#: AncestryTableReport.py:476
+#, fuzzy
+#| msgid "Whether to display the theoretical number of ancestor by generation"
+msgid "Add a page with tne number of ancestors per generation."
+msgstr "Показывать ли теоретическое количество предков по поколениям"
+
+#: AncestryTableReport.py:495
+#, fuzzy
+#| msgid "Color the name to indicate a person's gender in the chart."
+msgid "Mask the name of the calendar in the dates"
+msgstr "Изменить цвет имени для обозначения пола лица в графике."
+
+#: AncestryTableReport.py:496
+msgid ""
+"By default, except for gregorian dates, Gramps shows the name of the "
+"calendar in the dates."
+msgstr ""
+
+#: AncestryTableReport.py:519 RepositoriesReport/RepositoriesReport.py:175
+#: RepositoriesReport/RepositoriesReportAlt.py:504
+#: SourcesCitationsReport/SourcesCitationsReport.py:480
+msgid "The style used for the title of the report."
+msgstr "Стиль, используемый для заголовка отчёта."
+
+#: AncestryTableReport.py:541
+#, fuzzy
+#| msgid "The style used for the subtitle of the report."
+msgid "The style used for the Sosa number of the paternal branch."
+msgstr "Стиль субтитров отчета."
+
+#: AncestryTableReport.py:552
+#, fuzzy
+#| msgid "The style used for the subtitle of the report."
+msgid "The style used for the Sosa number of the maternal branch."
+msgstr "Стиль субтитров отчета."
+
+#: AncestryTableReport.py:562
+#, fuzzy
+#| msgid "The style used for the title of the page."
+msgid "The style used for the data of the males."
+msgstr "Стиль заголовка страницы."
+
+#: AncestryTableReport.py:572
+#, fuzzy
+#| msgid "The style used for the title of the page."
+msgid "The style used for the data of the females."
+msgstr "Стиль заголовка страницы."
+
+#: AncestryTableReport.py:583
+#, fuzzy
+#| msgid "The style used for names."
+msgid "The style used for the marriage."
+msgstr "Стиль для имён."
+
+#: AncestryTableReport.py:593
+msgid ""
+"The style used for an empty row.\n"
+"To enlarge the height of the empty row, just increase the size of the font."
+msgstr ""
+
+#: AncestryTableReport.py:632
+#, fuzzy
+#| msgid "The style used for the header in the Index of Places."
+msgid ""
+"The style used for the header table of the number of ancestors per "
+"generation."
+msgstr "Стиль для заголовка содержания мест."
+
+#: AncestryTableReport.py:643
+#, fuzzy
+#| msgid "The style used for the table of contents header."
+msgid "The style used for the number of ancestors per generation."
+msgstr "Стиль для заголовка содержания."
+
+#: AncestryTableReport.py:654
+#, fuzzy
+#| msgid "The style used for the title of the report."
+msgid ""
+"The style used for the total line of the number of ancestors per generation."
+msgstr "Стиль, используемый для заголовка отчёта."
 
 #: AssociationsTool/associationstool.gpr.py:36
 msgid "Check Associations data"
@@ -18218,12 +18351,6 @@ msgstr "Показывает количество потомков для выб
 msgid "Number of %s's ancestors"
 msgstr "Количество предков для %s"
 
-#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
-msgid "Generation"
-msgstr "Поколение"
-
 #: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:55
 msgid "Found"
 msgstr "Найдено"
@@ -20893,12 +21020,6 @@ msgstr "Предоставляет текстовый отчёт о хранил
 msgid "Repositories Report"
 msgstr "Отчёт о хранилищах"
 
-#: RepositoriesReport/RepositoriesReport.py:175
-#: RepositoriesReport/RepositoriesReportAlt.py:504
-#: SourcesCitationsReport/SourcesCitationsReport.py:480
-msgid "The style used for the title of the report."
-msgstr "Стиль, используемый для заголовка отчёта."
-
 #: RepositoriesReport/RepositoriesReport.py:189
 #: RepositoriesReport/RepositoriesReportAlt.py:518
 msgid "The style used for repository title."
@@ -22280,21 +22401,21 @@ msgstr ""
 msgid "No existing associations, so no reciprocal ones needed"
 msgstr ""
 
-#: TMGimporter/importtmg.gpr.py:49
+#: TMGimporter/importtmg.gpr.py:45
 msgid "TMG Project Backup"
 msgstr "Резервная копия проекта TMG"
 
-#: TMGimporter/importtmg.gpr.py:50 TMGimporter/importtmg.gpr.py:66
-#: TMGimporter/importtmg.gpr.py:81 TMGimporter/importtmg.gpr.py:96
+#: TMGimporter/importtmg.gpr.py:46 TMGimporter/importtmg.gpr.py:67
+#: TMGimporter/importtmg.gpr.py:82 TMGimporter/importtmg.gpr.py:97
 msgid "Import TMG project files"
 msgstr "Импорт файлов проекта TMG"
 
-#: TMGimporter/importtmg.gpr.py:65 TMGimporter/importtmg.gpr.py:80
-#: TMGimporter/importtmg.gpr.py:95
+#: TMGimporter/importtmg.gpr.py:66 TMGimporter/importtmg.gpr.py:81
+#: TMGimporter/importtmg.gpr.py:96
 msgid "TMG Unsupported"
 msgstr "TMG не поддерживается"
 
-#: TMGimporter/importtmg.py:89
+#: TMGimporter/importtmg.py:84
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supported\n"
@@ -22325,7 +22446,7 @@ msgstr ""
 "Дополнительная информация:\n"
 "%(gramps_wiki_import_pjc_direct_url)s"
 
-#: TMGimporter/importtmg.py:110
+#: TMGimporter/importtmg.py:105
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -22340,7 +22461,7 @@ msgstr ""
 "файл контроля версий для TMG 2.0 - TMG 4.0. Дополнительная информация: "
 "%(gramps_wiki_import_pjc_direct_url)s"
 
-#: TMGimporter/importtmg.py:131
+#: TMGimporter/importtmg.py:126
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -22380,6 +22501,66 @@ msgstr "Название набора данных"
 #: TMGimporter/libtmg.glade:148
 msgid "_Import TMG Data Set"
 msgstr "_Импорт данных TMG"
+
+#: TMGimporter/libtmg.py:2324 TMGimporter/libtmg.py:2357
+#: TMGimporter/libtmg.py:2439 TMGimporter/libtmg.py:2466
+#, fuzzy
+#| msgid "Export failed"
+msgid "TMG import failed"
+msgstr "Ошибка при экспорте"
+
+#: TMGimporter/libtmg.py:2325
+msgid ""
+"The current Family Tree is not empty.\n"
+"\n"
+"Please create a new empty Family Tree before importing a TMG backup file."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2358
+msgid ""
+"The TMG backup file could not be read: PJC version information is missing or "
+"unreadable.\n"
+"\n"
+"Please ensure you are using a backup created by TMG 9.02 or later "
+"(PjcVersion >= 11.0)."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2370
+#, fuzzy
+#| msgid "TMG Unsupported"
+msgid "TMG version not supported"
+msgstr "TMG не поддерживается"
+
+#: TMGimporter/libtmg.py:2371
+#, python-format
+msgid ""
+"This backup was created with an older version of TMG (PjcVersion %(ver)s, "
+"equivalent to TMG 9.01 or earlier).\n"
+"\n"
+"Please upgrade your TMG project to version 9.05 and create a new backup, "
+"then import again.\n"
+"\n"
+"See: https://gramps-project.org/wiki/index.php/"
+"Addon:TMGimporter#Before_Import_From_TMG_Backup_file"
+msgstr ""
+
+#: TMGimporter/libtmg.py:2440
+msgid ""
+"No datasets were found in this TMG backup file.\n"
+"\n"
+"The backup may be corrupt or empty."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2467
+#, python-format
+msgid ""
+"%(filename)s does not appear to be a valid TMG backup file.\n"
+"\n"
+"The file must be a TMG backup archive (*.SQZ) containing a project "
+"configuration file (.PJC).\n"
+"\n"
+"Ensure the file was created by TMG version 5.x or later."
+msgstr ""
 
 #: Themes/themes.gpr.py:29
 msgid "Theme preferences"

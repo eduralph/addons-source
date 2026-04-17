@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-03 08:54-0800\n"
-"PO-Revision-Date: 2026-02-08 09:09+0000\n"
+"POT-Creation-Date: 2026-04-11 17:13-0700\n"
+"PO-Revision-Date: 2026-04-07 13:46+0000\n"
 "Last-Translator: Pär Ekholm <github1@m.pekholm.org>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/gramps-project/"
 "addons/sv/>\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.16-dev\n"
+"X-Generator: Weblate 5.17-dev\n"
 
 #: AllNamesQuickview/AllNames.gpr.py:4 AllNamesQuickview/AllNames.py:51
 msgid "All Names of All People"
@@ -147,6 +147,121 @@ msgstr "Huruvida det teoretiska antalet förfäder ska visas per generation"
 #: PersonEverything/PersonEverything.py:1028 ToDoReport/TodoReport.py:903
 msgid "The style used for the title of the page."
 msgstr "Mall för rapporttitel."
+
+#: AncestryTableReport.gpr.py:3
+msgid "Ancestry Table"
+msgstr "Antabell"
+
+#: AncestryTableReport.gpr.py:4
+msgid "Produces a table of ancestry about a person"
+msgstr "Producerar en tabell med anor för en person"
+
+#: AncestryTableReport.py:133
+#, python-format
+msgid "Person %(name)s is not in the Database"
+msgstr "Personen %(name)s finns inte i databasen"
+
+#: AncestryTableReport.py:277
+#, python-format
+msgid "Ancestry Table Report for %(name)s"
+msgstr "Antabells-rapport för %(name)s"
+
+#: AncestryTableReport.py:311
+#, python-format
+msgid "Generation %(gen_number)d"
+msgstr "Generation %(gen_number)d"
+
+#: AncestryTableReport.py:360
+#, python-format
+msgid "Number of Ancestors for %(name)s"
+msgstr "Antal förfäder för %(name)s"
+
+#: AncestryTableReport.py:370
+#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
+#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
+msgid "Generation"
+msgstr "Generation"
+
+#: AncestryTableReport.py:472
+msgid "To start a new page after each generation."
+msgstr "Att börja en ny sida efter varje generation."
+
+#: AncestryTableReport.py:475
+msgid "Number of ancestors per generation"
+msgstr "Antal förfäder per generation"
+
+#: AncestryTableReport.py:476
+msgid "Add a page with tne number of ancestors per generation."
+msgstr "Lägg till en sida med antalet förfäder per generation."
+
+#: AncestryTableReport.py:495
+msgid "Mask the name of the calendar in the dates"
+msgstr "Maskera kalendernamnet i datumen"
+
+#: AncestryTableReport.py:496
+msgid ""
+"By default, except for gregorian dates, Gramps shows the name of the "
+"calendar in the dates."
+msgstr ""
+"Som standard, förutom för gregorianska datum, visar Gramps namnet på "
+"kalendern i datumen."
+
+#: AncestryTableReport.py:519 RepositoriesReport/RepositoriesReport.py:175
+#: RepositoriesReport/RepositoriesReportAlt.py:504
+#: SourcesCitationsReport/SourcesCitationsReport.py:480
+msgid "The style used for the title of the report."
+msgstr "Den mall, som används för rapportens titel."
+
+#: AncestryTableReport.py:541
+msgid "The style used for the Sosa number of the paternal branch."
+msgstr "Den stil som används för sosa-numret för faderns gren."
+
+#: AncestryTableReport.py:552
+msgid "The style used for the Sosa number of the maternal branch."
+msgstr "Den stil som används för Sosa-numret för möderne-grenen."
+
+#: AncestryTableReport.py:562
+msgid "The style used for the data of the males."
+msgstr "Stilen som används för data om män."
+
+#: AncestryTableReport.py:572
+msgid "The style used for the data of the females."
+msgstr "Stilen som används för data om kvinnor."
+
+#: AncestryTableReport.py:583
+msgid "The style used for the marriage."
+msgstr "Stilen som används för äktenskap."
+
+#: AncestryTableReport.py:593
+#, fuzzy
+#| msgid ""
+#| "The style used for an empty row.\n"
+#| "To enlarge the height of the empty row, just increse the size of the "
+#| "police."
+msgid ""
+"The style used for an empty row.\n"
+"To enlarge the height of the empty row, just increase the size of the font."
+msgstr ""
+"Stilen som används för en tom rad.\n"
+"För att öka höjden på den tomma raden, öka helt enkelt teckenstorleken."
+
+#: AncestryTableReport.py:632
+msgid ""
+"The style used for the header table of the number of ancestors per "
+"generation."
+msgstr ""
+"Stilen som används för rubriktabellen över antalet förfäder per generation."
+
+#: AncestryTableReport.py:643
+msgid "The style used for the number of ancestors per generation."
+msgstr "Stilen som används för antalet förfäder per generation."
+
+#: AncestryTableReport.py:654
+msgid ""
+"The style used for the total line of the number of ancestors per generation."
+msgstr ""
+"Stilen som används för den totala linjen av antalet förfäder per generation."
 
 #: AssociationsTool/associationstool.gpr.py:36
 msgid "Check Associations data"
@@ -15372,7 +15487,7 @@ msgstr "Visa bokmärkt först"
 
 #: GraphView/graphview.py:966
 msgid "Show bookmarked persons first in search result list."
-msgstr ""
+msgstr "Visa bokmärkta personer först i sökresultatlistan."
 
 #: GraphView/graphview.py:999
 msgid "Select a dot file name"
@@ -15396,15 +15511,15 @@ msgstr "Gå till bokmärke"
 
 #: GraphView/graphview.py:1130
 msgid "Center view on selected bookmark"
-msgstr ""
+msgstr "Centrera vyn på valt bokmärke"
 
 #: GraphView/graphview.py:1132
 msgid "Bookmarks for current graph"
-msgstr ""
+msgstr "Bokmärken för aktuell graf"
 
 #: GraphView/graphview.py:1133
 msgid "Other Bookmarks"
-msgstr ""
+msgstr "Andra bokmärken"
 
 #: GraphView/graphview.py:1164
 msgid "Ancestor generations"
@@ -15428,13 +15543,15 @@ msgstr "Mellanrum"
 
 #: GraphView/graphview.py:1193
 msgid "All connected"
-msgstr ""
+msgstr "Alla anslutna"
 
 #: GraphView/graphview.py:1195
 msgid ""
 "Show all connected persons limited by generation restrictions.\n"
 "Works slow, so don't set large generation values."
 msgstr ""
+"Visa alla anslutna personer begränsade av generationsbegränsningar\n"
+"Fungerar långsamt, så ange inte stora genereringsvärden."
 
 #: GraphView/graphview.py:1337
 msgid "Add active person"
@@ -17952,12 +18069,6 @@ msgstr "Visar antalet förfäder för aktuell person"
 #, python-format
 msgid "Number of %s's ancestors"
 msgstr "Antal för %ss förfäder"
-
-#: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:54
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:87
-#: NumberOfDescendantsQuickview/NumberOfDescendantsQuickview.py:94
-msgid "Generation"
-msgstr "Generation"
 
 #: NumberOfAncestorsQuickview/NumberOfAncestorsQuickview.py:55
 msgid "Found"
@@ -20546,12 +20657,6 @@ msgstr "Skapar en textbaserad rapport över arkivplatser"
 msgid "Repositories Report"
 msgstr "Arkivplatsrapport"
 
-#: RepositoriesReport/RepositoriesReport.py:175
-#: RepositoriesReport/RepositoriesReportAlt.py:504
-#: SourcesCitationsReport/SourcesCitationsReport.py:480
-msgid "The style used for the title of the report."
-msgstr "Den mall, som används för rapportens titel."
-
 #: RepositoriesReport/RepositoriesReport.py:189
 #: RepositoriesReport/RepositoriesReportAlt.py:518
 msgid "The style used for repository title."
@@ -21721,21 +21826,21 @@ msgstr "Alla ömsesidiga föreningar finns redan, inga skapade"
 msgid "No existing associations, so no reciprocal ones needed"
 msgstr "Inge befintliga föreningar fanns, så inga ömsesidiga behövdes"
 
-#: TMGimporter/importtmg.gpr.py:49
+#: TMGimporter/importtmg.gpr.py:45
 msgid "TMG Project Backup"
 msgstr "Säkerhetskopiera TMG-projekt"
 
-#: TMGimporter/importtmg.gpr.py:50 TMGimporter/importtmg.gpr.py:66
-#: TMGimporter/importtmg.gpr.py:81 TMGimporter/importtmg.gpr.py:96
+#: TMGimporter/importtmg.gpr.py:46 TMGimporter/importtmg.gpr.py:67
+#: TMGimporter/importtmg.gpr.py:82 TMGimporter/importtmg.gpr.py:97
 msgid "Import TMG project files"
 msgstr "Importera TMG-projektfiler"
 
-#: TMGimporter/importtmg.gpr.py:65 TMGimporter/importtmg.gpr.py:80
-#: TMGimporter/importtmg.gpr.py:95
+#: TMGimporter/importtmg.gpr.py:66 TMGimporter/importtmg.gpr.py:81
+#: TMGimporter/importtmg.gpr.py:96
 msgid "TMG Unsupported"
 msgstr "TMG stöds inte"
 
-#: TMGimporter/importtmg.py:89
+#: TMGimporter/importtmg.py:84
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supported\n"
@@ -21766,7 +21871,7 @@ msgstr ""
 "Vänligen hänvisa till:\n"
 "%(gramps_wiki_import_pjc_direct_url)s"
 
-#: TMGimporter/importtmg.py:110
+#: TMGimporter/importtmg.py:105
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -21781,7 +21886,7 @@ msgstr ""
 "versionskontrollfil för TMG 2.0 till TMG 4.0dVänligen hänvisa till:"
 "%(gramps_wiki_import_pjc_direct_url)s"
 
-#: TMGimporter/importtmg.py:131
+#: TMGimporter/importtmg.py:126
 #, python-format
 msgid ""
 "Directly importing from TMG files is not supportedby the TMG Importer "
@@ -21821,6 +21926,62 @@ msgstr "Namn på datauppsättning"
 #: TMGimporter/libtmg.glade:148
 msgid "_Import TMG Data Set"
 msgstr "_Importera TMG datauppsättning"
+
+#: TMGimporter/libtmg.py:2324 TMGimporter/libtmg.py:2357
+#: TMGimporter/libtmg.py:2439 TMGimporter/libtmg.py:2466
+msgid "TMG import failed"
+msgstr "TMG-import misslyckades"
+
+#: TMGimporter/libtmg.py:2325
+msgid ""
+"The current Family Tree is not empty.\n"
+"\n"
+"Please create a new empty Family Tree before importing a TMG backup file."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2358
+msgid ""
+"The TMG backup file could not be read: PJC version information is missing or "
+"unreadable.\n"
+"\n"
+"Please ensure you are using a backup created by TMG 9.02 or later "
+"(PjcVersion >= 11.0)."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2370
+msgid "TMG version not supported"
+msgstr "TMG-version stöds inte"
+
+#: TMGimporter/libtmg.py:2371
+#, python-format
+msgid ""
+"This backup was created with an older version of TMG (PjcVersion %(ver)s, "
+"equivalent to TMG 9.01 or earlier).\n"
+"\n"
+"Please upgrade your TMG project to version 9.05 and create a new backup, "
+"then import again.\n"
+"\n"
+"See: https://gramps-project.org/wiki/index.php/"
+"Addon:TMGimporter#Before_Import_From_TMG_Backup_file"
+msgstr ""
+
+#: TMGimporter/libtmg.py:2440
+msgid ""
+"No datasets were found in this TMG backup file.\n"
+"\n"
+"The backup may be corrupt or empty."
+msgstr ""
+
+#: TMGimporter/libtmg.py:2467
+#, python-format
+msgid ""
+"%(filename)s does not appear to be a valid TMG backup file.\n"
+"\n"
+"The file must be a TMG backup archive (*.SQZ) containing a project "
+"configuration file (.PJC).\n"
+"\n"
+"Ensure the file was created by TMG version 5.x or later."
+msgstr ""
 
 #: Themes/themes.gpr.py:29
 msgid "Theme preferences"
