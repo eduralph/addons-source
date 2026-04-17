@@ -51,6 +51,8 @@ Additionals goals:
 """
 
 from gramps.gen.db import DbTxn
+from gramps.gen.const import GRAMPS_LOCALE as glocale
+_ = glocale.translation.gettext
 
 import itertools
 
@@ -87,7 +89,7 @@ class Null(object):
         return NONE
 
     def __cmp__(self, other):
-        return cmp(None, other)
+        return (None > other) - (None < other)
 
     def __hash__(self):
         return hash(None)
@@ -249,7 +251,7 @@ class Person(Object):
 
     setters = {
         "handle": lambda self, value: self.setit("handle", value),
-        "gramps_id": lambda self: self.setit("gramps_id", value),
+        "gramps_id": lambda self, value: self.setit("gramps_id", value),
         }
 
     def setit(self, attr, value):

@@ -97,8 +97,8 @@ class GtkHandlers:
         print('save')
         Gtk.main_save()
 
-    def on_witness_clicked( widget, data=None):
-        print(event)
+    def on_witness_clicked(widget, data=None):
+        print('witness')
         #from witness import Witness
         #Witness.window.show()
 

@@ -54,7 +54,9 @@ from navigationview import NavigationView
 from personpage import PersonPage
 from eventpage import EventPage
 from gramps.gen.config import config
-from gramps.gen.lib import Family, ChildRef, Person
+from gramps.gen.lib import Family, ChildRef, Person, EventType
+from gramps.gen.utils.db import get_birth_or_fallback, get_death_or_fallback
+from gramps.gen.datehandler import get_date
 from gramps.gui.uimanager import ActionGroup
 from gramps.gui.selectors import SelectorFactory
 from gramps.gen.errors import WindowActiveError

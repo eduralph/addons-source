@@ -49,6 +49,7 @@ from gramps.gen.lib.serialize import to_json, from_json
 from gramps.gen.utils.configmanager import ConfigManager
 from gramps.gen.config import config
 from gramps.gen.const import GRAMPS_LOCALE as glocale
+_ = glocale.translation.gettext
 
 LOG = logging.getLogger(".mongodb")
 _LOG = logging.getLogger(DBLOGNAME)

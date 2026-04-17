@@ -1,0 +1,13 @@
+name: addons-ci
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pygobject
+  - gtk3
+  - pip
+  - pip:
+      - "gramps>=6.0,<6.1"
+      - orjson
+      - pytest
+      - dbf

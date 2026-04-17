@@ -42,6 +42,7 @@ from gramps.gen.display.name import displayer as _nd
 from gramps.gen.plug.report import Report
 from gramps.gen.plug.report import CATEGORY_TEXT
 from gramps.gen.plug.report import MenuReportOptions
+from gramps.gen.errors import ReportError
 import gramps.gen.plug.report.utils as ReportUtils
 
 

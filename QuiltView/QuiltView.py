@@ -56,7 +56,7 @@ from gi.repository import Pango, PangoCairo
 # Gramps Modules
 #
 #-------------------------------------------------------------------------
-from gramps.gen.lib import Person, Family, ChildRef, Name
+from gramps.gen.lib import Person, Family, ChildRef, Name, Surname
 from gramps.gui.views.navigationview import NavigationView
 from gramps.gen.display.name import displayer as name_displayer
 from gramps.gen.errors import WindowActiveError
@@ -1236,9 +1236,9 @@ class QuiltView(NavigationView):
 
             if find_children(self.dbstate.db, child):
                 label = Gtk.Label(label='<b><i>%s</i></b>'
-                                  % escape(displayer.display(child)))
+                                  % escape(name_displayer.display(child)))
             else:
-                label = Gtk.Label(label=escape(displayer.display(child)))
+                label = Gtk.Label(label=escape(name_displayer.display(child)))
 
             child_item = Gtk.MenuItem()
             label.set_use_markup(True)
