@@ -28,7 +28,10 @@ Form editor.
 # Python modules
 # -------------------------------------------------------------------------
 from gi.repository import Gdk
+import logging
 import pickle
+
+LOG = logging.getLogger(".FormGramplet")
 
 # ------------------------------------------------------------------------
 #
@@ -77,6 +80,7 @@ from form import (
     get_section_columns,
     get_form_citation,
 )
+from form_validator import split_family_title
 from entrygrid import EntryGrid
 
 # ------------------------------------------------------------------------
@@ -113,6 +117,12 @@ class EditForm(ManagedWindow):
         self.event = event
         self.citation = citation
         self.callback = callback
+
+        LOG.debug(
+            "Opening EditForm for event %s, citation %s",
+            event.get_handle() or "<new>",
+            citation.get_handle() or "<new>",
+        )
 
         ManagedWindow.__init__(self, uistate, track, citation)
 
@@ -1102,7 +1112,15 @@ class FamilySection(Gtk.Box):
         hbox = Gtk.Box()
 
         title = get_section_title(form_id, section)
-        title1, title2 = title.split("/")
+        title1, title2 = split_family_title(title)
+        if not title2:
+            LOG.warning(
+                "FamilySection for form '%s' section '%s' has title '%s' "
+                "without the expected 'X/Y' separator; second label will be empty",
+                form_id,
+                section,
+                title,
+            )
 
         label = Gtk.Label(label="<b>%s</b>" % title1)
         label.set_use_markup(True)
