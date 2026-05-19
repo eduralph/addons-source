@@ -1,0 +1,634 @@
+name: CI
+
+# Branch-neutral workflow: the image tag, make.py argument, and Gramps
+# series pin are all derived from the branch ref at runtime, so the same
+# file runs unchanged on maintenance/gramps60, maintenance/gramps61, and
+# any future maintenance/grampsNN branch.
+#
+# NOTE for maintainers — first push to a new maintenance branch: the
+# corresponding gramps-ci:<suffix> image does not exist in GHCR yet, so
+# the container jobs in this workflow will fail at "Initialize containers"
+# on the very first run. The companion docker-build.yml workflow fires
+# on the same push and builds/pushes the image (~5 min cold). After it
+# finishes, re-run the failed CI jobs (Actions tab → this run → "Re-run
+# failed jobs") and they will pull the now-existing image. This race
+# happens only on initial branch creation — every subsequent push to
+# that branch finds the image already in GHCR.
+#
+# Full operational runbook (GHCR visibility, PyPI-release transitions,
+# diagnostic log markers, etc.): .github/CI-MAINTAINER.md
+
+on:
+  push:
+    branches: [maintenance/gramps**]
+  pull_request:
+    branches: [maintenance/gramps**]
+
+jobs:
+  # -----------------------------------------------------------------
+  # Setup — derive the branch suffix (gramps60 / gramps61 / …) from
+  # the ref. On push events github.ref_name is the branch being
+  # pushed; on pull_request events github.base_ref is the target
+  # branch. Either way the suffix is what follows "maintenance/".
+  # -----------------------------------------------------------------
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      branch_suffix: ${{ steps.compute.outputs.branch_suffix }}
+      ci_image: ${{ steps.compute.outputs.ci_image }}
+    steps:
+      - id: compute
+        shell: bash
+        run: |
+          ref="${{ github.base_ref || github.ref_name }}"
+          suffix="${ref#maintenance/}"
+          case "$suffix" in
+            gramps[0-9][0-9]) ;;
+            *) echo "::error::unexpected ref '$ref' (suffix '$suffix')"; exit 1 ;;
+          esac
+          echo "branch_suffix=$suffix" >> "$GITHUB_OUTPUT"
+          echo "ci_image=ghcr.io/${{ github.repository }}/gramps-ci:$suffix" >> "$GITHUB_OUTPUT"
+
+  # -----------------------------------------------------------------
+  # Lint (ci container)
+  # -----------------------------------------------------------------
+  lint:
+    name: Lint
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.ci_image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ruff (syntax and import errors only)
+        # Skip addon directories whose every register() in .gpr.py sets
+        # include_in_listing=False — those addons are not built or released
+        # by make.py, so CI does not gate on their lint state (per Gary
+        # Griffin's request on PR #820). To re-enable lint gating for an
+        # addon, set include_in_listing=True on at least one register()
+        # call in its descriptor (or remove the field — Gramps' default
+        # is True). Repeated inline rather than centralised so each job
+        # step stays self-contained.
+        shell: bash
+        run: |
+          is_active() {
+            local addon="$1" g
+            for g in "$addon"/*.gpr.py; do
+              [ -f "$g" ] || continue
+              grep -qE 'include_in_listing[[:space:]]*=[[:space:]]*True' "$g" && return 0
+              grep -qE 'include_in_listing[[:space:]]*=' "$g" || return 0
+            done
+            return 1
+          }
+          excludes=""
+          for d in */; do
+            d="${d%/}"
+            ls "$d"/*.gpr.py >/dev/null 2>&1 || continue
+            is_active "$d" || excludes="$excludes --exclude=$d"
+          done
+          ruff check --select=E9,F63,F7,F82 --no-fix --exclude='*.gpr.py' $excludes .
+
+      - name: Check trailing whitespace in Python files
+        run: |
+          # Use PCRE (-P): in BRE/ERE the bracket expression [ \t] is the
+          # set { space, backslash, 't' } — git grep matches anything ending
+          # in 't', not just whitespace. -P makes \t a tab.
+          if git --no-pager grep --color -n --full-name -P '[ \t]+$' -- '*.py'; then
+            echo "::error::Trailing whitespace found in Python files"
+            exit 1
+          fi
+
+  # -----------------------------------------------------------------
+  # Addon structure (bare runner — just bash, no deps needed)
+  # -----------------------------------------------------------------
+  addon-structure:
+    name: Addon Structure
+    runs-on: ubuntu-latest
+    # Non-blocking until the four addons missing po/template.pot are fixed
+    # in a follow-up PR. Flip this off in that PR.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check all listed addons have po/template.pot
+        # Skip include_in_listing=False addons (see lint job for rationale).
+        shell: bash
+        run: |
+          is_active() {
+            local addon="$1" g
+            for g in "$addon"/*.gpr.py; do
+              [ -f "$g" ] || continue
+              grep -qE 'include_in_listing[[:space:]]*=[[:space:]]*True' "$g" && return 0
+              grep -qE 'include_in_listing[[:space:]]*=' "$g" || return 0
+            done
+            return 1
+          }
+          failed=0
+          for gpr in */*.gpr.py; do
+            addon_dir="$(dirname "$gpr")"
+            is_active "$addon_dir" || continue
+            if [ ! -d "$addon_dir/po" ]; then
+              echo "::error::$addon_dir is missing po/ directory"
+              failed=1
+            elif [ ! -f "$addon_dir/po/template.pot" ]; then
+              echo "::error::$addon_dir is missing po/template.pot"
+              failed=1
+            fi
+          done
+          if [ "$failed" -eq 0 ]; then
+            echo "All listed addons have po/template.pot"
+          fi
+          exit $failed
+
+  # -----------------------------------------------------------------
+  # Compile check (ci container)
+  # -----------------------------------------------------------------
+  compile-check:
+    name: Compile Check
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.ci_image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile all Python files in listed addons (excluding .gpr.py)
+        # Skip include_in_listing=False addons (see lint job for rationale).
+        shell: bash
+        run: |
+          is_active() {
+            local addon="$1" g
+            for g in "$addon"/*.gpr.py; do
+              [ -f "$g" ] || continue
+              grep -qE 'include_in_listing[[:space:]]*=[[:space:]]*True' "$g" && return 0
+              grep -qE 'include_in_listing[[:space:]]*=' "$g" || return 0
+            done
+            return 1
+          }
+          skipped=""
+          for d in */; do
+            d="${d%/}"
+            ls "$d"/*.gpr.py >/dev/null 2>&1 || continue
+            is_active "$d" || skipped="$skipped $d"
+          done
+          failed=0
+          while IFS= read -r f; do
+            skip=0
+            for s in $skipped; do
+              case "$f" in ./$s/*) skip=1; break;; esac
+            done
+            [ "$skip" = 1 ] && continue
+            if ! python3 -m py_compile "$f" 2>&1; then
+              failed=1
+            fi
+          done < <(find . -name '*.py' ! -name '*.gpr.py' ! -path './.git/*' ! -path '*/__pycache__/*')
+          exit $failed
+
+  # -----------------------------------------------------------------
+  # Unit tests — Linux (ci container)
+  # -----------------------------------------------------------------
+  unit-test-linux:
+    name: Unit Tests (Linux)
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.ci_image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install addon runtime deps (derived from requires_mod)
+        # Auto-derive the union of requires_mod across every .gpr.py in
+        # the repo. Mirrors Gramps' Addon Manager install path
+        # (gramps/gui/plug/_windows.py __on_install_clicked → req.install →
+        # gen/utils/requirements.py). Keeps .gpr.py files as the single
+        # source of truth for addon deps — no parallel list to maintain
+        # in the image or workflow. Best-effort: a package needing exotic
+        # system deps (pygraphviz → graphviz-dev, psycopg2 → libpq-dev)
+        # may fail here; the affected addon's tests will skip or fail in
+        # isolation without blocking the rest.
+        shell: bash
+        run: |
+          addon_mods=$(python3 - <<'PY'
+          import ast, glob, re
+          pat = re.compile(r"requires_mod\s*=\s*(\[[^\]]*\])")
+          mods = set()
+          for f in glob.glob("*/*.gpr.py"):
+              try:
+                  text = open(f, encoding="utf-8").read()
+              except OSError:
+                  continue
+              for m in pat.finditer(text):
+                  try:
+                      mods.update(ast.literal_eval(m.group(1)))
+                  except (ValueError, SyntaxError):
+                      pass
+          print(" ".join(sorted(mods)))
+          PY
+          )
+          if [ -n "$addon_mods" ]; then
+            echo "→ addon deps: $addon_mods"
+            for mod in $addon_mods; do
+              pip install "$mod" || echo "× $mod failed to install (continuing)"
+            done
+          else
+            echo "no requires_mod declarations found"
+          fi
+
+      - name: Validate requires_mod names against Gramps' dep gate
+        # Cross-check: every requires_mod entry that pip successfully
+        # installed in the previous step must also resolve via
+        # find_spec(), since that is what Gramps' Addon Manager calls
+        # (gramps/gen/utils/requirements.py:check_mod). A name that
+        # pip-installs but does not import is a declaration bug — e.g.
+        # requires_mod=["Pillow"] when the importable name is "PIL".
+        # Pip-install failures upstream are skipped: those are
+        # system-dep / image gaps, not PR-caused.
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ast, glob, re, subprocess, sys
+          from importlib.util import find_spec
+
+          pat = re.compile(r"requires_mod\s*=\s*(\[[^\]]*\])")
+          names = set()
+          for f in glob.glob("*/*.gpr.py"):
+              try:
+                  text = open(f, encoding="utf-8").read()
+              except OSError:
+                  continue
+              for m in pat.finditer(text):
+                  try:
+                      names.update(ast.literal_eval(m.group(1)))
+                  except (ValueError, SyntaxError):
+                      pass
+
+          bad = []
+          for name in sorted(names):
+              installed = subprocess.run(
+                  [sys.executable, "-m", "pip", "show", name],
+                  capture_output=True,
+              ).returncode == 0
+              if not installed:
+                  print(f"~  {name} (pip-install failed earlier, skipping)")
+                  continue
+              if find_spec(name) is None:
+                  bad.append(name)
+                  print(f"x  {name} (pip-installed but find_spec returned None)")
+              else:
+                  print(f"ok {name}")
+
+          if bad:
+              print()
+              print(f"::error::Wrong requires_mod names: {bad}")
+              print("These pip-install but are not importable. requires_mod is")
+              print("consumed by gramps' check_mod() via find_spec(), so the")
+              print("importable module name is required (e.g. 'PIL', not 'Pillow').")
+              sys.exit(1)
+          PY
+
+      - name: Run per-addon unit tests
+        # Filename convention (all OSes):
+        #   test_*.py              — general (any OS)
+        #   test_linux_*.py        — Linux-only
+        #   test_windows_*.py      — Windows-only
+        #   test_integration_*.py  — Linux-only, full-pipeline/DB-backed
+        # The Linux job runs test_*.py except the Windows-only and
+        # integration buckets. Integration tests run in their own job.
+        #
+        # shell: bash — the container's default shell is /bin/sh
+        # (dash on python:3.12-slim), which does not support the
+        # ${var//pattern/repl} and ${var%.py} parameter expansions
+        # used below.
+        shell: bash
+        env:
+          PYTHONPATH: .
+        run: |
+          is_active() {
+            local addon="$1" g
+            for g in "$addon"/*.gpr.py; do
+              [ -f "$g" ] || continue
+              grep -qE 'include_in_listing[[:space:]]*=[[:space:]]*True' "$g" && return 0
+              grep -qE 'include_in_listing[[:space:]]*=' "$g" || return 0
+            done
+            return 1
+          }
+          modules=""
+          for f in */tests/test_*.py; do
+            [ -f "$f" ] || continue
+            addon="${f%%/*}"
+            is_active "$addon" || continue
+            case "$(basename "$f")" in
+              test_integration*) continue ;;
+              test_windows_*)    continue ;;
+            esac
+            case "$f" in
+              Sqlite/tests/test_sqlite.py) continue ;;
+            esac
+            mod="${f%.py}"
+            mod="${mod//\//.}"
+            modules="$modules $mod"
+          done
+          if [ -n "$modules" ]; then
+            echo "Running unit tests:$modules"
+            python3 -m unittest -v $modules
+          else
+            echo "No per-addon unit test modules found"
+          fi
+
+  # -----------------------------------------------------------------
+  # Unit tests — Windows (conda-forge: bundles PyGObject + GTK + Gramps)
+  # -----------------------------------------------------------------
+  unit-test-windows:
+    name: Unit Tests (Windows)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: addons-ci
+          environment-file: .github/environment.yml
+          use-mamba: true
+
+      - name: Verify environment
+        run: |
+          mamba info
+          mamba list | head -30
+          python -c "import gramps, gi; print('deps OK')"
+
+      - name: Install addon runtime deps (derived from requires_mod)
+        # See unit-test-linux for rationale. Uses `python` (conda-forge
+        # env) to match the surrounding Windows job style.
+        run: |
+          addon_mods=$(python - <<'PY'
+          import ast, glob, re
+          pat = re.compile(r"requires_mod\s*=\s*(\[[^\]]*\])")
+          mods = set()
+          for f in glob.glob("*/*.gpr.py"):
+              try:
+                  text = open(f, encoding="utf-8").read()
+              except OSError:
+                  continue
+              for m in pat.finditer(text):
+                  try:
+                      mods.update(ast.literal_eval(m.group(1)))
+                  except (ValueError, SyntaxError):
+                      pass
+          print(" ".join(sorted(mods)))
+          PY
+          )
+          if [ -n "$addon_mods" ]; then
+            echo "→ addon deps: $addon_mods"
+            for mod in $addon_mods; do
+              pip install "$mod" || echo "× $mod failed to install (continuing)"
+            done
+          else
+            echo "no requires_mod declarations found"
+          fi
+
+      - name: Validate requires_mod names against Gramps' dep gate
+        # See unit-test-linux for rationale. Uses `python` (conda-forge
+        # env) to match the surrounding Windows job style.
+        run: |
+          python - <<'PY'
+          import ast, glob, re, subprocess, sys
+          from importlib.util import find_spec
+
+          pat = re.compile(r"requires_mod\s*=\s*(\[[^\]]*\])")
+          names = set()
+          for f in glob.glob("*/*.gpr.py"):
+              try:
+                  text = open(f, encoding="utf-8").read()
+              except OSError:
+                  continue
+              for m in pat.finditer(text):
+                  try:
+                      names.update(ast.literal_eval(m.group(1)))
+                  except (ValueError, SyntaxError):
+                      pass
+
+          bad = []
+          for name in sorted(names):
+              installed = subprocess.run(
+                  [sys.executable, "-m", "pip", "show", name],
+                  capture_output=True,
+              ).returncode == 0
+              if not installed:
+                  print(f"~  {name} (pip-install failed earlier, skipping)")
+                  continue
+              if find_spec(name) is None:
+                  bad.append(name)
+                  print(f"x  {name} (pip-installed but find_spec returned None)")
+              else:
+                  print(f"ok {name}")
+
+          if bad:
+              print()
+              print(f"::error::Wrong requires_mod names: {bad}")
+              print("These pip-install but are not importable. requires_mod is")
+              print("consumed by gramps' check_mod() via find_spec(), so the")
+              print("importable module name is required (e.g. 'PIL', not 'Pillow').")
+              sys.exit(1)
+          PY
+
+      - name: Run per-addon unit tests
+        # See filename-convention note in unit-test-linux. The Windows
+        # job runs test_*.py except test_linux_* and test_integration_*.
+        env:
+          PYTHONPATH: .
+        run: |
+          is_active() {
+            local addon="$1" g
+            for g in "$addon"/*.gpr.py; do
+              [ -f "$g" ] || continue
+              grep -qE 'include_in_listing[[:space:]]*=[[:space:]]*True' "$g" && return 0
+              grep -qE 'include_in_listing[[:space:]]*=' "$g" || return 0
+            done
+            return 1
+          }
+          modules=""
+          for f in */tests/test_*.py; do
+            [ -f "$f" ] || continue
+            addon="${f%%/*}"
+            is_active "$addon" || continue
+            case "$(basename "$f")" in
+              test_integration*) continue ;;
+              test_linux_*)      continue ;;
+            esac
+            case "$f" in
+              Sqlite/tests/test_sqlite.py) continue ;;
+            esac
+            mod="${f%.py}"
+            mod="${mod//\//.}"
+            modules="$modules $mod"
+          done
+          if [ -n "$modules" ]; then
+            echo "Running unit tests:$modules"
+            python -m unittest -v $modules
+          else
+            echo "No per-addon unit test modules found"
+          fi
+
+  # -----------------------------------------------------------------
+  # Integration tests — Gramps (ci container, xvfb available)
+  # -----------------------------------------------------------------
+  integration-test:
+    name: Integration Tests (Gramps)
+    runs-on: ubuntu-latest
+    needs: [setup, unit-test-linux]
+    container:
+      image: ${{ needs.setup.outputs.ci_image }}
+      options: --init
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install addon runtime deps (derived from requires_mod)
+        # See unit-test-linux for rationale. The plugin registration test
+        # subprocess-loads each addon's module, which imports its
+        # requires_mod packages.
+        shell: bash
+        run: |
+          addon_mods=$(python3 - <<'PY'
+          import ast, glob, re
+          pat = re.compile(r"requires_mod\s*=\s*(\[[^\]]*\])")
+          mods = set()
+          for f in glob.glob("*/*.gpr.py"):
+              try:
+                  text = open(f, encoding="utf-8").read()
+              except OSError:
+                  continue
+              for m in pat.finditer(text):
+                  try:
+                      mods.update(ast.literal_eval(m.group(1)))
+                  except (ValueError, SyntaxError):
+                      pass
+          print(" ".join(sorted(mods)))
+          PY
+          )
+          if [ -n "$addon_mods" ]; then
+            echo "→ addon deps: $addon_mods"
+            for mod in $addon_mods; do
+              pip install "$mod" || echo "× $mod failed to install (continuing)"
+            done
+          else
+            echo "no requires_mod declarations found"
+          fi
+
+      - name: Validate requires_mod names against Gramps' dep gate
+        # See unit-test-linux for rationale.
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ast, glob, re, subprocess, sys
+          from importlib.util import find_spec
+
+          pat = re.compile(r"requires_mod\s*=\s*(\[[^\]]*\])")
+          names = set()
+          for f in glob.glob("*/*.gpr.py"):
+              try:
+                  text = open(f, encoding="utf-8").read()
+              except OSError:
+                  continue
+              for m in pat.finditer(text):
+                  try:
+                      names.update(ast.literal_eval(m.group(1)))
+                  except (ValueError, SyntaxError):
+                      pass
+
+          bad = []
+          for name in sorted(names):
+              installed = subprocess.run(
+                  [sys.executable, "-m", "pip", "show", name],
+                  capture_output=True,
+              ).returncode == 0
+              if not installed:
+                  print(f"~  {name} (pip-install failed earlier, skipping)")
+                  continue
+              if find_spec(name) is None:
+                  bad.append(name)
+                  print(f"x  {name} (pip-installed but find_spec returned None)")
+              else:
+                  print(f"ok {name}")
+
+          if bad:
+              print()
+              print(f"::error::Wrong requires_mod names: {bad}")
+              print("These pip-install but are not importable. requires_mod is")
+              print("consumed by gramps' check_mod() via find_spec(), so the")
+              print("importable module name is required (e.g. 'PIL', not 'Pillow').")
+              sys.exit(1)
+          PY
+
+      - name: Run plugin registration tests
+        # shell: bash for consistency with the surrounding steps; the
+        # current command uses no bashisms, but keeps this block safe
+        # against future edits. Container default is /bin/sh → dash.
+        shell: bash
+        env:
+          PYTHONPATH: .
+        run: python3 -m unittest discover -s tests -p "test_*.py" -t . -v
+
+      - name: Run per-addon integration tests
+        # shell: bash — see unit-test-linux for rationale; the
+        # ${var//pattern/repl} and ${var%.py} expansions below are
+        # bash-only.
+        shell: bash
+        env:
+          PYTHONPATH: .
+        run: |
+          is_active() {
+            local addon="$1" g
+            for g in "$addon"/*.gpr.py; do
+              [ -f "$g" ] || continue
+              grep -qE 'include_in_listing[[:space:]]*=[[:space:]]*True' "$g" && return 0
+              grep -qE 'include_in_listing[[:space:]]*=' "$g" || return 0
+            done
+            return 1
+          }
+          modules=""
+          for f in */tests/test_integration*.py; do
+            [ -f "$f" ] || continue
+            addon="${f%%/*}"
+            is_active "$addon" || continue
+            mod="${f%.py}"
+            mod="${mod//\//.}"
+            modules="$modules $mod"
+          done
+          if [ -n "$modules" ]; then
+            echo "Running per-addon integration tests:$modules"
+            python3 -m unittest -v $modules
+          else
+            echo "No per-addon integration test modules found"
+          fi
+
+  # -----------------------------------------------------------------
+  # Build (ci container)
+  # -----------------------------------------------------------------
+  build:
+    name: Build
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.ci_image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine GRAMPSPATH
+        id: gramps-path
+        run: |
+          GPATH=$(python3 -c "import gramps, os; print(os.path.dirname(os.path.dirname(gramps.__file__)))")
+          echo "path=$GPATH" >> "$GITHUB_OUTPUT"
+
+      - name: Build all addons
+        env:
+          GRAMPSPATH: ${{ steps.gramps-path.outputs.path }}
+        run: |
+          mkdir -p ../download
+          python3 make.py "${{ needs.setup.outputs.branch_suffix }}" build all
