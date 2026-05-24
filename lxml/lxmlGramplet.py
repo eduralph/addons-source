@@ -69,7 +69,7 @@ try:
     GZIP_OK = True
 except ImportError:
     GZIP_OK = False
-    ErrorDialog(_('Where is gzip?'), _('"gzip" is missing'), parent=self.uistate.window)
+    ErrorDialog(_('Where is gzip?'), _('"gzip" is missing'))
     LOG.error('No gzip')
 
 #-------------------------------------------------------------------------
@@ -91,7 +91,7 @@ try:
     LIBXSLT_VERSION = etree.LIBXSLT_VERSION
 except ImportError:
     LXML_OK = False
-    ErrorDialog(_('Missing python3 lxml'), _('Please, try to install "python3 lxml" package.'), parent=self.uistate.window)
+    ErrorDialog(_('Missing python3 lxml'), _('Please, try to install "python3 lxml" package.'))
     LOG.debug('No lxml')
 
 #-------------------------------------------------------------------------
@@ -397,7 +397,7 @@ class lxmlGramplet(Gramplet):
             os.system(f'xmllint')
 
         try:
-            if os.name is 'nt':
+            if os.name == 'nt':
                 os.system(f'xmllint --relaxng {rng} --noout {filename} {options}')
                 LOG.debug('xmllint (relaxng) : %s' % filename)
             else:
@@ -755,7 +755,7 @@ class lxmlGramplet(Gramplet):
 
         dtd = os.path.join(USER_PLUGINS, 'lxml', 'grampsxml.dtd')
         try:
-            if os.name is 'nt':
+            if os.name == 'nt':
                 os.system(f'xmllint --dtdvalid {dtd} {filename} {options}')
             else:
                 os.system(f'xmllint --dtdvalid file://{dtd} {filename} {options}')
