@@ -423,9 +423,11 @@ jobs:
             echo "conda-forge gramps already matches the branch series; no git-install needed"
           else
             echo "::warning::conda gramps $have != branch series $want; installing gramps from maintenance/$suffix"
-            # msgfmt (gettext-tools) comes from environment.yml at env-creation
-            # time; the build hook (build_trans + build_intl) shells out to it.
-            command -v msgfmt >/dev/null || { echo "::error::msgfmt not on PATH (expected from environment.yml gettext-tools)"; exit 1; }
+            # gettext-tools (not the plain "gettext" runtime) is the conda-forge
+            # package that ships the msgfmt executable the build hook shells out
+            # to (build_trans + build_intl).
+            mamba install -y -c conda-forge gettext-tools
+            command -v msgfmt >/dev/null || { echo "::error::msgfmt not on PATH after installing gettext-tools"; exit 1; }
             # </dev/null: build_hook.py prompts via input() if a .po fails to
             # compile; closed stdin turns that into a fast EOFError abort rather
             # than a CI hang.

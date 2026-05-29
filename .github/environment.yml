@@ -6,12 +6,6 @@ dependencies:
   - pygobject
   - gtk3
   - pip
-  # gettext-tools provides the msgfmt executable that gramps' wheel build
-  # hook (build_trans + build_intl) shells out to. Installed at env-creation
-  # time (reliable) rather than via an in-step `mamba install` (which is flaky
-  # in the git-bash/conda shell). Only used when ci.yml git-builds gramps for a
-  # branch series conda-forge doesn't ship yet (e.g. 6.1); harmless otherwise.
-  - gettext-tools
   # Addon runtime deps (dbf, networkx, lxml, svgwrite, boto3, etc.) are
   # installed at CI runtime by ci.yml's auto-derive step from .gpr.py
   # requires_mod — single source of truth. Keep only the stable base
