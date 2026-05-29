@@ -977,55 +977,69 @@ elif command == "listing":
                         print("   ignoring '%s'" % (p["name"]))
         # Write out new listing:
         output = []
+        listings_path = (
+            f"../addons/{gramps_version}/listings/" + ("addons-%s.json" % lang)
+        )
+        if cmd_arg != "all" and not listings and os.path.isfile(listings_path):
+            # Bug 13694: a single-addon `listing <Addon>` whose source yields
+            # no eligible plugin (include_in_listing=False, or no .tgz built
+            # yet) used to overwrite the listings file with [], wiping every
+            # previously listed addon. Leave the file untouched and tell the
+            # user how to remove an existing entry on purpose.
+            print(
+                "   '%s' produced no listing entry; leaving %s untouched. "
+                "Use 'make.py %s unlist %s' to remove an existing entry."
+                % (cmd_arg, os.path.basename(listings_path), gramps_version, cmd_arg)
+            )
+            continue
         if cmd_arg == "all":
             # Replace it!
             for plugin in sorted(listings, key=lambda p: (p["t"], p["i"])):
                 output.append(plugin)
-        elif not os.path.isfile(
-            f"../addons/{gramps_version}/listings/" + ("addons-%s.json" % lang)
-        ):
+        elif not os.path.isfile(listings_path):
             for plugin in sorted(listings, key=lambda p: (p["t"], p["i"])):
                 output.append(plugin)
         else:
-            # just update the lines from these addons:
-            for plugin in sorted(listings, key=lambda p: (p["t"], p["i"])):
-                already_added = []
-                fp_in = open(
-                    f"../addons/{gramps_version}/listings/" + ("addons-%s.json" % lang),
-                    "r",
-                    encoding="utf-8",
-                )
-                added = False
-                for line in json.load(fp_in):
-                    if line["i"] in already_added:
-                        continue
-                    if (
-                        cmd_arg + ".addon.tgz" == line["z"]
-                        and plugin["t"] == line["t"]
-                        and not added
-                    ):
-                        # print("UPDATED")
-                        output.append(plugin)
-                        added = True
-                        already_added.append(line["i"])
-                    elif (
-                        (plugin["t"], plugin["i"]) < (line["t"], line["i"])
-                    ) and not added:
-                        # print("ADDED in middle")
-                        output.append(plugin)
-                        added = True
-                        output.append(line)
-                        already_added.append(line["i"])
-                    else:
-                        output.append(line)
-                        already_added.append(line["i"])
-                if not added:
-                    if plugin["i"] not in already_added:
-                        # print("ADDED at end")
-                        output.append(plugin)
+            # Single-addon update: replace every existing entry that
+            # belongs to cmd_arg with the fresh plugins from `listings`,
+            # then merge the result with the rest of the file. Reading
+            # the existing file ONCE (rather than once per plugin) is
+            # what fixes the multi-gpr corruption flagged on PR 915:
+            # addons like Form ship multiple .gpr.py files / register()
+            # calls in one directory, and the per-plugin restart of the
+            # outer iteration used to append the whole existing file
+            # once per plugin, producing N copies of every other addon.
+            with open(listings_path, "r", encoding="utf-8") as fp_in:
+                existing = json.load(fp_in)
+            cmd_tgz = cmd_arg + ".addon.tgz"
+            new_keys = {(p["t"], p["i"]) for p in listings}
+            # Carry over only entries that do NOT belong to cmd_arg and
+            # whose (t, i) does not collide with one of the fresh
+            # plugins. Dropping all cmd_arg entries also cleans up
+            # stale rows (e.g. a register() removed from a gpr.py since
+            # the last build).
+            kept = [
+                line
+                for line in existing
+                if line.get("z") != cmd_tgz
+                and (line["t"], line["i"]) not in new_keys
+            ]
+            # Merge kept (already sorted by (t, i) - the canonical
+            # listing order) with the fresh plugins (sorted here).
+            new = sorted(listings, key=lambda p: (p["t"], p["i"]))
+            i = j = 0
+            while i < len(kept) and j < len(new):
+                if (kept[i]["t"], kept[i]["i"]) < (new[j]["t"], new[j]["i"]):
+                    output.append(kept[i])
+                    i += 1
+                else:
+                    output.append(new[j])
+                    j += 1
+            output.extend(kept[i:])
+            output.extend(new[j:])
         mkdir(f"../addons/{gramps_version}/listings")
         fp_out = open(
-            f"../addons/{gramps_version}/listings/" + ("addons-%s.json" % lang),
+            listings_path,
             "w",
             encoding="utf-8",
             newline="",

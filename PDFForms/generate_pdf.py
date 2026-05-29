@@ -199,33 +199,82 @@ def _sanitize(text):
 
 
 MIN_COL_W = 20   # pt — minimum usable column width
+MAX_COL_W = 100  # pt — maximum column width (≈ 20 chars at 8 pt Helvetica)
 
 
 def _col_widths(columns, available_w):
-    """Return a list of point widths proportional to each column's <size>."""
+    """
+    Return column widths fitting *available_w*, clamped to [MIN_COL_W, MAX_COL_W].
+    Excess/deficit from clamped columns is redistributed iteratively among the rest.
+    """
     sizes = [c["size"] for c in columns]
     total = sum(sizes)
     if total > 0 and all(s > 0 for s in sizes):
-        return [available_w * s / total for s in sizes]
+        widths = [0.0] * len(sizes)
+        fixed = set()
+        for _ in range(len(sizes)):
+            free = [i for i in range(len(sizes)) if i not in fixed]
+            if not free:
+                break
+            fixed_sum = sum(widths[i] for i in fixed)
+            free_avail = available_w - fixed_sum
+            free_total = sum(sizes[i] for i in free)
+            if free_total <= 0:
+                break
+            did_clamp = False
+            for i in free:
+                w = free_avail * sizes[i] / free_total
+                if w < MIN_COL_W:
+                    widths[i] = MIN_COL_W
+                    fixed.add(i)
+                    did_clamp = True
+                elif w > MAX_COL_W:
+                    widths[i] = MAX_COL_W
+                    fixed.add(i)
+                    did_clamp = True
+                else:
+                    widths[i] = w
+            if not did_clamp:
+                break
+        return widths
     n = len(columns) or 1
     return [available_w / n] * len(columns)
 
 
 def _required_avail_w(columns):
     """
-    Return the minimum available_w so every proportional column >= MIN_COL_W.
-    Used to expand the page rather than squish columns.
+    Return the minimum available_w so every column fits within [MIN_COL_W, MAX_COL_W].
+
+    Each column is allocated ``clamp(size * MAX_COL_W / max_size)`` — proportional
+    to the largest column at MAX_COL_W — with a floor of MIN_COL_W.  Summing these
+    gives the page width where the iterative clamp in _col_widths converges cleanly.
     """
     sizes = [c["size"] for c in columns]
     pos = [s for s in sizes if s > 0]
     if not pos:
         return 0
-    return MIN_COL_W * sum(sizes) / min(pos)
+    max_s = max(pos)
+    return sum(
+        max(MIN_COL_W, min(MAX_COL_W, s * MAX_COL_W / max_s))
+        for s in sizes if s > 0
+    )
+
+
+def _split_camel(text):
+    """Insert spaces at camelCase boundaries: 'WindowRooms' → 'Window Rooms'."""
+    import re
+    return re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
 
 
 def _wrap_text(text, max_width, canv, font, size):
-    """Break *text* into lines that fit within *max_width* points."""
-    words = text.split()
+    """
+    Break *text* into lines that fit within *max_width* points.
+
+    CamelCase tokens are split first so e.g. 'WindowRooms' wraps as
+    two words.  Words wider than *max_width* are kept whole — callers
+    that need overflow clipping should widen their clip rect accordingly.
+    """
+    words = _split_camel(text).split()
     lines, line = [], ""
     for word in words:
         candidate = (line + " " + word).strip()
@@ -293,10 +342,27 @@ def _draw_branding_header(canv, pw, y):
     return y
 
 
+def _fit_col_widths(columns, cws, canv):
+    """
+    Return column widths expanded so each column is at least as wide as its
+    wrapped header text: max(field_width, header_text_width).
+    """
+    result = []
+    for col_info, cw in zip(columns, cws):
+        lines = _wrap_text(col_info["attribute"], cw - 2, canv, "Helvetica-Bold", HEADER_SIZE)
+        display = lines[-HEADER_LINES:]
+        text_w = max(
+            canv.stringWidth(ln, "Helvetica-Bold", HEADER_SIZE) for ln in display
+        )
+        result.append(max(cw, text_w + 4))
+    return result
+
+
 def _draw_column_headers(canv, columns, col_widths, x0, y_top):
     """
     Draw column headers above a data grid, bottom-aligned within each column.
-    Each column is clipped to its own width so text never bleeds into neighbours.
+    Assumes col_widths have already been expanded via _fit_col_widths so no
+    text ever exceeds its column width.
     Returns the y coordinate of the bottom of the header block.
     """
     header_h = HEADER_LINES * (HEADER_SIZE + 1) + 2
@@ -304,7 +370,6 @@ def _draw_column_headers(canv, columns, col_widths, x0, y_top):
         lines = _wrap_text(col_info["attribute"], cw - 2, canv, "Helvetica-Bold", HEADER_SIZE)
         display = lines[-HEADER_LINES:]
 
-        # Clip this column so long words cannot bleed into the next column.
         canv.saveState()
         clip = canv.beginPath()
         clip.rect(x0, y_top - header_h, cw - 1, header_h)
@@ -435,7 +500,9 @@ def generate_form_pdf(form, rows, output_path):
 
     # ── Heading fields (form metadata) ─────────────────────────────────────
     if form["headings"]:
-        heading_w = avail_w / HEADING_PER_ROW
+        # Use the base (non-expanded) page width so heading fields stay
+        # a reasonable size regardless of how wide the data columns require.
+        heading_w = base_avail / HEADING_PER_ROW
         col = 0
         row_top = y
         for i, heading in enumerate(form["headings"]):
@@ -445,8 +512,8 @@ def generate_form_pdf(form, rows, output_path):
             # Label
             c.setFont("Helvetica", LABEL_SIZE)
             c.drawString(hx, row_top - LABEL_SIZE, label)
-            # Field
-            field_w = heading_w - lw - 2
+            # Field — cap at MAX_COL_W so headings stay compact
+            field_w = min(heading_w - lw - 2, MAX_COL_W)
             if field_w >= 20:
                 c.acroForm.textfield(
                     name=f"heading_{i}",
@@ -489,7 +556,7 @@ def generate_form_pdf(form, rows, output_path):
         c.drawString(MARGIN, y - (LABEL_SIZE + 1), title)
         y -= LABEL_SIZE + 1 + 3
 
-        cws = _col_widths(columns, avail_w)
+        cws = _fit_col_widths(columns, _col_widths(columns, avail_w), c)
 
         # ── family: Groom + Bride split ─────────────────────────────────
         if stype == "family":
@@ -500,7 +567,7 @@ def generate_form_pdf(form, rows, output_path):
             side_keys = ["Groom", "Bride"]
 
             for s_label, sx, sk in zip(side_labels, side_x, side_keys):
-                side_cws = _col_widths(columns, half_w)
+                side_cws = _fit_col_widths(columns, _col_widths(columns, half_w), c)
                 # Side sub-title
                 c.setFont("Helvetica-Bold", LABEL_SIZE)
                 c.drawString(sx, y - LABEL_SIZE, s_label or sk)
@@ -510,7 +577,7 @@ def generate_form_pdf(form, rows, output_path):
 
             # One data row per side
             for sx, sk in zip(side_x, side_keys):
-                side_cws = _col_widths(columns, half_w)
+                side_cws = _fit_col_widths(columns, _col_widths(columns, half_w), c)
                 _add_row_fields(c, columns, side_cws, sx, y, f"{role}_{sk}", "1")
             y -= ROW_HEIGHT
 
