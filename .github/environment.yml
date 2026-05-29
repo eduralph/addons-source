@@ -6,10 +6,22 @@ dependencies:
   - pygobject
   - gtk3
   - pip
+  # gettext-tools provides the msgfmt executable gramps' wheel build hook
+  # (build_trans + build_intl) shells out to. Installed with the env (reliable)
+  # rather than via an in-step `mamba install` (flaky in the git-bash/conda
+  # shell). Only used when ci.yml git-builds gramps for a series conda-forge
+  # doesn't ship yet (e.g. 6.1); harmless on branches where conda has gramps.
+  - gettext-tools
   # Addon runtime deps (dbf, networkx, lxml, svgwrite, boto3, etc.) are
   # installed at CI runtime by ci.yml's auto-derive step from .gpr.py
   # requires_mod — single source of truth. Keep only the stable base
   # here (Gramps + orjson for plugin registration).
+  #
+  # The gramps pin only fixes the *base* install. conda-forge has no gramps
+  # 6.1 yet, so on a maintenance/gramps61 (or later) branch this resolves to
+  # 6.0.x — the wrong series. ci.yml's "Match gramps to branch series" step
+  # detects that and git-installs the matching gramps, so the pin range can
+  # stay broad without silently testing addons against the wrong gramps.
   - pip:
       - "gramps>=6.0,<6.1"
       - orjson
