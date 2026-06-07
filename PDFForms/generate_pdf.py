@@ -198,6 +198,11 @@ def _sanitize(text):
     return re.sub(r"[^A-Za-z0-9_]", "_", text).strip("_") or "field"
 
 
+def _split_camel(text):
+    """Insert spaces before uppercase letters in a CamelCase string."""
+    return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", text)
+
+
 MIN_COL_W = 20   # pt — minimum usable column width
 MAX_COL_W = 100  # pt — maximum column width (≈ 20 chars at 8 pt Helvetica)
 
@@ -536,6 +541,12 @@ def generate_form_pdf(form, rows, output_path):
         c.setLineWidth(0.3)
         c.line(MARGIN, y, pw - MARGIN, y)
         y -= 5
+
+    # ── Page-break helper ──────────────────────────────────────────────────
+    def new_page():
+        """Flush the current page and return a fresh y cursor at the top margin."""
+        c.showPage()
+        return ph - MARGIN
 
     # ── Sections ───────────────────────────────────────────────────────────
     for sec_idx, section in enumerate(sections):
