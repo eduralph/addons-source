@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-02 13:20-0700\n"
+"POT-Creation-Date: 2026-07-03 09:18-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1031,7 +1031,8 @@ msgstr ""
 msgid "Type a message..."
 msgstr ""
 
-#: ChatWithTree/ChatWithTree.py:153
+#: ChatWithTree/ChatWithTree.py:153 GrampsAssistant/grampsassistant.py:216
+#: GrampsAssistant/grampsassistant.py:920
 msgid "Send"
 msgstr ""
 
@@ -15258,6 +15259,139 @@ msgid ""
 "in user home directory ''%s''?"
 msgstr ""
 
+#: GrampsAssistant/grampsassistant.gpr.py:26
+#: GrampsAssistant/grampsassistant.py:1417
+msgid "Gramps Assistant"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.gpr.py:27
+msgid "AI assistant for querying your Gramps family tree"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:58
+msgid ""
+"You are a helpful genealogy assistant with access to the user's Gramps "
+"database. Answer questions about people, families, events, and "
+"relationships. When you need information from the database, call the "
+"provided tools — never write code, simulate results, or make up data. If no "
+"tool exists for the requested information, say so plainly."
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:209
+msgid "Gramps Assistant settings"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:213
+msgid "Clear conversation and context"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:388
+#: GrampsAssistant/grampsassistant.py:749
+msgid "Gramps Assistant:"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:390
+msgid ""
+"Ask me anything about the Gramps program or your specific Gramps family "
+"tree. Use the ⚙ button to configure the AI.\n"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:720
+msgid ""
+"\n"
+"No model configured. Please click the Settings button to choose a backend "
+"and model before chatting.\n"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:755
+msgid "Thinking..."
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:824
+#, python-brace-format
+msgid ""
+"API key error: the environment variable {var} is not set or is invalid. Set "
+"it before launching Gramps:\n"
+"  export {var}=your-key-here"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:830
+msgid ""
+"API key error: this provider requires an API key. Open Settings and enter "
+"the environment variable name for your API key (e.g. OPENAI_API_KEY)."
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:973
+msgid "Done.\n"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1203
+msgid "System Prompt:"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1217
+msgid "Simplify tools (recommended for smaller/local models)"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1221
+msgid ""
+"When enabled, only the tools relevant to your question are sent to the "
+"model. This improves performance with smaller local models."
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1230
+msgid "Use Local Model"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1249
+msgid ""
+"URL of a local OpenAI-compatible server. Ollama: http://localhost:11434  LM "
+"Studio: http://localhost:1234  llama.cpp: http://localhost:8080"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1257
+msgid "model name (leave blank for LM Studio / llama.cpp)"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1260
+msgid ""
+"Model to request from the local server. Required for Ollama (e.g. llama3.1). "
+"Leave blank for LM Studio or llama.cpp, which use whatever model is loaded."
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1267
+#: GrampsAssistant/grampsassistant.py:1311
+msgid "Model:"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1273
+msgid "Use Foundational Model"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1315
+msgid "e.g. OPENAI_API_KEY"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1317
+msgid "Name of the environment variable holding your API key."
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1319
+msgid "API key env var:"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1322
+msgid "Backend:"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1334
+msgid "Base URL:"
+msgstr ""
+
+#: GrampsAssistant/grampsassistant.py:1338
+msgid "Model name:"
+msgstr ""
+
 #: GrampsChat/GrampsChat.gpr.py:4 GrampsChat/GrampsChat.gpr.py:9
 msgid "GrampsChat"
 msgstr ""
@@ -17613,6 +17747,216 @@ msgstr ""
 
 #: NLWebConnectPack/NLWebPack.py:38
 msgid "Who (re)searches who?"
+msgstr ""
+
+#: NameSuite/.venv/lib/python3.12/site-packages/mypy/main.py:450
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr ""
+
+#: NameSuite/name_processor.gpr.py:6
+msgid "Audit Given and Patronymic Names"
+msgstr ""
+
+#: NameSuite/name_processor.gpr.py:9
+msgid ""
+"Tools to rename given name, audit and infer patronymic (East Slavic) names."
+msgstr ""
+
+#: NameSuite/name_processor.gpr.py:25 NameSuite/name_processor.gpr.py:37
+msgid "Patronymic Suggestion"
+msgstr ""
+
+#: NameSuite/name_processor.gpr.py:27
+msgid "Suggests (East Slavic) patronymic names in real-time as you navigate."
+msgstr ""
+
+#: NameSuite/name_processor/views/base_tab.py:150
+msgid "Use"
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:32
+#, python-brace-format
+msgid ""
+"Missing Patronymic Detected.\n"
+"Suggested: {0}\n"
+"Based on father: {1}"
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:34
+msgid "Navigate to an individual to check patronymic status."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:35
+msgid "No active person selected."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:37
+msgid ""
+"Patronymic inference can't be inferred for non-binary or unknown genders."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:40
+msgid "Individual already has a recorded patronymic."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:43
+msgid "No attached father found in database family records."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:46
+msgid "Father lacks a recorded first name."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:49
+msgid "Could not generate valid morphology patterns."
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:51
+msgid "Patronymic applied successfully!"
+msgstr ""
+
+#: NameSuite/name_processor/views/gramplet.py:77
+msgid "Apply Suggestion"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool.py:92
+msgid "Infer East Slavic Patronymics"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool.py:112
+msgid "Rename Given Names"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool.py:115
+msgid "Audit Patronymics"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:68
+msgid "Auditing Settings"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:76
+msgid "All Records"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:77
+msgid "Males Only"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:78
+msgid "Females Only"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:82
+msgid "Configure Rules..."
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:87
+msgid "Match Pre-Revolutionary Orthography"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:95
+msgid "Audit Database"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:117
+msgid "Select All Safe Corrections"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:122
+#: NameSuite/name_processor/views/tool_rename_tab.py:116
+msgid "Apply Selected Corrections"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:162
+msgid "Configure Rules"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:186
+#: NameSuite/name_processor/views/tool_rename_tab.py:156
+msgid "Individual"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:190
+#: NameSuite/name_processor/views/tool_rename_tab.py:158
+msgid "Current"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:193
+msgid "Correction"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:200
+msgid "Conf"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:201
+msgid "Ref Year"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:204
+msgid "Explanation"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:243
+msgid "Audit Complete!"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:248
+msgid "No Results"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_audit_tab.py:248
+msgid "No issues found."
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:63
+msgid "Search and Replace Options"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:70
+msgid "Source Name:"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:72
+msgid "e.g. Иоанн"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:75
+msgid "Target Name:"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:77
+msgid "e.g. Иван"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:80
+msgid "Match Mode:"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:82
+msgid "Exact Match"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:83
+msgid "Substring"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:84
+msgid "Regular Expression"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:88
+msgid "Scan for Names"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:93
+msgid "Preserve original name as alternative"
+msgstr ""
+
+#: NameSuite/name_processor/views/tool_rename_tab.py:160
+msgid "Proposed"
 msgstr ""
 
 #: NetworkChart/NetworkChart.gpr.py:24
