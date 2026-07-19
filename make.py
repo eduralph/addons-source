@@ -49,6 +49,26 @@ Examples:
    python3 make.py gramps60 extract-po
        Extracts strings from the aggregated `po/{lang}.po` files into the
        `{lang}-local.po` files for each addon.
+
+   GRAMPSPATH=path python3 make.py gramps60 test
+       Runs the repo-root `tests/` suite (unittest discovery for
+       `test_*.py`). GRAMPSPATH must point at a Gramps checkout so the
+       addon plugins are importable. Exits non-zero on any failure.
+
+       Default mode is a headless developer SMOKE run, not a full gate:
+         - only listed addons (include_in_listing=True) are load/version/
+           dependency checked; unlisted ones are covered only by the
+           listing-manifest test;
+         - failures that are really about the environment — no display, a
+           missing GI/typelib, a native GTK abort — are advisory, not fatal;
+         - tests needing extra tools skip (e.g. i18n extraction without
+           `xgettext`, GUI loads without a display).
+       For a full gate, run under a complete runtime (Xvfb + gettext + all
+       GI typelibs) with GRAMPS_ADDON_TEST_STRICT=1: unmet dependencies,
+       display/GTK failures and unverified addon dependencies then become
+       hard failures. (Slow registry-scan timeouts stay advisory — they are
+       a performance signal, not a correctness one; a genuine import hang is
+       always a hard failure.)
 """
 import shutil
 import glob
@@ -1072,6 +1092,23 @@ elif command == "extract-po":
     ]:
         print(addon)
         extract_po(addon)
+
+elif command == "test":
+    import logging
+
+    # Quiet the "no compiled locale" warning Gramps logs at import: this
+    # command imports Gramps (via check_gramps_path) before the test package's
+    # own suppression runs, and translations are irrelevant to the tests.
+    logging.getLogger(".gramps.gen.utils.grampslocale").setLevel(logging.ERROR)
+    check_gramps_path(command)
+    import unittest
+
+    suite = unittest.TestLoader().discover(
+        "tests", pattern="test_*.py", top_level_dir="."
+    )
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if not result.wasSuccessful():
+        exit(1)
 
 else:
     raise AttributeError("unknown command")
