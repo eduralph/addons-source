@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gramps51\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-03 07:42-0700\n"
-"PO-Revision-Date: 2026-07-03 15:58+0000\n"
+"POT-Creation-Date: 2026-08-04 08:55-0700\n"
+"PO-Revision-Date: 2026-08-03 04:01+0000\n"
 "Last-Translator: Pedro Albuquerque <pmra@protonmail.com>\n"
 "Language-Team: Portuguese (Portugal) <https://hosted.weblate.org/projects/"
 "gramps-project/addons/pt_PT/>\n"
@@ -17,7 +17,34 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.7.1.dev0\n"
+"X-Generator: Weblate 2026.8.dev0\n"
+
+msgid "Birthdays"
+msgstr "Aniversários"
+
+msgid "Ignore birthdays with tag"
+msgstr "Ignorar aniversários com etiqueta"
+
+msgid "Month and day"
+msgstr "Mês e dia"
+
+msgid "Only show birthdays with tag"
+msgstr "Mostrar só aniversários com etiqueta"
+
+msgid "Proximity to current date"
+msgstr "Proximidade à data actual"
+
+msgid "Sort birthdays by"
+msgstr "Ordenar aniversários por"
+
+msgid "Sort dates of death by"
+msgstr "Ordenar óbitos por"
+
+msgid "a gramplet that displays death dates in sorted order"
+msgstr "um gramplet que mostra os óbitos ordenados"
+
+msgid "a gramplet that displays the birthdays of the living people"
+msgstr "um gramplet que mostra os aniversários de indivíduos vivos"
 
 #: AllNamesQuickview/AllNames.gpr.py:4 AllNamesQuickview/AllNames.py:51
 msgid "All Names of All People"
@@ -769,23 +796,6 @@ msgstr "Editar famílias"
 msgid "Looking for children birth order"
 msgstr "A procurar ordem de nascimento dos filhos"
 
-#: BirthdaysGramplet/BirthdaysGramplet.gpr.py:25
-#: BirthdaysGramplet/BirthdaysGramplet.gpr.py:33
-msgid "Birthdays"
-msgstr "Aniversários"
-
-#: BirthdaysGramplet/BirthdaysGramplet.gpr.py:26
-msgid "a gramplet that displays the birthdays of the living people"
-msgstr "um gramplet que mostra os aniversários de indivíduos vivos"
-
-#: BirthdaysGramplet/BirthdaysGramplet.py:45
-msgid "Ignore birthdays with tag"
-msgstr "Ignorar aniversários com etiqueta"
-
-#: BirthdaysGramplet/BirthdaysGramplet.py:46
-msgid "Only show birthdays with tag"
-msgstr "Mostrar só aniversários com etiqueta"
-
 #: CalculateEstimatedDates/CalculateEstimatedDates.gpr.py:10
 #: CalculateEstimatedDates/CalculateEstimatedDates.py:194
 msgid "Calculate Estimated Dates"
@@ -1121,7 +1131,8 @@ msgstr "Chat With Tree"
 msgid "Type a message..."
 msgstr "Escreva uma mensagem..."
 
-#: ChatWithTree/ChatWithTree.py:153
+#: ChatWithTree/ChatWithTree.py:153 GrampsAssistant/grampsassistant.py:216
+#: GrampsAssistant/grampsassistant.py:920
 msgid "Send"
 msgstr "Enviar"
 
@@ -1289,6 +1300,10 @@ msgstr ""
 "Tem de definir um \"indivíduo pré-definido\" para onde ir. Seleccione a "
 "vista Indivíduos, escolha o indivíduo desejado e confirme a escolha no menu "
 "Editar -> Definir indivíduo inicial."
+
+#: CombinedView/personpage.py:306 CombinedView/personpage.py:368
+msgid "Add existing child to family"
+msgstr "Adicionar filho existente à família"
 
 #: CombinedView/personpage.py:597
 #, python-format
@@ -2481,12 +2496,6 @@ msgstr "de"
 #: DenominoViso/DenominoViso.py:1960
 msgid "the chart type runs out of bounds"
 msgstr "o tipo de gráfico sai dos limites"
-
-#: DenominoViso/DenominoViso.py:2002 GraphView/graphview.py:968
-#: NoteCleanup/NoteCleanup.py:126 SearchGramplet/SearchGramplet.gpr.py:9
-#: SearchGramplet/SearchGramplet.gpr.py:19
-msgid "Search"
-msgstr "Procurar"
 
 #: DenominoViso/DenominoViso.py:2553
 msgid "DenominoViso Options"
@@ -5426,6 +5435,29 @@ msgstr "Permitir regex"
 #: EventDescriptionEditor/EventDescriptionEditor.py:152
 msgid "Allow regular expressions."
 msgstr "Permite a utilização de expressões regulares."
+
+#: ExcludeSubtreeFilter/excludesubtree.gpr.py:24
+#: ExcludeSubtreeFilter/excludesubtree.py:106
+msgid "People reachable from <Person>, stopping at <Filter> matches"
+msgstr ""
+"Indivíduoss contactáveis a partir de <indivíduo>, parando em <filtro> "
+"correspondências"
+
+#: ExcludeSubtreeFilter/excludesubtree.gpr.py:26
+#: ExcludeSubtreeFilter/excludesubtree.py:109
+msgid ""
+"Matches people who are reachable starting from <Person> (walking all parents "
+"and children of attached families, recursively) stopping at persons in "
+"<Filter>."
+msgstr ""
+"Compara indivíduos que estão acessíveis a partir de <indivíduo> (percorrendo "
+"recursivamente todos os pais e filhos das famílias associadas), parando nos "
+"indivíduos em <filtro>."
+
+#: ExcludeSubtreeFilter/excludesubtree.py:121
+#: FilterRules/isrelatedwithfiltermatch.py:80
+msgid "Retrieving all sub-filter matches"
+msgstr "A obter todas as correspondências do subfiltro"
 
 #: ExportPersonGexf/exportpersongexf.gpr.py:30
 msgid "Person GEXF"
@@ -15393,6 +15425,284 @@ msgstr "Formulários"
 msgid "Select Form"
 msgstr "Seleccionar formulário"
 
+#: GOQLFilter/goql.gpr.py:31
+#, fuzzy
+#| msgid "Person Relationship Filter"
+msgid "Person GOQL Filter"
+msgstr "Filtro de parentescos do indivíduo"
+
+#: GOQLFilter/goql.gpr.py:32
+msgid "Gramplet providing a gramps-object-query-language person filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:39 GOQLFilter/goql.gpr.py:58
+#: GOQLFilter/goql.gpr.py:77 GOQLFilter/goql.gpr.py:96
+#: GOQLFilter/goql.gpr.py:117 GOQLFilter/goql.gpr.py:136
+#: GOQLFilter/goql.gpr.py:155 GOQLFilter/goql.gpr.py:174
+#: GOQLFilter/goql.gpr.py:193
+#, fuzzy
+#| msgid "Filtering"
+msgid "GOQL Filter"
+msgstr "A filtrar"
+
+#: GOQLFilter/goql.gpr.py:50
+#, fuzzy
+#| msgid "Family Filter name:"
+msgid "Family GOQL Filter"
+msgstr "Nome do filtro de família:"
+
+#: GOQLFilter/goql.gpr.py:51
+msgid "Gramplet providing a gramps-object-query-language family filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:69
+msgid "Event GOQL Filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:70
+msgid "Gramplet providing a gramps-object-query-language event filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:88
+#, fuzzy
+#| msgid "Place _filter:"
+msgid "Place GOQL Filter"
+msgstr "_Filtro de local:"
+
+#: GOQLFilter/goql.gpr.py:89
+msgid "Gramplet providing a gramps-object-query-language place filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:107
+#, fuzzy
+#| msgid "Repository title"
+msgid "Repository GOQL Filter"
+msgstr "Título do repositório"
+
+#: GOQLFilter/goql.gpr.py:109
+msgid "Gramplet providing a gramps-object-query-language repository filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:128
+#, fuzzy
+#| msgid "Source type"
+msgid "Source GOQL Filter"
+msgstr "Tipo de fonte"
+
+#: GOQLFilter/goql.gpr.py:129
+msgid "Gramplet providing a gramps-object-query-language source filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:147
+#, fuzzy
+#| msgid "Relationship Filter"
+msgid "Citation GOQL Filter"
+msgstr "Filtro de parentescos"
+
+#: GOQLFilter/goql.gpr.py:148
+#, fuzzy
+#| msgid "Gramplet providing a person filter on relationships"
+msgid "Gramplet providing a gramps-object-query-language citation filter"
+msgstr "Gramplet que permite filtrar as relações por indivíduo"
+
+#: GOQLFilter/goql.gpr.py:166
+#, fuzzy
+#| msgid "Media Object Title"
+msgid "Media GOQL Filter"
+msgstr "Título do objecto multimédia"
+
+#: GOQLFilter/goql.gpr.py:167
+msgid "Gramplet providing a gramps-object-query-language media filter"
+msgstr ""
+
+#: GOQLFilter/goql.gpr.py:185
+#, fuzzy
+#| msgid "Note Link (internal)"
+msgid "Note GOQL Filter"
+msgstr "Ligação de nota (interna)"
+
+#: GOQLFilter/goql.gpr.py:186
+msgid "Gramplet providing a gramps-object-query-language note filter"
+msgstr ""
+
+#: GOQLFilter/goql.py:186
+msgid "A gramps-object-query-language where-expression, e.g.\n"
+msgstr ""
+
+#: GOQLFilter/goql.py:188
+msgid "Enter inserts a newline; Ctrl+Enter runs Find.\n"
+msgstr ""
+
+#: GOQLFilter/goql.py:189
+msgid "Up/Down at the first/last line recalls previous expressions.\n"
+msgstr ""
+
+#: GOQLFilter/goql.py:190
+msgid "Tab always completes -- it never inserts a tab character."
+msgstr ""
+
+#: GOQLFilter/goql.py:213
+#, fuzzy, python-format
+#| msgid "Use filter "
+msgid "%s filter"
+msgstr "Usar filtro "
+
+#: GOQLFilter/goql.py:233
+msgid "This resets the filter parameters to empty state."
+msgstr ""
+
+#: GOQLFilter/goql.py:239
+msgid "This opens a dialog to save the current expression as a named filter."
+msgstr ""
+
+#: GOQLFilter/goql.py:244
+msgid "Open this gramplet's help page in a browser."
+msgstr ""
+
+#: GOQLFilter/goql.py:402
+msgid "SQL"
+msgstr ""
+
+#: GOQLFilter/goql.py:403
+#, fuzzy
+#| msgid "Python Shell"
+msgid "Python evaluation"
+msgstr "Consola Python"
+
+#: GOQLFilter/goql.py:523
+#, fuzzy, python-format
+#| msgid "Error: login failed"
+msgid "Error applying filter: %s"
+msgstr "Erro: falha ao iniciar sessão"
+
+#: GOQLFilter/goql.py:526
+#, python-format
+msgid "Showing %(shown)d of %(total)d (%(method)s)"
+msgstr ""
+
+#: GOQLFilter/goql.py:541
+#, fuzzy, python-format
+#| msgid "Error creating note"
+msgid "Error resetting filter: %s"
+msgstr "Erro ao criar a nota"
+
+#: GOQLFilter/goql.py:548
+#, fuzzy
+#| msgid "Enter Python expressions"
+msgid "Enter an expression first"
+msgstr "Insira expressões Python"
+
+#: GOQLFilter/goql.py:560
+#, python-brace-format
+msgid "Created by the GOQL Filter gramplet on {today}"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:30 GOQLFilter/whereexprrule.py:261
+msgid "People matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:32
+msgid ""
+"Matches people for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:50 GOQLFilter/whereexprrule.py:266
+#, fuzzy
+#| msgid "Families matching <event filter>"
+msgid "Families matching the <GOQL expression>"
+msgstr "Famílias com <filtro de evento>"
+
+#: GOQLFilter/whereexprrule.gpr.py:52
+msgid ""
+"Matches families for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:70 GOQLFilter/whereexprrule.py:271
+msgid "Events matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:72
+msgid ""
+"Matches events for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:90 GOQLFilter/whereexprrule.py:276
+msgid "Places matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:92
+msgid ""
+"Matches places for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:110 GOQLFilter/whereexprrule.py:281
+msgid "Repositories matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:112
+msgid ""
+"Matches repositories for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:130 GOQLFilter/whereexprrule.py:286
+#, fuzzy
+#| msgid "Source matching parameters"
+msgid "Sources matching the <GOQL expression>"
+msgstr "Parâmetros de comparação de fontes"
+
+#: GOQLFilter/whereexprrule.gpr.py:132
+msgid ""
+"Matches sources for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:150 GOQLFilter/whereexprrule.py:291
+msgid "Citations matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:152
+msgid ""
+"Matches citations for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:170 GOQLFilter/whereexprrule.py:296
+msgid "Media matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:172
+msgid ""
+"Matches media for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:190 GOQLFilter/whereexprrule.py:301
+msgid "Notes matching the <GOQL expression>"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.gpr.py:192
+msgid ""
+"Matches notes for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
+#: GOQLFilter/whereexprrule.py:212
+#, fuzzy
+#| msgid "Regular Expression"
+msgid "GOQL expression"
+msgstr "Expressão regular"
+
+#: GOQLFilter/whereexprrule.py:214
+msgid ""
+"Matches objects for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+
 #: GedcomExtensions/GedcomExtensions.gpr.py:32
 msgid "Export GEDCOM Extensions (GED2)"
 msgstr "Exportar extensões GEDCOM (GED2)"
@@ -15792,6 +16102,164 @@ msgstr ""
 "Sobrescrever ficheiro kmz/kml ''%s''\n"
 "na pasta do utilizador ''%s''?"
 
+#: GrampsAssistant/grampsassistant.gpr.py:26
+#: GrampsAssistant/grampsassistant.py:1417
+msgid "Gramps Assistant"
+msgstr "Assistente Gramps"
+
+#: GrampsAssistant/grampsassistant.gpr.py:27
+msgid "AI assistant for querying your Gramps family tree"
+msgstr "Assistente de IA para consultar a sua árvore genealógica no Gramps"
+
+#: GrampsAssistant/grampsassistant.py:58
+msgid ""
+"You are a helpful genealogy assistant with access to the user's Gramps "
+"database. Answer questions about people, families, events, and "
+"relationships. When you need information from the database, call the "
+"provided tools — never write code, simulate results, or make up data. If no "
+"tool exists for the requested information, say so plainly."
+msgstr ""
+"É um assistente de genealogia prestável, com acesso à base de dados do "
+"Gramps. Responde a perguntas sobre pessoas, famílias, eventos e relações. "
+"Quando precisar de informações da base de dados, recorra às ferramentas "
+"disponibilizadas — nunca escreva código, simule resultados ou invente dados. "
+"Se não existir nenhuma ferramenta para a informação solicitada, di-lo "
+"claramente."
+
+#: GrampsAssistant/grampsassistant.py:209
+msgid "Gramps Assistant settings"
+msgstr "Definições do assistente Gramps"
+
+#: GrampsAssistant/grampsassistant.py:213
+msgid "Clear conversation and context"
+msgstr "Conversa e contexto claros"
+
+#: GrampsAssistant/grampsassistant.py:388
+#: GrampsAssistant/grampsassistant.py:749
+msgid "Gramps Assistant:"
+msgstr "Assistente Gramps:"
+
+#: GrampsAssistant/grampsassistant.py:390
+msgid ""
+"Ask me anything about the Gramps program or your specific Gramps family "
+"tree. Use the ⚙ button to configure the AI.\n"
+msgstr ""
+"Pergunte-me o que quiser sobre o programa Gramps ou sobre a sua árvore "
+"genealógica específica no Gramps. Utilize o botão ⚙ para configurar a IA.\n"
+
+#: GrampsAssistant/grampsassistant.py:720
+msgid ""
+"\n"
+"No model configured. Please click the Settings button to choose a backend "
+"and model before chatting.\n"
+msgstr ""
+"\n"
+"Não há nenhum modelo configurado. Clique no botão «Definições» para escolher "
+"um motor e um modelo antes de iniciar a conversa.\n"
+
+#: GrampsAssistant/grampsassistant.py:755
+msgid "Thinking..."
+msgstr "A pensar..."
+
+#: GrampsAssistant/grampsassistant.py:824
+#, python-brace-format
+msgid ""
+"API key error: the environment variable {var} is not set or is invalid. Set "
+"it before launching Gramps:\n"
+"  export {var}=your-key-here"
+msgstr ""
+"Erro na chave API: a variável de ambiente {var} não está definida ou é "
+"inválida. Defina-a antes de iniciar o Gramps:\n"
+"  export {var}=a-sua-chave-aqui"
+
+#: GrampsAssistant/grampsassistant.py:830
+msgid ""
+"API key error: this provider requires an API key. Open Settings and enter "
+"the environment variable name for your API key (e.g. OPENAI_API_KEY)."
+msgstr ""
+"Erro na chave API: este fornecedor requer uma chave API. Abra as definições "
+"e introduza o nome da variável de ambiente correspondente à sua chave API "
+"(e.g. OPENAI_API_KEY)."
+
+#: GrampsAssistant/grampsassistant.py:973
+msgid "Done.\n"
+msgstr "Feito.\n"
+
+#: GrampsAssistant/grampsassistant.py:1203
+msgid "System Prompt:"
+msgstr "Mensagem do sistema:"
+
+#: GrampsAssistant/grampsassistant.py:1217
+msgid "Simplify tools (recommended for smaller/local models)"
+msgstr "Simplificar ferramentas (recomendado para modelos menores/locais)"
+
+#: GrampsAssistant/grampsassistant.py:1221
+msgid ""
+"When enabled, only the tools relevant to your question are sent to the "
+"model. This improves performance with smaller local models."
+msgstr ""
+"Quando activa, só as ferramentas relevantes para a sua pergunta são enviadas "
+"para o modelo. Melhora o desempenho com modelos locais menores."
+
+#: GrampsAssistant/grampsassistant.py:1230
+msgid "Use Local Model"
+msgstr "Usar modelo local"
+
+#: GrampsAssistant/grampsassistant.py:1249
+msgid ""
+"URL of a local OpenAI-compatible server. Ollama: http://localhost:11434  LM "
+"Studio: http://localhost:1234  llama.cpp: http://localhost:8080"
+msgstr ""
+"URL de um servidor local compatível com a OpenAI. Ollama: http://"
+"localhost:11434  LM Studio: http://localhost:1234  llama.cpp: http://"
+"localhost:8080"
+
+#: GrampsAssistant/grampsassistant.py:1257
+msgid "model name (leave blank for LM Studio / llama.cpp)"
+msgstr "nome do modelo (deixe em branco para LM Studio / llama.cpp)"
+
+#: GrampsAssistant/grampsassistant.py:1260
+msgid ""
+"Model to request from the local server. Required for Ollama (e.g. llama3.1). "
+"Leave blank for LM Studio or llama.cpp, which use whatever model is loaded."
+msgstr ""
+"Modelo a solicitar ao servidor local. Obrigatório para Ollama (e.g., "
+"llama3.1). Deixe em branco para LM Studio ou llama.cpp, que utilizam "
+"qualquer modelo que esteja carregado."
+
+#: GrampsAssistant/grampsassistant.py:1267
+#: GrampsAssistant/grampsassistant.py:1311
+msgid "Model:"
+msgstr "Modelo:"
+
+#: GrampsAssistant/grampsassistant.py:1273
+msgid "Use Foundational Model"
+msgstr "Utilizar o modelo fundamental"
+
+#: GrampsAssistant/grampsassistant.py:1315
+msgid "e.g. OPENAI_API_KEY"
+msgstr "e.g. OPENAI_API_KEY"
+
+#: GrampsAssistant/grampsassistant.py:1317
+msgid "Name of the environment variable holding your API key."
+msgstr "Nome da variável de ambiente que contém a sua chave API."
+
+#: GrampsAssistant/grampsassistant.py:1319
+msgid "API key env var:"
+msgstr "Variável de ambiente da chave API:"
+
+#: GrampsAssistant/grampsassistant.py:1322
+msgid "Backend:"
+msgstr "Motor:"
+
+#: GrampsAssistant/grampsassistant.py:1334
+msgid "Base URL:"
+msgstr "URL base:"
+
+#: GrampsAssistant/grampsassistant.py:1338
+msgid "Model name:"
+msgstr "Nome do modelo:"
+
 #: GrampsChat/GrampsChat.gpr.py:4 GrampsChat/GrampsChat.gpr.py:9
 msgid "GrampsChat"
 msgstr "GrampsChat"
@@ -15800,8 +16268,8 @@ msgstr "GrampsChat"
 msgid "AI Chatbot Gramplet (requires connecting to an LLM service)"
 msgstr "AI Chatbot Gramplet (requer ligação a um serviço LLM)"
 
-#: GrampsWebSync/grampswebsync.gpr.py:29 GrampsWebSync/grampswebsync.py:118
-#: GrampsWebSync/grampswebsync.py:212
+#: GrampsWebSync/grampswebsync.gpr.py:29 GrampsWebSync/grampswebsync.py:213
+#: GrampsWebSync/grampswebsync.py:271
 msgid "Gramps Web Sync"
 msgstr "Sincronização \"web\" do Gramps"
 
@@ -15809,131 +16277,112 @@ msgstr "Sincronização \"web\" do Gramps"
 msgid "Synchronizes a local database with a Gramps Web instance."
 msgstr "Sincroniza uma base de dados local com uma instância do Gramps Web."
 
-#: GrampsWebSync/grampswebsync.py:276
+#: GrampsWebSync/grampswebsync.py:124
+#, python-format
+msgid ""
+"The system keyring could not be used. Snap confinement blocks access until "
+"you run: %s"
+msgstr ""
+"Impossível utilizar o porta-chaves do sistema. O confinamento do Snap "
+"bloqueia o acesso até que execute: %s"
+
+#: GrampsWebSync/grampswebsync.py:128
+msgid ""
+"The system keyring could not be used. You will need to enter your password "
+"each time."
+msgstr ""
+"Impossível utilizar o porta-chaves do sistema. Terá de inserir a sua senha "
+"sempre que necessário."
+
+#: GrampsWebSync/grampswebsync.py:145
+msgid "Authentication failed. Please check your username and password."
+msgstr "Falha ao autenticar. Por favor, verifique os dados de acesso."
+
+#: GrampsWebSync/grampswebsync.py:148
+msgid "Access forbidden. Please check username and password."
+msgstr "Acesso proibido. Por favor, verifique o utilizador e a senha."
+
+#: GrampsWebSync/grampswebsync.py:150
+msgid "GrampsWeb service not found. Please check the URL."
+msgstr "Serviço GrampsWeb não encontrado. Por favor, verifique o URL."
+
+#: GrampsWebSync/grampswebsync.py:152
+msgid "Too many requests, please try again in a few seconds."
+msgstr "Demasiados pedidos, por favor, tente mais tarde."
+
+#: GrampsWebSync/grampswebsync.py:154
+msgid "GrampsWeb tree is disabled."
+msgstr "A árvore GrampsWeb está desactivada."
+
+#: GrampsWebSync/grampswebsync.py:156
+msgid "Connection failed. Please check the URL and your internet connection."
+msgstr ""
+"Falha de ligação. Por favor, verifique o URL e a sua ligação à Internet."
+
+#: GrampsWebSync/grampswebsync.py:159
+msgid "Invalid server response. Please check the URL."
+msgstr "Resposta do servidor inválida. Por favor, verifique o URL."
+
+#: GrampsWebSync/grampswebsync.py:162
 msgid "Your user does not have sufficient server permissions to use sync."
 msgstr ""
 "O utilizador não tem permissões de servidor suficientes para utilizar a "
 "sincronização."
 
-#: GrampsWebSync/grampswebsync.py:282
-msgid "Fetching remote data..."
-msgstr "A obter dados remotos..."
-
-#: GrampsWebSync/grampswebsync.py:298
-msgid "Unexpected error while applying changes."
-msgstr "Erro inesperado ao aplicar as alterações."
-
-#: GrampsWebSync/grampswebsync.py:336
-msgid "Media files are in sync."
-msgstr "Multimédia sincronizada."
-
-#: GrampsWebSync/grampswebsync.py:345
-#, python-format
-msgid "Successfully downloaded %s media files."
-msgstr "Transferiu com êxito %s ficheiros multimédia."
-
-#: GrampsWebSync/grampswebsync.py:348
-#, python-format
-msgid "Encountered %s errors during download."
-msgstr "Encontrados %s erros durante a transferência."
-
-#: GrampsWebSync/grampswebsync.py:354
-#, python-format
-msgid "Successfully uploaded %s media files."
-msgstr "Envio com êxito de %s ficheiros multimédia."
-
-#: GrampsWebSync/grampswebsync.py:357
-#, python-format
-msgid "Encountered %s errors during upload."
-msgstr "%s erros encontrados durante o envio."
-
-#: GrampsWebSync/grampswebsync.py:375
-msgid "Authentication failed. Please check your username and password."
-msgstr "Falha ao autenticar. Por favor, verifique os dados de acesso."
-
-#: GrampsWebSync/grampswebsync.py:379
-msgid "Access forbidden. Please check username and password."
-msgstr "Acesso proibido. Por favor, verifique o utilizador e a senha."
-
-#: GrampsWebSync/grampswebsync.py:383
-msgid "GrampsWeb service not found. Please check the URL."
-msgstr "Serviço GrampsWeb não encontrado. Por favor, verifique o URL."
-
-#: GrampsWebSync/grampswebsync.py:387
-msgid "Too many requests, please try again in a few seconds."
-msgstr "Demasiados pedidos, por favor, tente mais tarde."
-
-#: GrampsWebSync/grampswebsync.py:390
-msgid "GrampsWeb tree is disabled."
-msgstr "A árvore GrampsWeb está desactivada."
-
-#: GrampsWebSync/grampswebsync.py:393
-#, python-format
-msgid "Server error %s. Please check your connection."
-msgstr "Erro de servidor %s. Por favor, verifique a ligação."
-
-#: GrampsWebSync/grampswebsync.py:399
-msgid "Connection failed. Please check the URL and your internet connection."
-msgstr ""
-"Falha de ligação. Por favor, verifique o URL e a sua ligação à Internet."
-
-#: GrampsWebSync/grampswebsync.py:405
-msgid "Invalid server response. Please check the URL."
-msgstr "Resposta do servidor inválida. Por favor, verifique o URL."
-
-#: GrampsWebSync/grampswebsync.py:409
-#, python-format
-msgid "Unexpected error: %s"
-msgstr "Erro inesperado: %s"
-
-#: GrampsWebSync/grampswebsync.py:453 GrampsWebSync/grampswebsync.py:478
-msgid "Error accessing media object."
-msgstr "Erro ao aceder ao objecto multimédia."
-
-#: GrampsWebSync/grampswebsync.py:522
+#: GrampsWebSync/grampswebsync.py:164
 msgid "Failed importing downloaded XML file."
 msgstr "Falha ao importar o ficheiro XML transferido."
 
-#: GrampsWebSync/grampswebsync.py:527
-msgid "Comparing local and remote data..."
-msgstr "A comparar dados locais e remotos..."
-
-#: GrampsWebSync/grampswebsync.py:576
-msgid "Server authorization error."
-msgstr "Erro de autorização do servidor."
-
-#: GrampsWebSync/grampswebsync.py:579
-msgid "Server authorization error: insufficient permissions."
-msgstr "Erro de autorização do servidor: permissões insuficientes."
-
-#: GrampsWebSync/grampswebsync.py:582
-msgid "Error: URL not found."
-msgstr "Erro: URL não encontrado."
-
-#: GrampsWebSync/grampswebsync.py:586
+#: GrampsWebSync/grampswebsync.py:166
 msgid "Unable to synchronize changes to server: objects have been modified."
 msgstr ""
 "Impossível sincronizar alterações com o servidor: os objectos foram "
 "modificados."
 
-#: GrampsWebSync/grampswebsync.py:590
+#: GrampsWebSync/grampswebsync.py:168
+msgid "Unexpected error while applying changes."
+msgstr "Erro inesperado ao aplicar as alterações."
+
+#: GrampsWebSync/grampswebsync.py:170
+msgid ""
+"The family tree was modified while the changes were being reviewed. Nothing "
+"has been applied. Please compare again."
+msgstr ""
+"A árvore genealógica foi alterada enquanto as alterações estavam a ser "
+"revistas. Nenhuma alteração foi aplicada. Por favor, compare novamente."
+
+#: GrampsWebSync/grampswebsync.py:175
 #, python-format
-msgid "Error %s while connecting to server."
-msgstr "Erro %s durante a ligação ao servidor."
+msgid "The server could not apply the changes: %s"
+msgstr "O servidor não conseguiu aplicar as alterações: %s"
 
-#: GrampsWebSync/grampswebsync.py:593
-msgid "URL error while connecting to server."
-msgstr "Erro de URL durante a ligação ao servidor."
+#: GrampsWebSync/grampswebsync.py:177
+#, python-format
+msgid "Server error %s. Please check your connection."
+msgstr "Erro de servidor %s. Por favor, verifique a ligação."
 
-#: GrampsWebSync/grampswebsync.py:597
-msgid "Unable to synchronize changes to server."
-msgstr "Impossível sincronizar alterações com o servidor."
+#: GrampsWebSync/grampswebsync.py:179 GrampsWebSync/grampswebsync.py:180
+#, python-format
+msgid "Unexpected error: %s"
+msgstr "Erro inesperado: %s"
 
-#: GrampsWebSync/grampswebsync.py:626
+#: GrampsWebSync/grampswebsync.py:341
+msgid "Fetching remote data..."
+msgstr "A obter dados remotos..."
+
+#: GrampsWebSync/grampswebsync.py:344
+msgid "Comparing local and remote data..."
+msgstr "A comparar dados locais e remotos..."
+
+#: GrampsWebSync/grampswebsync.py:348
+msgid "Successfully applied changes to local database."
+msgstr "Aplicadas com êxito as alterações à base de dados local."
+
+#: GrampsWebSync/grampswebsync.py:437
 msgid "Continue without transport encryption?"
 msgstr "Continuar sem a encriptação de transporte?"
 
-#: GrampsWebSync/grampswebsync.py:628
+#: GrampsWebSync/grampswebsync.py:439
 msgid ""
 "You have specified a URL with http scheme. If you continue, your password "
 "will be sent in clear text over the network. Use only for local testing!"
@@ -15941,15 +16390,15 @@ msgstr ""
 "Especificou um URL com esquema http. Se continuar, a sua senha será enviada "
 "em texto simples através da rede. Utilize apenas para testes locais!"
 
-#: GrampsWebSync/grampswebsync.py:633
+#: GrampsWebSync/grampswebsync.py:444
 msgid "Continue with HTTP"
 msgstr "Continuar com HTTP"
 
-#: GrampsWebSync/grampswebsync.py:634
+#: GrampsWebSync/grampswebsync.py:445
 msgid "Use HTTPS"
 msgstr "Usar HTTPS"
 
-#: GrampsWebSync/grampswebsync.py:762
+#: GrampsWebSync/grampswebsync.py:495
 msgid ""
 "This tool allows to synchronize the currently opened family tree with a "
 "remote family tree served by Gramps Web.\n"
@@ -15980,83 +16429,175 @@ msgstr ""
 "com a opção de efectuar modificações manuais, utilize a Ferramenta de união "
 "de importação."
 
-#: GrampsWebSync/grampswebsync.py:789
+#: GrampsWebSync/grampswebsync.py:522
 msgid "Server URL: "
 msgstr "URL do servidor: "
 
-#: GrampsWebSync/grampswebsync.py:898
+#: GrampsWebSync/grampswebsync.py:578 HistContext/HistContext.py:289
+#: HistContext/HistContext.py:333 HistContext/HistContext.py:420
+msgid "Error:"
+msgstr "Erro:"
+
+#: GrampsWebSync/grampswebsync.py:646
+msgid "Sync mode"
+msgstr "Modo de sincronização"
+
+#: GrampsWebSync/grampswebsync.py:656
+msgid ""
+"Changes from both sides are combined. Objects edited in both places are "
+"merged."
+msgstr ""
+"As alterações de ambos os lados são combinadas. Os objectos editados em "
+"ambos os locais são unidos."
+
+#: GrampsWebSync/grampswebsync.py:660
+msgid ""
+"The server is made to match this computer. Anything changed only on the "
+"server is discarded."
+msgstr ""
+"O servidor foi feito para corresponder a este computador. Qualquer alteração "
+"feita no servidor é descartada."
+
+#: GrampsWebSync/grampswebsync.py:664
+msgid ""
+"This computer is made to match the server. Anything changed only here is "
+"discarded."
+msgstr ""
+"Este computador foi feito para corresponder ao servidor. Qualquer alteração "
+"feita aqui é ignorada."
+
+#: GrampsWebSync/grampswebsync.py:671
 msgid "Bidirectional Synchronization"
 msgstr "Sincronização bidireccional"
 
-#: GrampsWebSync/grampswebsync.py:907
+#: GrampsWebSync/grampswebsync.py:672
 msgid "Reset remote to local"
 msgstr "Repor a remota com a local"
 
-#: GrampsWebSync/grampswebsync.py:915
+#: GrampsWebSync/grampswebsync.py:673
 msgid "Reset local to remote"
 msgstr "Repor a local com a remota"
 
-#: GrampsWebSync/grampswebsync.py:923
-msgid "Merge"
-msgstr "Unir"
+#: GrampsWebSync/grampswebsync.py:712
+msgid "Warning:"
+msgstr "Aviso:"
 
-#: GrampsWebSync/grampswebsync.py:948
+#: GrampsWebSync/grampswebsync.py:722
 msgid "Local changes"
 msgstr "Alterações locais"
 
-#: GrampsWebSync/grampswebsync.py:953
+#: GrampsWebSync/grampswebsync.py:727
 msgid "Remote changes"
 msgstr "Alterações remotas"
 
-#: GrampsWebSync/grampswebsync.py:958
+#: GrampsWebSync/grampswebsync.py:732
 msgid "Simultaneous changes"
 msgstr "Alterações simultâneas"
 
-#: GrampsWebSync/grampswebsync.py:1015
+#: GrampsWebSync/grampswebsync.py:790
 msgid "Fetching information about media files..."
 msgstr "A obter informação sobre multimédia..."
 
-#: GrampsWebSync/grampswebsync.py:1035
+#: GrampsWebSync/grampswebsync.py:816
 msgid "Both trees are the same."
 msgstr "As árvores são idênticas."
 
-#: GrampsWebSync/grampswebsync.py:1041
+#: GrampsWebSync/grampswebsync.py:822
 msgid "Applying changes to local database ..."
 msgstr "Aplicar alterações à base de dados local."
 
-#: GrampsWebSync/grampswebsync.py:1043
+#: GrampsWebSync/grampswebsync.py:824
 msgid "No changes to apply to local database."
 msgstr "Não aplicar alterações à base de dados local."
 
-#: GrampsWebSync/grampswebsync.py:1047
+#: GrampsWebSync/grampswebsync.py:828
 msgid "Applying changes to remote database ..."
 msgstr "A aplicar alterações à base de dados remota..."
 
-#: GrampsWebSync/grampswebsync.py:1052
+#: GrampsWebSync/grampswebsync.py:833
 msgid "No changes to apply to remote database."
 msgstr "Não há alterações a aplicar à base de dados remota."
 
-#: GrampsWebSync/grampswebsync.py:1060
-msgid "Successfully applied changes to local database."
-msgstr "Aplicadas com êxito as alterações à base de dados local."
-
-#: GrampsWebSync/grampswebsync.py:1089
+#: GrampsWebSync/grampswebsync.py:862
 msgid "Missing locally"
 msgstr "Locais em falta"
 
-#: GrampsWebSync/grampswebsync.py:1092
+#: GrampsWebSync/grampswebsync.py:865
 msgid "Missing remotely"
 msgstr "Remotos em falta"
 
-#: GrampsWebSync/grampswebsync.py:1130
+#: GrampsWebSync/grampswebsync.py:905
 #, python-format
-msgid "Downloading %s media file(s)"
-msgstr "A transferir %s ficheiro(s) multimédia"
+msgid "Downloading %s media file"
+msgid_plural "Downloading %s media files"
+msgstr[0] "A transferir %s ficheiro multimédia"
+msgstr[1] "A transferir %s ficheiros multimédia"
 
-#: GrampsWebSync/grampswebsync.py:1138
+#: GrampsWebSync/grampswebsync.py:920
 #, python-format
-msgid "Uploading %s media file(s)"
-msgstr "A enviar %s ficheiro(s) multimédia"
+msgid "Uploading %s media file"
+msgid_plural "Uploading %s media files"
+msgstr[0] "A enviar %s ficheiro multimédia"
+msgstr[1] "A enviar %s ficheiros multimédia"
+
+#: GrampsWebSync/grampswebsync.py:965
+msgid "Try again"
+msgstr "Tentar novamente"
+
+#: GrampsWebSync/grampswebsync.py:999
+#, python-format
+msgid "Applied %s change."
+msgid_plural "Applied %s changes."
+msgstr[0] "Aplicar %s alteração."
+msgstr[1] "Aplicar %s alterações."
+
+#: GrampsWebSync/grampswebsync.py:1006
+msgid "Media files are in sync."
+msgstr "Multimédia sincronizada."
+
+#: GrampsWebSync/grampswebsync.py:1011
+#, python-format
+msgid "%s media file is missing on both sides and could not be transferred."
+msgid_plural ""
+"%s media files are missing on both sides and could not be transferred."
+msgstr[0] ""
+"O ficheiro multimédia %s não existe em nenhum dos lados e não foi possível "
+"transferi-lo."
+msgstr[1] ""
+"Os ficheiros multimédia %s não existem em nenhum dos lados e não foi "
+"possível transferi-los."
+
+#: GrampsWebSync/grampswebsync.py:1020
+msgid "Both trees are already in sync."
+msgstr "As árvores já estão sincronizadas."
+
+#: GrampsWebSync/grampswebsync.py:1033
+#, python-format
+msgid "Successfully downloaded %s media file."
+msgid_plural "Successfully downloaded %s media files."
+msgstr[0] "Transferiu com êxito %s ficheiro multimédia."
+msgstr[1] "Transferiu com êxito %s ficheiros multimédia."
+
+#: GrampsWebSync/grampswebsync.py:1043
+#, python-format
+msgid "Encountered %s error during download."
+msgid_plural "Encountered %s errors during download."
+msgstr[0] "Encontrado %s erro durante a transferência."
+msgstr[1] "Encontrados %s erros durante a transferência."
+
+#: GrampsWebSync/grampswebsync.py:1056
+#, python-format
+msgid "Successfully uploaded %s media file."
+msgid_plural "Successfully uploaded %s media files."
+msgstr[0] "Envio com êxito de %s ficheiro multimédia."
+msgstr[1] "Envio com êxito de %s ficheiros multimédia."
+
+#: GrampsWebSync/grampswebsync.py:1065
+#, python-format
+msgid "Encountered %s error during upload."
+msgid_plural "Encountered %s errors during upload."
+msgstr[0] "%s erro encontrado durante o envio."
+msgstr[1] "%s erros encontrados durante o envio."
 
 #: GrampyScript/GrampyScript.gpr.py:23 GrampyScript/GrampyScript.gpr.py:32
 msgid "Gram.py Script"
@@ -16851,11 +17392,6 @@ msgstr "Data inválida "
 #: HistContext/HistContext.py:288
 msgid " in line: "
 msgstr " em linha: "
-
-#: HistContext/HistContext.py:289 HistContext/HistContext.py:333
-#: HistContext/HistContext.py:420
-msgid "Error:"
-msgstr "Erro:"
 
 #: HistContext/HistContext.py:327
 msgid ": line does not contain four sections separated by semicolons in : \""
@@ -19259,6 +19795,10 @@ msgstr "Visão geral do indivíduo"
 msgid "Gramplet showing an overview of events for a person"
 msgstr "Gramplet que mostra uma visão geral dos eventos de um dado indivíduo"
 
+#: Overview/Overview.gpr.py:37 Overview/Overview.gpr.py:53
+msgid "Overview"
+msgstr "Visão geral"
+
 #: Overview/Overview.gpr.py:45
 msgid "Family Overview"
 msgstr "Visão geral da família"
@@ -19663,6 +20203,51 @@ msgstr "Cor e prioridade da etiqueta"
 #: PersonEverything/PersonEverything.py:961
 msgid "No source information found"
 msgstr "Sem informações de fontes"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.gpr.py:25
+msgid "Person Relationship Filter"
+msgstr "Filtro de parentescos do indivíduo"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.gpr.py:26
+msgid "Gramplet providing a person filter on relationships"
+msgstr "Gramplet que permite filtrar as relações por indivíduo"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.gpr.py:33
+msgid "Relationship Filter"
+msgstr "Filtro de parentescos"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:82
+msgid "Children of name match"
+msgstr "Filhos com o mesmo nome"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:84
+msgid "Matches children of anybody with a given name"
+msgstr "Corresponde aos filhos de qualquer pessoa com um determinado nome"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:251
+msgid "Sibling 1"
+msgstr "Irmão 1"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:252
+msgid "Sibling 2"
+msgstr "Irmão 2"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:253
+msgid "Child 1"
+msgstr "Filho 1"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:254
+msgid "Child 2"
+msgstr "Filho 2"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:282
+msgid "Probably Alive"
+msgstr "Provavelmente vivo"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:284
+#, python-format
+msgid "example: '%(msg1)s' or '%(msg2)s'"
+msgstr "exemplo: \"%(msg1)s\" ou \"%(msg2)s\""
 
 #: PhotoTaggingGramplet/PhotoTaggingGramplet.gpr.py:29
 #: PhotoTaggingGramplet/PhotoTaggingGramplet.gpr.py:38
@@ -21248,9 +21833,9 @@ msgstr "Tem o Gramps %s. Parabéns, tem a versão mais actual.\n"
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:608
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:661
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:729
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:913
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1133
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1354
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:923
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1143
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1364
 msgid " (Requires version "
 msgstr " (Requer a versão "
 
@@ -21273,9 +21858,9 @@ msgstr " ou superior instalada.)\n"
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:670
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:691
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:738
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:905
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1123
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1346
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:915
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1133
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1356
 msgid " (Passed: version "
 msgstr " (Aprovado: versão "
 
@@ -21284,10 +21869,10 @@ msgstr " (Aprovado: versão "
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:648
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:649
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:716
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:894
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:966
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:967
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1295
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:904
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:976
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:977
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1305
 msgid "unknown version"
 msgstr "versão desconhecida"
 
@@ -21307,23 +21892,34 @@ msgstr " ou superior.)\n"
 msgid " (Requires "
 msgstr " (Requer "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:796
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:789
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:806
 msgid " • Berkeley Database library (bsddb3: "
 msgstr " • Biblioteca Berkeley Database (bsddb3: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:827
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:791
+msgid ""
+")\n"
+"\tRequires  BerkeleyDB or Python-bsddb3 Python adapter and the Berkeley "
+"database"
+msgstr ""
+")\n"
+"\tRequer adaptador Python BerkeleyDB ou Python-bsddb3 e a base de dados "
+"Berkeley"
+
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:837
 msgid " • SQLite Database library (sqlite3: "
 msgstr " • Biblioteca SQLite Database (sqlite3: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:844
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:854
 msgid " • xdg-utils (Manual check see instructions link)"
 msgstr " • xdg-utils (verificação manual, veja a ligação às instruções)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:857
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:867
 msgid " • librsvg2 (Manual check see instructions link)"
 msgstr " • librsvg2 (verificação manual, veja a ligação às instruções)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:869
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:879
 msgid ""
 " • language-pack-gnome-xx (Manual check see instructions link) for your "
 "Language <show locale here TBD>"
@@ -21331,49 +21927,49 @@ msgstr ""
 " • language-pack-gnome-xx (verificação manual, veja a ligação às instruções) "
 "para o seu idioma <mostrar aqui TBD>"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:907
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1348
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1356
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1798
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1807
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2021
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:917
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1358
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1366
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1808
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1817
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2031
 msgid " or greater installed.)"
 msgstr " ou superior instalada.)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:915
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:925
 msgid " or greater)"
 msgstr " ou superior)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:948
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:958
 msgid "Graphviz not in system PATH"
 msgstr "O Graphviz não está no PATH do sistema"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1014
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1024
 msgid "Ghostscript not in system PATH"
 msgstr "O Ghostscript não está no PATH do sistema"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1032
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1042
 msgid " (Passed: version 0.5.x is installed.)"
 msgstr " (Aprovado: a versão 0.5.x está instalada.)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1035
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1045
 msgid " (Requires version 0.5.x)"
 msgstr " (Requer versão 0.5.x)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1037
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1047
 msgid " • python-fontconfig not found, (Requires version 0.5.x)"
 msgstr " • python-fontconfig em falta, requer versão 0.5.x)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1039
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1049
 msgid " • python-fontconfig installed, version unavailable"
 msgstr " • python-fontconfig instalado, versão indisponível"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1125
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1135
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1145
 msgid " or greater installed.) (enchant module: "
 msgstr " ou superior instalado.) (módulo enchant: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1194
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1204
 #, python-format
 msgid ""
 " • rcs %s TBD (Passed: version %s or greater installed. If not on Microsoft "
@@ -21382,7 +21978,7 @@ msgstr ""
 " • rcs %s TBD (passou: versão %s ou superior instalada. Se não for Microsoft "
 "Windows)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1199
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1209
 #, python-format
 msgid ""
 " • rcs %s TBD (Requires version %s or greater installed. If not on Microsoft "
@@ -21391,21 +21987,21 @@ msgstr ""
 " • rcs %s TBD (requer a versão %s ou superior instalada. Se não for "
 "Microsoft Windows)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1316
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1326
 msgid "exiv2 executable not installed, can't retrieve libexiv2 version."
 msgstr ""
 "o executável exiv2 não está instalado, impossível obter a versão libexiv2."
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1317
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1327
 #, python-format
 msgid "GExiv2 : %s (Exiv2 library : %s)"
 msgstr "GExiv2 : %s (biblioteca Exiv2 : %s)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1394
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1404
 msgid "found another font"
 msgstr "encontrou outra fonte"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1403
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1413
 msgid ""
 "For addon Networkchart, font <a href=\"https://www.fontsquirrel.com/fonts/"
 "white-rabbit\">White Rabbit</a> provides an extremely readable result.\n"
@@ -21414,81 +22010,81 @@ msgstr ""
 "fonts/white-rabbit\">White Rabbit</a> fornece um resultado extremamente "
 "legível.\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1447
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1505
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1516
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1527
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1457
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1515
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1526
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1537
 msgid "not installed"
 msgstr "não instalado"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1535
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1545
 msgid "     and one of either: (pydotplus: "
 msgstr "     e um de: (pydotplus: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1537
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1547
 msgid ") or (pygraphviz: "
 msgstr ") ou (pygraphviz: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1566
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1576
 msgid "Installed(MS-Windows)"
 msgstr "Instalado (MS-Windows)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1570
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1580
 msgid "Installed(Linux/Mac)"
 msgstr "Instalado (Linux / Mac)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1607
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1617
 msgid "not installed "
 msgstr "não instalado "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1664
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1860
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1862
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1863
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1952
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1959
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1674
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1870
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1872
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1873
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1962
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1969
 msgid "not found."
 msgstr "não encontrado."
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1690
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1700
 msgid "Standard. Passed: program installed - 32bit on 64bit Win OS."
 msgstr "Padrão. Aprovado: programa instalado - 32 bits em Windows 64 bits."
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1749
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1759
 msgid ") (Requires the gramps addon listed under 'Plugin lib')"
 msgstr ") (Requer a extensão Gramps listada em \"Plugin lib\")"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1785
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1795
 msgid "DBF installed"
 msgstr "DBF instalado"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1796
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1806
 msgid ".)(Requires version "
 msgstr ".) (Requer versão "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1805
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1815
 msgid " installed.)(Passed: version "
 msgstr " instalado.) (Aprovado: versão "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1962
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1972
 #, python-format
 msgid "(OpenCV facedetection: %s)"
 msgstr "(Detecção de rosto OpenCV: %s)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2019
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2029
 msgid " (lxml: not found. Requires version "
 msgstr " (lxml: não encontrado. Requer versão "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2041
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2051
 msgid " • Requires: MongoDB TBD / pymongo TBD"
 msgstr " • Requer: MongoDB TBD / pymongo TBD"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2055
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2065
 #, python-format
 msgid " • Operating System: %s"
 msgstr " • Sistema operativo: %s"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2078
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2088
 msgid ""
 "<u><b><a href=\"https://gramps-project.org/wiki/index.php?"
 "title=Gramps_5.0_Wiki_Manual_-"
@@ -21500,29 +22096,29 @@ msgstr ""
 "_Command_Line#LANG.2C_LANGUAGE.2C_LC_MESSAGE.2C_LC_TIME\">Configurações "
 "locais:</a></b></u>\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2086
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2087
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2088
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2089
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2150
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2151
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2152
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2153
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2096
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2097
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2098
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2099
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2160
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2161
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2162
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2163
 msgid "not set"
 msgstr "não configurado"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2091
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2092
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2093
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2094
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2155
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2156
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2157
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2158
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2101
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2102
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2103
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2104
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2165
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2166
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2167
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2168
 msgid "not tested"
 msgstr "não testado"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2123
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2133
 msgid ""
 "\n"
 "Installed Locales\\Translations (If only English is listed please re-install "
@@ -21535,7 +22131,7 @@ msgstr ""
 "dicionários)\n"
 "\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2161
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2171
 msgid ""
 "\n"
 "Gramps Environment variables:\n"
@@ -21543,13 +22139,13 @@ msgstr ""
 "\n"
 "Variáveis de ambiente do Gramps:\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2200
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2263
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2300
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2210
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2273
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2310
 msgid "found"
 msgstr "encontrado"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2309
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2319
 msgid ""
 "Sphinx is a tool that builds the Gramps development documentation and man "
 "pages\n"
@@ -25219,26 +25815,71 @@ msgstr "Mostrar colunas"
 msgid "Display Icons"
 msgstr "Ícones de exibição"
 
-#: WordleGramplet/WordleGramplet.gpr.py:4
-#: WordleGramplet/WordleGramplet.gpr.py:10
-msgid "Wordle"
-msgstr "Wordle"
+#: WordClouds/WordClouds.gpr.py:24 WordClouds/WordClouds.gpr.py:32
+msgid "Given Name Word Cloud"
+msgstr "Nuvem de nomes próprios"
 
-#: WordleGramplet/WordleGramplet.gpr.py:13
-msgid "Gramplet used to make word clouds with wordle.net"
-msgstr "Gramplet para construir nuvens de palavras com wordle.net"
+#: WordClouds/WordClouds.gpr.py:25
+msgid "Gramplet showing all given names as a word cloud"
+msgstr "Gramplet que mostra todos os nomes próprios numa nuvem"
 
-#: WordleGramplet/WordleGramplet.py:126
-msgid "[Missing]"
-msgstr "(em falta)"
+#: WordClouds/WordClouds.gpr.py:40 WordClouds/WordClouds.gpr.py:48
+msgid "Surname Word Cloud"
+msgstr "Nuvem de apelidos"
 
-#: WordleGramplet/WordleGramplet.py:140
-msgid "Number of font sizes"
-msgstr "Número de tamanhos de letra"
+#: WordClouds/WordClouds.gpr.py:41
+msgid "Gramplet showing all surnames as a word cloud"
+msgstr "Gramplet que mostra todos os apelidos numa nuvem"
 
-#: WordleGramplet/WordleGramplet.py:144
-msgid "Select filter to restrict list"
-msgstr "Seleccione um filtro para limitar a lista"
+#: WordClouds/WordClouds.gpr.py:56 WordClouds/WordClouds.gpr.py:64
+msgid "Place Word Cloud"
+msgstr "Nuvem de locais"
+
+#: WordClouds/WordClouds.gpr.py:57
+msgid "Gramplet showing all places as a word cloud"
+msgstr "Gramplet que mostra todos os locais numa nuvem"
+
+#: WordClouds/cloudgramplet.py:147 WordClouds/cloudgramplet.py:225
+#, python-format
+msgid "Number of %s"
+msgstr "Número de %s"
+
+#: WordClouds/cloudgramplet.py:149 WordClouds/cloudgramplet.py:227
+msgid "Color (low)"
+msgstr "Cor (baixa)"
+
+#: WordClouds/cloudgramplet.py:150 WordClouds/cloudgramplet.py:228
+msgid "Color (high)"
+msgstr "Cor (alta)"
+
+#: WordClouds/cloudgramplet.py:151 WordClouds/cloudgramplet.py:229
+msgid "Hover color"
+msgstr "Cor ao pairar"
+
+#: WordClouds/cloudgramplet.py:152 WordClouds/cloudgramplet.py:230
+msgid "Layout quality"
+msgstr "Qualidade da disposição"
+
+#: WordClouds/cloudgramplet.py:154 WordClouds/cloudgramplet.py:232
+msgid "Filter missing/unknown words"
+msgstr "Filtrar palavras em falta/desconhecidas"
+
+#: WordClouds/cloudgramplet.py:207
+#, python-format
+msgid "[Missing %s]"
+msgstr "[%s em falta]"
+
+#: WordClouds/givennamewordcloudgramplet.py:50
+msgid "Click given name to view people with that given name"
+msgstr "Clique no nome próprio para ver indivíduos com esse nome"
+
+#: WordClouds/placewordcloudgramplet.py:53
+msgid "Click place name to view references"
+msgstr "Clique em locais para ver referências"
+
+#: WordClouds/surnamewordcloudgramplet.py:49
+msgid "Click surname to view people with that surname"
+msgstr "Clique no qpelido para ver indivíduos com esse apelido"
 
 #: libaccess/libaccess.gpr.py:34
 msgid "Provides a library for generic access to the database and gen.lib."
@@ -25690,6 +26331,46 @@ msgstr ""
 " \"%s\"\n"
 " no seu navegador web favorito..."
 
+#~ msgid "Error accessing media object."
+#~ msgstr "Erro ao aceder ao objecto multimédia."
+
+#~ msgid "Server authorization error."
+#~ msgstr "Erro de autorização do servidor."
+
+#~ msgid "Server authorization error: insufficient permissions."
+#~ msgstr "Erro de autorização do servidor: permissões insuficientes."
+
+#~ msgid "Error: URL not found."
+#~ msgstr "Erro: URL não encontrado."
+
+#, python-format
+#~ msgid "Error %s while connecting to server."
+#~ msgstr "Erro %s durante a ligação ao servidor."
+
+#~ msgid "URL error while connecting to server."
+#~ msgstr "Erro de URL durante a ligação ao servidor."
+
+#~ msgid "Unable to synchronize changes to server."
+#~ msgstr "Impossível sincronizar alterações com o servidor."
+
+#~ msgid "Search"
+#~ msgstr "Procurar"
+
+#~ msgid "Merge"
+#~ msgstr "Unir"
+
+#~ msgid "Wordle"
+#~ msgstr "Wordle"
+
+#~ msgid "Gramplet used to make word clouds with wordle.net"
+#~ msgstr "Gramplet para construir nuvens de palavras com wordle.net"
+
+#~ msgid "Number of font sizes"
+#~ msgstr "Número de tamanhos de letra"
+
+#~ msgid "Select filter to restrict list"
+#~ msgstr "Seleccione um filtro para limitar a lista"
+
 #, python-format
 #~ msgid "\\u2192 %s"
 #~ msgstr "\\u2192 %s"
@@ -25751,9 +26432,6 @@ msgstr ""
 #~ msgid "Export"
 #~ msgstr "Exportar"
 
-#~ msgid "Overview"
-#~ msgstr "Visão geral"
-
 #~ msgid "No file parsed..."
 #~ msgstr "Nenhum ficheiro analisado..."
 
@@ -25779,9 +26457,6 @@ msgstr ""
 #, python-format
 #~ msgid "Cannot validate \"%(file)s\" !"
 #~ msgstr "Impossível validar \"%(file)s\"!"
-
-#~ msgid "Gramps version"
-#~ msgstr "Versão Gramps"
 
 #, python-format
 #~ msgid ""

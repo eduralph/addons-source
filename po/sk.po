@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GRAMPS 3.1.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-03 07:42-0700\n"
-"PO-Revision-Date: 2026-06-29 14:56+0000\n"
+"POT-Creation-Date: 2026-08-04 08:55-0700\n"
+"PO-Revision-Date: 2026-08-05 18:02+0000\n"
 "Last-Translator: Milan <mobrcian@hotmail.com>\n"
 "Language-Team: Slovak <https://hosted.weblate.org/projects/gramps-project/"
 "addons/sk/>\n"
@@ -21,7 +21,34 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
-"X-Generator: Weblate 2026.7.dev0\n"
+"X-Generator: Weblate 2026.8.1.dev0\n"
+
+msgid "Birthdays"
+msgstr "Narodeniny"
+
+msgid "Ignore birthdays with tag"
+msgstr "Ignorovať dni narodenia so štítkom"
+
+msgid "Month and day"
+msgstr "Mesiac a deň"
+
+msgid "Only show birthdays with tag"
+msgstr "Zobraziť iba dni narodenia so štítkom"
+
+msgid "Proximity to current date"
+msgstr "Blízkosť k aktuálnemu dátumu"
+
+msgid "Sort birthdays by"
+msgstr "Zoradiť narodeniny podľa"
+
+msgid "Sort dates of death by"
+msgstr "Zoradiť dátumy úmrtia podľa"
+
+msgid "a gramplet that displays death dates in sorted order"
+msgstr "Gramplet, ktorý zobrazuje dátumy úmrtia v zoradenom poradí"
+
+msgid "a gramplet that displays the birthdays of the living people"
+msgstr "Gramplet, ktorý zobrazuje narodeniny žijúcich ľudí"
 
 #: AllNamesQuickview/AllNames.gpr.py:4 AllNamesQuickview/AllNames.py:51
 msgid "All Names of All People"
@@ -769,23 +796,6 @@ msgstr "Upraviť rodiny"
 msgid "Looking for children birth order"
 msgstr "Hľadanie poradia narodenia detí"
 
-#: BirthdaysGramplet/BirthdaysGramplet.gpr.py:25
-#: BirthdaysGramplet/BirthdaysGramplet.gpr.py:33
-msgid "Birthdays"
-msgstr "Narodeniny"
-
-#: BirthdaysGramplet/BirthdaysGramplet.gpr.py:26
-msgid "a gramplet that displays the birthdays of the living people"
-msgstr "Gramplet, ktorý zobrazuje narodeniny žijúcich ľudí"
-
-#: BirthdaysGramplet/BirthdaysGramplet.py:45
-msgid "Ignore birthdays with tag"
-msgstr "Ignorovať dni narodenia so štítkom"
-
-#: BirthdaysGramplet/BirthdaysGramplet.py:46
-msgid "Only show birthdays with tag"
-msgstr "Zobraziť iba dni narodenia so štítkom"
-
 #: CalculateEstimatedDates/CalculateEstimatedDates.gpr.py:10
 #: CalculateEstimatedDates/CalculateEstimatedDates.py:194
 msgid "Calculate Estimated Dates"
@@ -1127,7 +1137,8 @@ msgstr "Chat so stromom"
 msgid "Type a message..."
 msgstr "Napíšte správu..."
 
-#: ChatWithTree/ChatWithTree.py:153
+#: ChatWithTree/ChatWithTree.py:153 GrampsAssistant/grampsassistant.py:216
+#: GrampsAssistant/grampsassistant.py:920
 msgid "Send"
 msgstr "Poslať"
 
@@ -1297,6 +1308,10 @@ msgstr ""
 "Musíte nastaviť 'východziu osobu', ku ktorej chcete prejsť. Vyberte pohľad "
 "Ľudia, vyberte osobu, ktorú chcete ako 'Domovskú osobu', a potom potvrďte "
 "svoj výber cez menu Upraviť -> Nastaviť domovskú osobu."
+
+#: CombinedView/personpage.py:306 CombinedView/personpage.py:368
+msgid "Add existing child to family"
+msgstr "Pridať existujúce dieťa k rodine"
 
 #: CombinedView/personpage.py:597
 #, python-format
@@ -2484,12 +2499,6 @@ msgstr "z"
 #: DenominoViso/DenominoViso.py:1960
 msgid "the chart type runs out of bounds"
 msgstr "typ grafu presahuje hranice"
-
-#: DenominoViso/DenominoViso.py:2002 GraphView/graphview.py:968
-#: NoteCleanup/NoteCleanup.py:126 SearchGramplet/SearchGramplet.gpr.py:9
-#: SearchGramplet/SearchGramplet.gpr.py:19
-msgid "Search"
-msgstr "Vyhľadávanie"
 
 #: DenominoViso/DenominoViso.py:2553
 msgid "DenominoViso Options"
@@ -3831,7 +3840,7 @@ msgstr "MIN_C_WIDTH"
 
 #: DescendantsLines/DescendantsLines.py:1774
 msgid "The number of ??? min width"
-msgstr "Minimálna šírka ???"
+msgstr "Veľkosť ??? min. šírky"
 
 #: DescendantsLines/DescendantsLines.py:1779
 msgid "Space around text"
@@ -5423,6 +5432,27 @@ msgstr "Povoliť regex"
 #: EventDescriptionEditor/EventDescriptionEditor.py:152
 msgid "Allow regular expressions."
 msgstr "Povoliť regulárne výrazy."
+
+#: ExcludeSubtreeFilter/excludesubtree.gpr.py:24
+#: ExcludeSubtreeFilter/excludesubtree.py:106
+msgid "People reachable from <Person>, stopping at <Filter> matches"
+msgstr "Ľudia dostupní od <Osoby>, s ukončením pri zhodách vo <Filtri>"
+
+#: ExcludeSubtreeFilter/excludesubtree.gpr.py:26
+#: ExcludeSubtreeFilter/excludesubtree.py:109
+msgid ""
+"Matches people who are reachable starting from <Person> (walking all parents "
+"and children of attached families, recursively) stopping at persons in "
+"<Filter>."
+msgstr ""
+"Zodpovedá ľuďom, ktorí sú dostupní počnúc od <Osoby> (rekurzívne "
+"prechádzajúc všetkých rodičov a deti pripojených rodín), s ukončením pri "
+"osobách vo <Filtri>."
+
+#: ExcludeSubtreeFilter/excludesubtree.py:121
+#: FilterRules/isrelatedwithfiltermatch.py:80
+msgid "Retrieving all sub-filter matches"
+msgstr "Získavanie všetkých podfiltrových zhôd"
 
 #: ExportPersonGexf/exportpersongexf.gpr.py:30
 msgid "Person GEXF"
@@ -9159,7 +9189,7 @@ msgstr "Číslo osvedčenia"
 #: Form/form_us.xml.h:2344 Form/form_us.xml.h:2402 Form/form_us.xml.h:2428
 #: Form/form_us.xml.h:2460
 msgid "Entry Number"
-msgstr "Číslo záznamu"
+msgstr "Číslo zápisu"
 
 #: Form/form_gb.xml.h:3 Form/form_gb.xml.h:40 Form/form_gb.xml.h:196
 #: Form/form_gb.xml.h:230 Form/form_gb.xml.h:329 Form/form_gb.xml.h:365
@@ -10241,7 +10271,7 @@ msgstr "Meno matky manžela/manželky"
 
 #: Form/form_pl.xml.h:18
 msgid "Record Number"
-msgstr ""
+msgstr "Číslo záznamu"
 
 #: Form/form_pl.xml.h:19
 msgid "Volume"
@@ -10253,11 +10283,11 @@ msgstr "Čislo domu"
 
 #: Form/form_pl.xml.h:28
 msgid "Volume Beginning Year"
-msgstr ""
+msgstr "Zväzok začínajúci rokom"
 
 #: Form/form_pl.xml.h:29
 msgid "Volume Ending Year"
-msgstr ""
+msgstr "Zväzok končiaci rokom"
 
 #: Form/form_us.xml.h:1 Form/form_us.xml.h:14 Form/form_us.xml.h:35
 #: Form/form_us.xml.h:56 Form/form_us.xml.h:96 Form/form_us.xml.h:165
@@ -15407,6 +15437,273 @@ msgstr "Formuláre"
 msgid "Select Form"
 msgstr "Vybrať formulár"
 
+#: GOQLFilter/goql.gpr.py:31
+msgid "Person GOQL Filter"
+msgstr "Filter GOQL pre osoby"
+
+#: GOQLFilter/goql.gpr.py:32
+msgid "Gramplet providing a gramps-object-query-language person filter"
+msgstr "Gramplet poskytujúci filter osôb v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:39 GOQLFilter/goql.gpr.py:58
+#: GOQLFilter/goql.gpr.py:77 GOQLFilter/goql.gpr.py:96
+#: GOQLFilter/goql.gpr.py:117 GOQLFilter/goql.gpr.py:136
+#: GOQLFilter/goql.gpr.py:155 GOQLFilter/goql.gpr.py:174
+#: GOQLFilter/goql.gpr.py:193
+msgid "GOQL Filter"
+msgstr "Filter GOQL"
+
+#: GOQLFilter/goql.gpr.py:50
+msgid "Family GOQL Filter"
+msgstr "Filter GOQL pre rodiny"
+
+#: GOQLFilter/goql.gpr.py:51
+msgid "Gramplet providing a gramps-object-query-language family filter"
+msgstr "Gramplet poskytujúci filter rodín v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:69
+msgid "Event GOQL Filter"
+msgstr "Filter GOQL pre udalosti"
+
+#: GOQLFilter/goql.gpr.py:70
+msgid "Gramplet providing a gramps-object-query-language event filter"
+msgstr "Gramplet poskytujúci filter udalostí v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:88
+msgid "Place GOQL Filter"
+msgstr "Filter GOQL pre miesta"
+
+#: GOQLFilter/goql.gpr.py:89
+msgid "Gramplet providing a gramps-object-query-language place filter"
+msgstr "Gramplet poskytujúci filter miest v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:107
+msgid "Repository GOQL Filter"
+msgstr "Filter GOQL pre repozitáre"
+
+#: GOQLFilter/goql.gpr.py:109
+msgid "Gramplet providing a gramps-object-query-language repository filter"
+msgstr "Gramplet poskytujúci filter repozitárov v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:128
+msgid "Source GOQL Filter"
+msgstr "Filter GOQL pre zdroje"
+
+#: GOQLFilter/goql.gpr.py:129
+msgid "Gramplet providing a gramps-object-query-language source filter"
+msgstr "Gramplet poskytujúci filter zdrojov v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:147
+msgid "Citation GOQL Filter"
+msgstr "Filter GOQL pre citácie"
+
+#: GOQLFilter/goql.gpr.py:148
+msgid "Gramplet providing a gramps-object-query-language citation filter"
+msgstr "Gramplet poskytujúci filter citácií v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:166
+msgid "Media GOQL Filter"
+msgstr "Filter GOQL pre médiá"
+
+#: GOQLFilter/goql.gpr.py:167
+msgid "Gramplet providing a gramps-object-query-language media filter"
+msgstr "Gramplet poskytujúci filter médií v Gramps Object Query Language"
+
+#: GOQLFilter/goql.gpr.py:185
+msgid "Note GOQL Filter"
+msgstr "Filter GOQL pre poznámky"
+
+#: GOQLFilter/goql.gpr.py:186
+msgid "Gramplet providing a gramps-object-query-language note filter"
+msgstr "Gramplet poskytujúci filter poznámok v Gramps Object Query Language"
+
+#: GOQLFilter/goql.py:186
+msgid "A gramps-object-query-language where-expression, e.g.\n"
+msgstr "Výraz WHERE (kde) v Gramps Object Query Language, napr.\n"
+
+#: GOQLFilter/goql.py:188
+msgid "Enter inserts a newline; Ctrl+Enter runs Find.\n"
+msgstr "Enter vloží nový riadok; Ctrl+Enter spustí Hľadať.\n"
+
+#: GOQLFilter/goql.py:189
+msgid "Up/Down at the first/last line recalls previous expressions.\n"
+msgstr ""
+"Šípky hore/dole na prvom/poslednom riadku pripomenú predchádzajúce výrazy.\n"
+
+#: GOQLFilter/goql.py:190
+msgid "Tab always completes -- it never inserts a tab character."
+msgstr "Tab vždy dopĺňa -- nikdy nevloží znak tabulátora."
+
+#: GOQLFilter/goql.py:213
+#, python-format
+msgid "%s filter"
+msgstr "filter %s"
+
+#: GOQLFilter/goql.py:233
+msgid "This resets the filter parameters to empty state."
+msgstr "Toto resetuje parametre filtra do prázdneho stavu."
+
+#: GOQLFilter/goql.py:239
+msgid "This opens a dialog to save the current expression as a named filter."
+msgstr ""
+"Toto otvorí dialóg na uloženie aktuálneho výrazu ako pomenovaného filtra."
+
+#: GOQLFilter/goql.py:244
+msgid "Open this gramplet's help page in a browser."
+msgstr "Otvoriť stránku nápovedy tohto grampletu v prehliadači."
+
+#: GOQLFilter/goql.py:402
+msgid "SQL"
+msgstr "SQL"
+
+#: GOQLFilter/goql.py:403
+msgid "Python evaluation"
+msgstr "Vyhodnotenie v Pythone"
+
+#: GOQLFilter/goql.py:523
+#, python-format
+msgid "Error applying filter: %s"
+msgstr "Chyba pri aplikovaní filtra: %s"
+
+#: GOQLFilter/goql.py:526
+#, python-format
+msgid "Showing %(shown)d of %(total)d (%(method)s)"
+msgstr "Zobrazené %(shown)d z %(total)d (%(method)s)"
+
+#: GOQLFilter/goql.py:541
+#, python-format
+msgid "Error resetting filter: %s"
+msgstr "Chyba pri resetovaní filtra: %s"
+
+#: GOQLFilter/goql.py:548
+msgid "Enter an expression first"
+msgstr "Najprv zadajte výraz"
+
+#: GOQLFilter/goql.py:560
+#, python-brace-format
+msgid "Created by the GOQL Filter gramplet on {today}"
+msgstr "Vytvorené grampletom Filter GOQL na {today}"
+
+#: GOQLFilter/whereexprrule.gpr.py:30 GOQLFilter/whereexprrule.py:261
+msgid "People matching the <GOQL expression>"
+msgstr "Ľudia zodpovedajúci <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:32
+msgid ""
+"Matches people for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá osobám, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:50 GOQLFilter/whereexprrule.py:266
+msgid "Families matching the <GOQL expression>"
+msgstr "Rodiny zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:52
+msgid ""
+"Matches families for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá rodinám, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:70 GOQLFilter/whereexprrule.py:271
+msgid "Events matching the <GOQL expression>"
+msgstr "Udalosti zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:72
+msgid ""
+"Matches events for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá udalostiam, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:90 GOQLFilter/whereexprrule.py:276
+msgid "Places matching the <GOQL expression>"
+msgstr "Miesta zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:92
+msgid ""
+"Matches places for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá miestam, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:110 GOQLFilter/whereexprrule.py:281
+msgid "Repositories matching the <GOQL expression>"
+msgstr "Repozitáre zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:112
+msgid ""
+"Matches repositories for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá repozitárom, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:130 GOQLFilter/whereexprrule.py:286
+msgid "Sources matching the <GOQL expression>"
+msgstr "Zdroje zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:132
+msgid ""
+"Matches sources for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá zdrojom, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:150 GOQLFilter/whereexprrule.py:291
+msgid "Citations matching the <GOQL expression>"
+msgstr "Citácie zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:152
+msgid ""
+"Matches citations for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá citáciám, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:170 GOQLFilter/whereexprrule.py:296
+msgid "Media matching the <GOQL expression>"
+msgstr "Médiá zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:172
+msgid ""
+"Matches media for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá médiám, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.gpr.py:190 GOQLFilter/whereexprrule.py:301
+msgid "Notes matching the <GOQL expression>"
+msgstr "Poznámky zodpovedajúce <výrazu GOQL>"
+
+#: GOQLFilter/whereexprrule.gpr.py:192
+msgid ""
+"Matches notes for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá poznámkam, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
+#: GOQLFilter/whereexprrule.py:212
+msgid "GOQL expression"
+msgstr "Výraz GOQL"
+
+#: GOQLFilter/whereexprrule.py:214
+msgid ""
+"Matches objects for which the given gramps-object-query-language where-"
+"expression evaluates to true"
+msgstr ""
+"Zodpovedá objektom, pre ktoré sa daný výraz WHERE v Gramps Object Query "
+"Language vyhodnotí ako pravdivý"
+
 #: GedcomExtensions/GedcomExtensions.gpr.py:32
 msgid "Export GEDCOM Extensions (GED2)"
 msgstr "Export rozšíření GEDCOM (GED2)"
@@ -15804,7 +16101,166 @@ msgid ""
 "in user home directory ''%s''?"
 msgstr ""
 "Prepísať kmz/kml súbor ''%s''\n"
-"v domovskom adresári užívateľa ''%s''?"
+"v domovskom adresári používateľa ''%s''?"
+
+#: GrampsAssistant/grampsassistant.gpr.py:26
+#: GrampsAssistant/grampsassistant.py:1417
+msgid "Gramps Assistant"
+msgstr "Asistent Gramps"
+
+#: GrampsAssistant/grampsassistant.gpr.py:27
+msgid "AI assistant for querying your Gramps family tree"
+msgstr ""
+"AI asistent na získavanie informácií o vašom rodinnom strome v programe "
+"Gramps"
+
+#: GrampsAssistant/grampsassistant.py:58
+msgid ""
+"You are a helpful genealogy assistant with access to the user's Gramps "
+"database. Answer questions about people, families, events, and "
+"relationships. When you need information from the database, call the "
+"provided tools — never write code, simulate results, or make up data. If no "
+"tool exists for the requested information, say so plainly."
+msgstr ""
+"Si užitočný genealogický asistent s prístupom k databáze používateľa v "
+"programe Gramps. Odpovedaj na otázky týkajúce sa osôb, rodín, udalostí a "
+"vzťahov. Keď potrebuješ informácie z databázy, využi k tomu určené nástroje "
+"– nikdy nepíš kód, nesimuluj výsledky ani si nevymýšľaj údaje. Ak pre "
+"požadované informácie neexistuje žiadny nástroj, jasne to povedz."
+
+#: GrampsAssistant/grampsassistant.py:209
+msgid "Gramps Assistant settings"
+msgstr "Nastavenia asistenta Gramps"
+
+#: GrampsAssistant/grampsassistant.py:213
+msgid "Clear conversation and context"
+msgstr "Vymazať konverzáciu a kontext"
+
+#: GrampsAssistant/grampsassistant.py:388
+#: GrampsAssistant/grampsassistant.py:749
+msgid "Gramps Assistant:"
+msgstr "Asistent Gramps:"
+
+#: GrampsAssistant/grampsassistant.py:390
+msgid ""
+"Ask me anything about the Gramps program or your specific Gramps family "
+"tree. Use the ⚙ button to configure the AI.\n"
+msgstr ""
+"Opýtajte sa ma čokoľvek o programe Gramps alebo o vašom konkrétnom rodinnom "
+"strome v Gramps. Použite tlačidlo ⚙ na konfiguráciu umelej inteligencie "
+"(AI).\n"
+
+#: GrampsAssistant/grampsassistant.py:720
+msgid ""
+"\n"
+"No model configured. Please click the Settings button to choose a backend "
+"and model before chatting.\n"
+msgstr ""
+"\n"
+"Nie je nakonfigurovaný žiadny model. Pred začatím konverzácie kliknite na "
+"tlačidlo Nastavenia a vyberte backend a model.\n"
+
+#: GrampsAssistant/grampsassistant.py:755
+msgid "Thinking..."
+msgstr "Premýšľanie..."
+
+#: GrampsAssistant/grampsassistant.py:824
+#, python-brace-format
+msgid ""
+"API key error: the environment variable {var} is not set or is invalid. Set "
+"it before launching Gramps:\n"
+"  export {var}=your-key-here"
+msgstr ""
+"Chyba API kľúča: premenná prostredia {var} nie je nastavená alebo je "
+"neplatná. Nastavte ju pred spustením Gramps:\n"
+"  export {var}=váš-kľúč-je-tu"
+
+#: GrampsAssistant/grampsassistant.py:830
+msgid ""
+"API key error: this provider requires an API key. Open Settings and enter "
+"the environment variable name for your API key (e.g. OPENAI_API_KEY)."
+msgstr ""
+"Chyba API kľúča: tento poskytovateľ vyžaduje API kľúč. Otvorte Nastavenia a "
+"zadajte názov premennej prostredia pre váš API kľúč (napr. OPENAI_API_KEY)."
+
+#: GrampsAssistant/grampsassistant.py:973
+msgid "Done.\n"
+msgstr "Hotovo.\n"
+
+#: GrampsAssistant/grampsassistant.py:1203
+msgid "System Prompt:"
+msgstr "Systémová výzva:"
+
+#: GrampsAssistant/grampsassistant.py:1217
+msgid "Simplify tools (recommended for smaller/local models)"
+msgstr "Zjednodušiť nástroje (odporúčané pre menšie/lokálne modely)"
+
+#: GrampsAssistant/grampsassistant.py:1221
+msgid ""
+"When enabled, only the tools relevant to your question are sent to the "
+"model. This improves performance with smaller local models."
+msgstr ""
+"Ak je táto možnosť zapnutá, do modelu sa odosielajú len nástroje relevantné "
+"pre vašu otázku. Tým sa zlepšuje výkon pri menších lokálnych modeloch."
+
+#: GrampsAssistant/grampsassistant.py:1230
+msgid "Use Local Model"
+msgstr "Použiť lokálny model"
+
+#: GrampsAssistant/grampsassistant.py:1249
+msgid ""
+"URL of a local OpenAI-compatible server. Ollama: http://localhost:11434  LM "
+"Studio: http://localhost:1234  llama.cpp: http://localhost:8080"
+msgstr ""
+"URL lokálneho servera kompatibilného s OpenAI. Ollama: http://"
+"localhost:11434  LM Studio: http://localhost:1234  llama.cpp: http://"
+"localhost:8080"
+
+#: GrampsAssistant/grampsassistant.py:1257
+msgid "model name (leave blank for LM Studio / llama.cpp)"
+msgstr "názov modelu (v prípade LM Studio / llama.cpp nechajte prázdne)"
+
+#: GrampsAssistant/grampsassistant.py:1260
+msgid ""
+"Model to request from the local server. Required for Ollama (e.g. llama3.1). "
+"Leave blank for LM Studio or llama.cpp, which use whatever model is loaded."
+msgstr ""
+"Model, ktorý sa má vyžiadať z lokálneho servera. Povinné pre Ollama (napr. "
+"llama3.1). V prípade LM Studio alebo llama.cpp, ktoré používajú akýkoľvek "
+"načítaný model, nechajte prázdne."
+
+#: GrampsAssistant/grampsassistant.py:1267
+#: GrampsAssistant/grampsassistant.py:1311
+msgid "Model:"
+msgstr "Model:"
+
+#: GrampsAssistant/grampsassistant.py:1273
+msgid "Use Foundational Model"
+msgstr "Použiť základný model"
+
+#: GrampsAssistant/grampsassistant.py:1315
+msgid "e.g. OPENAI_API_KEY"
+msgstr "napr. OPENAI_API_KEY"
+
+#: GrampsAssistant/grampsassistant.py:1317
+msgid "Name of the environment variable holding your API key."
+msgstr "Názov premennej prostredia obsahujúcej váš API kľúč."
+
+#: GrampsAssistant/grampsassistant.py:1319
+msgid "API key env var:"
+msgstr "Premenná prostredia kľúča API:"
+
+#: GrampsAssistant/grampsassistant.py:1322
+msgid "Backend:"
+msgstr "Backend:"
+
+#: GrampsAssistant/grampsassistant.py:1334
+msgid "Base URL:"
+msgstr "Základná URL:"
+
+#: GrampsAssistant/grampsassistant.py:1338
+msgid "Model name:"
+msgstr "Názov modelu:"
 
 #: GrampsChat/GrampsChat.gpr.py:4 GrampsChat/GrampsChat.gpr.py:9
 msgid "GrampsChat"
@@ -15814,8 +16270,8 @@ msgstr "GrampsChat"
 msgid "AI Chatbot Gramplet (requires connecting to an LLM service)"
 msgstr "Gramplet AI Chatbot (vyžaduje pripojenie k službe LLM)"
 
-#: GrampsWebSync/grampswebsync.gpr.py:29 GrampsWebSync/grampswebsync.py:118
-#: GrampsWebSync/grampswebsync.py:212
+#: GrampsWebSync/grampswebsync.gpr.py:29 GrampsWebSync/grampswebsync.py:213
+#: GrampsWebSync/grampswebsync.py:271
 msgid "Gramps Web Sync"
 msgstr "Gramps Web Sync"
 
@@ -15823,130 +16279,111 @@ msgstr "Gramps Web Sync"
 msgid "Synchronizes a local database with a Gramps Web instance."
 msgstr "Synchronizuje lokálnu databázu s inštanciou Gramps Web."
 
-#: GrampsWebSync/grampswebsync.py:276
-msgid "Your user does not have sufficient server permissions to use sync."
+#: GrampsWebSync/grampswebsync.py:124
+#, python-format
+msgid ""
+"The system keyring could not be used. Snap confinement blocks access until "
+"you run: %s"
 msgstr ""
-"Váš používateľ nemá dostatočné oprávnenia na serveri na používanie "
-"synchronizácie."
+"Systémovú kľúčenku sa nepodarilo použiť. Obmedzenie Snap blokuje prístup, "
+"kým nespustíte: %s"
 
-#: GrampsWebSync/grampswebsync.py:282
-msgid "Fetching remote data..."
-msgstr "Získavanie vzdialených údajov..."
+#: GrampsWebSync/grampswebsync.py:128
+msgid ""
+"The system keyring could not be used. You will need to enter your password "
+"each time."
+msgstr ""
+"Systémovú kľúčenku sa nepodarilo použiť. Heslo budete musieť zadávať "
+"zakaždým."
 
-#: GrampsWebSync/grampswebsync.py:298
-msgid "Unexpected error while applying changes."
-msgstr "Neočakávaná chyba pri aplikovaní zmien."
-
-#: GrampsWebSync/grampswebsync.py:336
-msgid "Media files are in sync."
-msgstr "Mediálne súbory sú synchronizované."
-
-#: GrampsWebSync/grampswebsync.py:345
-#, python-format
-msgid "Successfully downloaded %s media files."
-msgstr "Úspešne stiahnuté %s mediálne súbory."
-
-#: GrampsWebSync/grampswebsync.py:348
-#, python-format
-msgid "Encountered %s errors during download."
-msgstr "Počas sťahovania sa vyskytlo %s chýb."
-
-#: GrampsWebSync/grampswebsync.py:354
-#, python-format
-msgid "Successfully uploaded %s media files."
-msgstr "Úspešne nahraté %s mediálne súbory."
-
-#: GrampsWebSync/grampswebsync.py:357
-#, python-format
-msgid "Encountered %s errors during upload."
-msgstr "Počas nahrávania sa vyskytlo %s chýb."
-
-#: GrampsWebSync/grampswebsync.py:375
+#: GrampsWebSync/grampswebsync.py:145
 msgid "Authentication failed. Please check your username and password."
 msgstr "Autorizácia zlyhala. Skontrolujte svoje používateľské meno a heslo."
 
-#: GrampsWebSync/grampswebsync.py:379
+#: GrampsWebSync/grampswebsync.py:148
 msgid "Access forbidden. Please check username and password."
 msgstr "Prístup zakázaný. Skontrolujte prosím používateľské meno a heslo."
 
-#: GrampsWebSync/grampswebsync.py:383
+#: GrampsWebSync/grampswebsync.py:150
 msgid "GrampsWeb service not found. Please check the URL."
 msgstr "Služba GrampsWeb nebola nájdená. Skontrolujte prosím URL adresu."
 
-#: GrampsWebSync/grampswebsync.py:387
+#: GrampsWebSync/grampswebsync.py:152
 msgid "Too many requests, please try again in a few seconds."
 msgstr "Príliš veľa požiadaviek, skúste to prosím o niekoľko sekúnd neskôr."
 
-#: GrampsWebSync/grampswebsync.py:390
+#: GrampsWebSync/grampswebsync.py:154
 msgid "GrampsWeb tree is disabled."
 msgstr "GrampsWeb tree je deaktivovaný."
 
-#: GrampsWebSync/grampswebsync.py:393
-#, python-format
-msgid "Server error %s. Please check your connection."
-msgstr "Chyba servera %s. Skontrolujte svoje pripojenie."
-
-#: GrampsWebSync/grampswebsync.py:399
+#: GrampsWebSync/grampswebsync.py:156
 msgid "Connection failed. Please check the URL and your internet connection."
 msgstr ""
 "Spojenie sa nepodarilo. Skontrolujte adresu URL a vaše pripojenie k "
 "internetu."
 
-#: GrampsWebSync/grampswebsync.py:405
+#: GrampsWebSync/grampswebsync.py:159
 msgid "Invalid server response. Please check the URL."
 msgstr "Neplatná odpoveď servera. Skontrolujte adresu URL."
 
-#: GrampsWebSync/grampswebsync.py:409
+#: GrampsWebSync/grampswebsync.py:162
+msgid "Your user does not have sufficient server permissions to use sync."
+msgstr ""
+"Váš používateľ nemá dostatočné oprávnenia na serveri na používanie "
+"synchronizácie."
+
+#: GrampsWebSync/grampswebsync.py:164
+msgid "Failed importing downloaded XML file."
+msgstr "Stiahnutý súbor XML sa nepodarilo importovať."
+
+#: GrampsWebSync/grampswebsync.py:166
+msgid "Unable to synchronize changes to server: objects have been modified."
+msgstr "Zmeny sa nedajú synchronizovať so serverom: objekty boli upravené."
+
+#: GrampsWebSync/grampswebsync.py:168
+msgid "Unexpected error while applying changes."
+msgstr "Neočakávaná chyba pri aplikovaní zmien."
+
+#: GrampsWebSync/grampswebsync.py:170
+msgid ""
+"The family tree was modified while the changes were being reviewed. Nothing "
+"has been applied. Please compare again."
+msgstr ""
+"Rodinný strom bol modifikovaný počas kontroly zmien. Nič nebolo aplikované. "
+"Prosím, porovnajte znova."
+
+#: GrampsWebSync/grampswebsync.py:175
+#, python-format
+msgid "The server could not apply the changes: %s"
+msgstr "Server nemohol aplikovať zmeny: %s"
+
+#: GrampsWebSync/grampswebsync.py:177
+#, python-format
+msgid "Server error %s. Please check your connection."
+msgstr "Chyba servera %s. Skontrolujte svoje pripojenie."
+
+#: GrampsWebSync/grampswebsync.py:179 GrampsWebSync/grampswebsync.py:180
 #, python-format
 msgid "Unexpected error: %s"
 msgstr "Neočakávaná chyba: %s"
 
-#: GrampsWebSync/grampswebsync.py:453 GrampsWebSync/grampswebsync.py:478
-msgid "Error accessing media object."
-msgstr "Chyba prístupu k mediálnemu objektu."
+#: GrampsWebSync/grampswebsync.py:341
+msgid "Fetching remote data..."
+msgstr "Získavanie vzdialených údajov..."
 
-#: GrampsWebSync/grampswebsync.py:522
-msgid "Failed importing downloaded XML file."
-msgstr "Stiahnutý súbor XML sa nepodarilo importovať."
-
-#: GrampsWebSync/grampswebsync.py:527
+#: GrampsWebSync/grampswebsync.py:344
 msgid "Comparing local and remote data..."
 msgstr "Porovnávanie miestnych a vzdialených údajov..."
 
-#: GrampsWebSync/grampswebsync.py:576
-msgid "Server authorization error."
-msgstr "Chyba autorizácie servera."
+#: GrampsWebSync/grampswebsync.py:348
+msgid "Successfully applied changes to local database."
+msgstr "Zmeny boli úspešne aplikované v lokálnej databáze."
 
-#: GrampsWebSync/grampswebsync.py:579
-msgid "Server authorization error: insufficient permissions."
-msgstr "Chyba autorizácie servera: nedostatočné oprávnenia."
-
-#: GrampsWebSync/grampswebsync.py:582
-msgid "Error: URL not found."
-msgstr "Chyba: Adresa URL sa nenašla."
-
-#: GrampsWebSync/grampswebsync.py:586
-msgid "Unable to synchronize changes to server: objects have been modified."
-msgstr "Zmeny sa nedajú synchronizovať so serverom: objekty boli upravené."
-
-#: GrampsWebSync/grampswebsync.py:590
-#, python-format
-msgid "Error %s while connecting to server."
-msgstr "Chyba %s pri pripájaní k serveru."
-
-#: GrampsWebSync/grampswebsync.py:593
-msgid "URL error while connecting to server."
-msgstr "Chyba URL pri pripájaní k serveru."
-
-#: GrampsWebSync/grampswebsync.py:597
-msgid "Unable to synchronize changes to server."
-msgstr "Zmeny sa nedajú synchronizovať so serverom."
-
-#: GrampsWebSync/grampswebsync.py:626
+#: GrampsWebSync/grampswebsync.py:437
 msgid "Continue without transport encryption?"
 msgstr "Pokračovať bez šifrovania prenosu?"
 
-#: GrampsWebSync/grampswebsync.py:628
+#: GrampsWebSync/grampswebsync.py:439
 msgid ""
 "You have specified a URL with http scheme. If you continue, your password "
 "will be sent in clear text over the network. Use only for local testing!"
@@ -15955,15 +16392,15 @@ msgstr ""
 "odoslané cez sieť v nezakódovanej podobe. Používajte len na lokálne "
 "testovanie!"
 
-#: GrampsWebSync/grampswebsync.py:633
+#: GrampsWebSync/grampswebsync.py:444
 msgid "Continue with HTTP"
 msgstr "Pokračovať s HTTP"
 
-#: GrampsWebSync/grampswebsync.py:634
+#: GrampsWebSync/grampswebsync.py:445
 msgid "Use HTTPS"
 msgstr "Použiť HTTPS"
 
-#: GrampsWebSync/grampswebsync.py:762
+#: GrampsWebSync/grampswebsync.py:495
 msgid ""
 "This tool allows to synchronize the currently opened family tree with a "
 "remote family tree served by Gramps Web.\n"
@@ -15991,83 +16428,182 @@ msgstr ""
 "Ak chcete namiesto toho zlúčiť dva výrazne odlišné stromy s možnosťou "
 "vykonať ručné úpravy, použite namiesto toho nástroj na import a zlúčenie."
 
-#: GrampsWebSync/grampswebsync.py:789
+#: GrampsWebSync/grampswebsync.py:522
 msgid "Server URL: "
 msgstr "URL servera: "
 
-#: GrampsWebSync/grampswebsync.py:898
+#: GrampsWebSync/grampswebsync.py:578 HistContext/HistContext.py:289
+#: HistContext/HistContext.py:333 HistContext/HistContext.py:420
+msgid "Error:"
+msgstr "Chyba:"
+
+#: GrampsWebSync/grampswebsync.py:646
+msgid "Sync mode"
+msgstr "Synchronizovaný režim"
+
+#: GrampsWebSync/grampswebsync.py:656
+msgid ""
+"Changes from both sides are combined. Objects edited in both places are "
+"merged."
+msgstr ""
+"Zmeny z oboch strán sú kombinované. Objekty upravené na oboch miestach sa "
+"zlúčia."
+
+#: GrampsWebSync/grampswebsync.py:660
+msgid ""
+"The server is made to match this computer. Anything changed only on the "
+"server is discarded."
+msgstr ""
+"Server sa upraví tak, aby zodpovedal tomuto počítaču. Čokoľvek zmenené len "
+"na serveri sa vyradí."
+
+#: GrampsWebSync/grampswebsync.py:664
+msgid ""
+"This computer is made to match the server. Anything changed only here is "
+"discarded."
+msgstr ""
+"Tento počítač sa upraví tak, aby zodpovedal serveru. Čokoľvek zmenené len tu "
+"sa vyradí."
+
+#: GrampsWebSync/grampswebsync.py:671
 msgid "Bidirectional Synchronization"
 msgstr "Obojsmerná synchronizácia"
 
-#: GrampsWebSync/grampswebsync.py:907
+#: GrampsWebSync/grampswebsync.py:672
 msgid "Reset remote to local"
 msgstr "Obnoviť vzdialené na lokálne"
 
-#: GrampsWebSync/grampswebsync.py:915
+#: GrampsWebSync/grampswebsync.py:673
 msgid "Reset local to remote"
 msgstr "Obnoviť lokálne na vzdialené"
 
-#: GrampsWebSync/grampswebsync.py:923
-msgid "Merge"
-msgstr "Zlúčiť"
+#: GrampsWebSync/grampswebsync.py:712
+msgid "Warning:"
+msgstr "Upozornenie:"
 
-#: GrampsWebSync/grampswebsync.py:948
+#: GrampsWebSync/grampswebsync.py:722
 msgid "Local changes"
 msgstr "Lokálne zmeny"
 
-#: GrampsWebSync/grampswebsync.py:953
+#: GrampsWebSync/grampswebsync.py:727
 msgid "Remote changes"
 msgstr "Vzdialené zmeny"
 
-#: GrampsWebSync/grampswebsync.py:958
+#: GrampsWebSync/grampswebsync.py:732
 msgid "Simultaneous changes"
 msgstr "Súbežné zmeny"
 
-#: GrampsWebSync/grampswebsync.py:1015
+#: GrampsWebSync/grampswebsync.py:790
 msgid "Fetching information about media files..."
 msgstr "Načítavanie informácií o mediálnych súboroch..."
 
-#: GrampsWebSync/grampswebsync.py:1035
+#: GrampsWebSync/grampswebsync.py:816
 msgid "Both trees are the same."
 msgstr "Obidva stromy sú rovnaké."
 
-#: GrampsWebSync/grampswebsync.py:1041
+#: GrampsWebSync/grampswebsync.py:822
 msgid "Applying changes to local database ..."
 msgstr "Aplikovanie zmien do lokálnej databázy ..."
 
-#: GrampsWebSync/grampswebsync.py:1043
+#: GrampsWebSync/grampswebsync.py:824
 msgid "No changes to apply to local database."
 msgstr "Žiadne zmeny na aplikovanie do lokálnej databázy."
 
-#: GrampsWebSync/grampswebsync.py:1047
+#: GrampsWebSync/grampswebsync.py:828
 msgid "Applying changes to remote database ..."
 msgstr "Aplikovanie zmien do vzdialenej databázy ..."
 
-#: GrampsWebSync/grampswebsync.py:1052
+#: GrampsWebSync/grampswebsync.py:833
 msgid "No changes to apply to remote database."
 msgstr "Žiadne zmeny na aplikovanie do vzdialenej databázy."
 
-#: GrampsWebSync/grampswebsync.py:1060
-msgid "Successfully applied changes to local database."
-msgstr "Zmeny boli úspešne aplikované v lokálnej databáze."
-
-#: GrampsWebSync/grampswebsync.py:1089
+#: GrampsWebSync/grampswebsync.py:862
 msgid "Missing locally"
 msgstr "Chýbajúce lokálne"
 
-#: GrampsWebSync/grampswebsync.py:1092
+#: GrampsWebSync/grampswebsync.py:865
 msgid "Missing remotely"
 msgstr "Chýbajúce vzdialene"
 
-#: GrampsWebSync/grampswebsync.py:1130
+#: GrampsWebSync/grampswebsync.py:905
 #, python-format
-msgid "Downloading %s media file(s)"
-msgstr "Sťahovanie %s súboru(-ov) média"
+msgid "Downloading %s media file"
+msgid_plural "Downloading %s media files"
+msgstr[0] "Sťahovanie %s mediálneho súboru"
+msgstr[1] "Sťahovanie %s mediálnych súborov"
+msgstr[2] "Sťahovanie %s mediálnych súborov"
 
-#: GrampsWebSync/grampswebsync.py:1138
+#: GrampsWebSync/grampswebsync.py:920
 #, python-format
-msgid "Uploading %s media file(s)"
-msgstr "Nahrávanie %s súboru(-ov) média"
+msgid "Uploading %s media file"
+msgid_plural "Uploading %s media files"
+msgstr[0] "Nahrávanie %s mediálneho súboru"
+msgstr[1] "Nahrávanie %s mediálnych súborov"
+msgstr[2] "Nahrávanie %s mediálnych súborov"
+
+#: GrampsWebSync/grampswebsync.py:965
+msgid "Try again"
+msgstr "Skúste znova"
+
+#: GrampsWebSync/grampswebsync.py:999
+#, python-format
+msgid "Applied %s change."
+msgid_plural "Applied %s changes."
+msgstr[0] "Aplikovaná %s zmena."
+msgstr[1] "Aplikované %s zmeny."
+msgstr[2] "Aplikovaných %s zmien."
+
+#: GrampsWebSync/grampswebsync.py:1006
+msgid "Media files are in sync."
+msgstr "Mediálne súbory sú synchronizované."
+
+#: GrampsWebSync/grampswebsync.py:1011
+#, python-format
+msgid "%s media file is missing on both sides and could not be transferred."
+msgid_plural ""
+"%s media files are missing on both sides and could not be transferred."
+msgstr[0] ""
+"%s mediálny súbor chýba na oboch stranách a nepodarilo sa ho preniesť."
+msgstr[1] ""
+"%s mediálne súbory chýbajú na oboch stranách a nepodarilo sa ich preniesť."
+msgstr[2] ""
+"%s mediálnych súborov chýba na oboch stranách a nepodarilo sa ich preniesť."
+
+#: GrampsWebSync/grampswebsync.py:1020
+msgid "Both trees are already in sync."
+msgstr "Obidva stromy sú už synchronizované."
+
+#: GrampsWebSync/grampswebsync.py:1033
+#, python-format
+msgid "Successfully downloaded %s media file."
+msgid_plural "Successfully downloaded %s media files."
+msgstr[0] "Úspešne stiahnutý %s mediálny súbor."
+msgstr[1] "Úspešne stiahnuté %s mediálne súbory."
+msgstr[2] "Úspešne stiahnutých %s mediálnych súborov."
+
+#: GrampsWebSync/grampswebsync.py:1043
+#, python-format
+msgid "Encountered %s error during download."
+msgid_plural "Encountered %s errors during download."
+msgstr[0] "Počas sťahovania sa vyskytla %s chyba."
+msgstr[1] "Počas sťahovania sa vyskytli %s chyby."
+msgstr[2] "Počas sťahovania sa vyskytlo %s chýb."
+
+#: GrampsWebSync/grampswebsync.py:1056
+#, python-format
+msgid "Successfully uploaded %s media file."
+msgid_plural "Successfully uploaded %s media files."
+msgstr[0] "Úspešne nahraný %s mediálny súbor."
+msgstr[1] "Úspešne nahrané %s mediálne súbory."
+msgstr[2] "Úspešne nahraných %s mediálnych súborov."
+
+#: GrampsWebSync/grampswebsync.py:1065
+#, python-format
+msgid "Encountered %s error during upload."
+msgid_plural "Encountered %s errors during upload."
+msgstr[0] "Počas nahrávania sa vyskytla %s chyba."
+msgstr[1] "Počas nahrávania sa vyskytli %s chyby."
+msgstr[2] "Počas nahrávania sa vyskytlo %s chýb."
 
 #: GrampyScript/GrampyScript.gpr.py:23 GrampyScript/GrampyScript.gpr.py:32
 msgid "Gram.py Script"
@@ -16848,11 +17384,6 @@ msgstr "Neplatný dátum "
 #: HistContext/HistContext.py:288
 msgid " in line: "
 msgstr " v riadku: "
-
-#: HistContext/HistContext.py:289 HistContext/HistContext.py:333
-#: HistContext/HistContext.py:420
-msgid "Error:"
-msgstr "Chyba:"
 
 #: HistContext/HistContext.py:327
 msgid ": line does not contain four sections separated by semicolons in : \""
@@ -18300,32 +18831,31 @@ msgstr "Kto (vy)hĺadá.koho?"
 #: NameSuite/.venv/lib/python3.12/site-packages/mypy/main.py:450
 #, python-format
 msgid "%(prog)s: error: %(message)s\n"
-msgstr ""
+msgstr "%(prog)s: chyba: %(message)s\n"
 
 #: NameSuite/name_processor.gpr.py:6
-#, fuzzy
-#| msgid "Patronymic names:"
 msgid "Audit Given and Patronymic Names"
-msgstr "Patronymické mená:"
+msgstr "Kontrola daných (krstných) mien a patronymických mien"
 
 #: NameSuite/name_processor.gpr.py:9
 msgid ""
 "Tools to rename given name, audit and infer patronymic (East Slavic) names."
 msgstr ""
+"Nástroje na premenovanie daného (krstného) mena, kontrolu a odvodzovanie "
+"patronymických (východoslovanských) mien."
 
 #: NameSuite/name_processor.gpr.py:25 NameSuite/name_processor.gpr.py:37
-#, fuzzy
-#| msgid "Patronymic names:"
 msgid "Patronymic Suggestion"
-msgstr "Patronymické mená:"
+msgstr "Návrh patronymického mena"
 
 #: NameSuite/name_processor.gpr.py:27
 msgid "Suggests (East Slavic) patronymic names in real-time as you navigate."
 msgstr ""
+"Navrhuje (východoslovanské) patronymické mená v reálnom čase počas navigácie."
 
 #: NameSuite/name_processor/views/base_tab.py:150
 msgid "Use"
-msgstr ""
+msgstr "Použiť"
 
 #: NameSuite/name_processor/views/gramplet.py:32
 #, python-brace-format
@@ -18334,238 +18864,185 @@ msgid ""
 "Suggested: {0}\n"
 "Based on father: {1}"
 msgstr ""
+"Zistené chýbajúce patronymické meno.\n"
+"Navrhované: {0}\n"
+"Na základe otca: {1}"
 
 #: NameSuite/name_processor/views/gramplet.py:34
 msgid "Navigate to an individual to check patronymic status."
-msgstr ""
+msgstr "Prejdite na konkrétnu osobu a skontrolujte stav otcovského mena."
 
 #: NameSuite/name_processor/views/gramplet.py:35
-#, fuzzy
-#| msgid "No Active Person set."
 msgid "No active person selected."
-msgstr "Nie je nastavená aktívna osoba."
+msgstr "Nebola vybraná žiadna aktívna osoba."
 
 #: NameSuite/name_processor/views/gramplet.py:37
 msgid ""
 "Patronymic inference can't be inferred for non-binary or unknown genders."
-msgstr ""
+msgstr "Otcovské meno nemožno odvodiť pre nebinárne alebo neznáme pohlavia."
 
 #: NameSuite/name_processor/views/gramplet.py:40
 msgid "Individual already has a recorded patronymic."
-msgstr ""
+msgstr "Osoba už má zaznamenané otcovské meno."
 
 #: NameSuite/name_processor/views/gramplet.py:43
 msgid "No attached father found in database family records."
-msgstr ""
+msgstr "V databáze rodinných záznamov nebol nájdený žiadny priradený otec."
 
 #: NameSuite/name_processor/views/gramplet.py:46
 msgid "Father lacks a recorded first name."
-msgstr ""
+msgstr "Otec nemá zaznamenané prvé (krstné) meno."
 
 #: NameSuite/name_processor/views/gramplet.py:49
 msgid "Could not generate valid morphology patterns."
-msgstr ""
+msgstr "Nepodarilo sa vygenerovať platné morfologické vzory."
 
 #: NameSuite/name_processor/views/gramplet.py:51
 msgid "Patronymic applied successfully!"
-msgstr ""
+msgstr "Otcovské meno bolo úspešne priradené!"
 
 #: NameSuite/name_processor/views/gramplet.py:77
-#, fuzzy
-#| msgid "🔍 AI Suggestions"
 msgid "Apply Suggestion"
-msgstr "🔍 Návrhy AI"
+msgstr "Aplikovať návrh"
 
 #: NameSuite/name_processor/views/tool.py:92
 msgid "Infer East Slavic Patronymics"
-msgstr ""
+msgstr "Odvodiť východoslovanské patronymá"
 
 #: NameSuite/name_processor/views/tool.py:112
-#, fuzzy
-#| msgid "Checking Given Names"
 msgid "Rename Given Names"
-msgstr "Kontrola daných mien"
+msgstr "Premenovať dané (krstné) mená"
 
 #: NameSuite/name_processor/views/tool.py:115
-#, fuzzy
-#| msgid "Patronymic names:"
 msgid "Audit Patronymics"
-msgstr "Patronymické mená:"
+msgstr "Skontrolovať patronymá"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:68
 msgid "Auditing Settings"
-msgstr ""
+msgstr "Nastavenia kontroly"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:76
-#, fuzzy
-#| msgid "Place of Record"
 msgid "All Records"
-msgstr "Miesto zápisu"
+msgstr "Všetky záznamy"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:77
-#, fuzzy
-#| msgid "Male line"
 msgid "Males Only"
-msgstr "Mužská línia"
+msgstr "Iba mužov"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:78
-#, fuzzy
-#| msgid "Female line"
 msgid "Females Only"
-msgstr "Ženská línia"
+msgstr "Iba ženy"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:82
-#, fuzzy
-#| msgid "Configure"
 msgid "Configure Rules..."
-msgstr "Konfigurovať"
+msgstr "Konfigurácia pravidiel..."
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:87
 msgid "Match Pre-Revolutionary Orthography"
-msgstr ""
+msgstr "Zhoda s predrevolučnou ortografiou"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:95
-#, fuzzy
-#| msgid "Edit tags"
 msgid "Audit Database"
-msgstr "Upraviť štítky"
+msgstr "Skontrolovať databázu"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:117
-#, fuzzy
-#| msgid "Select the graph direction."
 msgid "Select All Safe Corrections"
-msgstr "Vyberte smer diagramu."
+msgstr "Vybrať všetky bezpečné opravy"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:122
 #: NameSuite/name_processor/views/tool_rename_tab.py:116
-#, fuzzy
-#| msgid "Apply to selected places"
 msgid "Apply Selected Corrections"
-msgstr "Aplikovať na vybrané miesta"
+msgstr "Aplikovať vybrané opravy"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:162
-#, fuzzy
-#| msgid "Configure"
 msgid "Configure Rules"
-msgstr "Konfigurovať"
+msgstr "Konfigurácia pravidiel"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:186
 #: NameSuite/name_processor/views/tool_rename_tab.py:156
-#, fuzzy
-#| msgid "India"
 msgid "Individual"
-msgstr "India"
+msgstr "Jedinec"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:190
 #: NameSuite/name_processor/views/tool_rename_tab.py:158
-#, fuzzy
-#| msgid "Current sort"
 msgid "Current"
-msgstr "Aktuálne zoradenie"
+msgstr "Aktuálne"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:193
-#, fuzzy
-#| msgid "Section"
 msgid "Correction"
-msgstr "Sekcia"
+msgstr "Korekcia"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:200
-#, fuzzy
-#| msgid "Configure"
 msgid "Conf"
 msgstr "Konfigurovať"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:201
-#, fuzzy
-#| msgid "Event Year"
 msgid "Ref Year"
-msgstr "Rok udalosti"
+msgstr "Referenčný rok"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:204
-#, fuzzy
-#| msgid "Relation"
 msgid "Explanation"
-msgstr "Vzťah"
+msgstr "Vysvetlenie"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:243
-#, fuzzy
-#| msgid "Completed?"
 msgid "Audit Complete!"
-msgstr "Dokončený?"
+msgstr "Kontrola dokončená!"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:248
-#, fuzzy
-#| msgid "Result"
 msgid "No Results"
-msgstr "Výsledok"
+msgstr "Žiadne výsledky"
 
 #: NameSuite/name_processor/views/tool_audit_tab.py:248
-#, fuzzy
-#| msgid "No persons found..."
 msgid "No issues found."
-msgstr "Žiadne osoby nenájdené..."
+msgstr "Neboli nájdené žiadne problémy."
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:63
-#, fuzzy
-#| msgid "Search result places"
 msgid "Search and Replace Options"
-msgstr "Výsledky vyhľadávania miest"
+msgstr "Možnosti vyhľadávania a nahradzovania"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:70
-#, fuzzy
-#| msgid "Spouse name:"
 msgid "Source Name:"
-msgstr "Meno manžela/manželky:"
+msgstr "Zdrojové meno:"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:72
 msgid "e.g. Иоанн"
-msgstr ""
+msgstr "napr. Иоанн"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:75
-#, fuzzy
-#| msgid "Street Name"
 msgid "Target Name:"
-msgstr "Názov ulice"
+msgstr "Cieľové meno:"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:77
 msgid "e.g. Иван"
-msgstr ""
+msgstr "napr. Иван"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:80
 msgid "Match Mode:"
-msgstr ""
+msgstr "Režim zhody:"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:82
 msgid "Exact Match"
-msgstr ""
+msgstr "Presná zhoda"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:83
-#, fuzzy
-#| msgid "Search substring..."
 msgid "Substring"
-msgstr "Hľadanie podreťazca..."
+msgstr "Časť reťazca"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:84
-#, fuzzy
-#| msgid "Allow regular expressions."
 msgid "Regular Expression"
-msgstr "Povoliť regulárne výrazy."
+msgstr "Regulárny výraz"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:88
-#, fuzzy
-#| msgid "Index of Names"
 msgid "Scan for Names"
-msgstr "Register mien"
+msgstr "Skenovať mená"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:93
 msgid "Preserve original name as alternative"
-msgstr ""
+msgstr "Zachovať pôvodné meno ako alternatívu"
 
 #: NameSuite/name_processor/views/tool_rename_tab.py:160
-#, fuzzy
-#| msgid "Proposed sort"
 msgid "Proposed"
-msgstr "Navrhované zoradenie"
+msgstr "Navrhované"
 
 #: NetworkChart/NetworkChart.gpr.py:24
 msgid "Network Chart"
@@ -19300,6 +19777,10 @@ msgstr "Osobný prehľad"
 msgid "Gramplet showing an overview of events for a person"
 msgstr "Gramplet zobrazujúci prehľad udalostí pre osobu"
 
+#: Overview/Overview.gpr.py:37 Overview/Overview.gpr.py:53
+msgid "Overview"
+msgstr "Prehľad"
+
 #: Overview/Overview.gpr.py:45
 msgid "Family Overview"
 msgstr "Rodinný prehľad"
@@ -19704,6 +20185,51 @@ msgstr "Farba štítku a priorita"
 #: PersonEverything/PersonEverything.py:961
 msgid "No source information found"
 msgstr "Neboli nájdené žiadne informácie o zdroji"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.gpr.py:25
+msgid "Person Relationship Filter"
+msgstr "Filter vzťahov osôb"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.gpr.py:26
+msgid "Gramplet providing a person filter on relationships"
+msgstr "Gramplet poskytujúci filter osôb podľa vzťahov"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.gpr.py:33
+msgid "Relationship Filter"
+msgstr "Filter vzťahov"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:82
+msgid "Children of name match"
+msgstr "Deti so zhodným menom"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:84
+msgid "Matches children of anybody with a given name"
+msgstr "Zodpovedá deťom akejkoľvek osoby s daným menom"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:251
+msgid "Sibling 1"
+msgstr "Súrodenec 1"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:252
+msgid "Sibling 2"
+msgstr "Súrodenec 2"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:253
+msgid "Child 1"
+msgstr "Dieťa 1"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:254
+msgid "Child 2"
+msgstr "Dieťa 2"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:282
+msgid "Probably Alive"
+msgstr "Pravdepodobne nažive"
+
+#: PersonRelationshipFilter/PersonRelationshipFilter.py:284
+#, python-format
+msgid "example: '%(msg1)s' or '%(msg2)s'"
+msgstr "príklad: '%(msg1)s' alebo '%(msg2)s'"
 
 #: PhotoTaggingGramplet/PhotoTaggingGramplet.gpr.py:29
 #: PhotoTaggingGramplet/PhotoTaggingGramplet.gpr.py:38
@@ -21297,9 +21823,9 @@ msgstr "Máte Gramps %s. Gratulujeme, máte aktuálnu verziu.\n"
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:608
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:661
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:729
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:913
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1133
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1354
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:923
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1143
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1364
 msgid " (Requires version "
 msgstr " (Vyžaduje verziu "
 
@@ -21322,9 +21848,9 @@ msgstr " alebo vyššiu nainštalovanú.)\n"
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:670
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:691
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:738
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:905
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1123
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1346
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:915
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1133
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1356
 msgid " (Passed: version "
 msgstr " (Úspešné: verzia "
 
@@ -21333,10 +21859,10 @@ msgstr " (Úspešné: verzia "
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:648
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:649
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:716
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:894
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:966
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:967
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1295
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:904
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:976
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:977
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1305
 msgid "unknown version"
 msgstr "neznáma verzia"
 
@@ -21356,23 +21882,34 @@ msgstr " alebo vyššiu.)\n"
 msgid " (Requires "
 msgstr " (Vyžaduje "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:796
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:789
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:806
 msgid " • Berkeley Database library (bsddb3: "
 msgstr " • knižnicu Berkeley Database (bsddb3: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:827
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:791
+msgid ""
+")\n"
+"\tRequires  BerkeleyDB or Python-bsddb3 Python adapter and the Berkeley "
+"database"
+msgstr ""
+")\n"
+"\tVyžaduje  BerkeleyDB alebo adaptér Python-bsddb3 pre Python a databázu "
+"Berkeley"
+
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:837
 msgid " • SQLite Database library (sqlite3: "
 msgstr " • knižnicu SQLite Database (sqlite3: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:844
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:854
 msgid " • xdg-utils (Manual check see instructions link)"
 msgstr " • xdg-utils (manuálna kontrola, pozri odkaz s pokynmi)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:857
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:867
 msgid " • librsvg2 (Manual check see instructions link)"
 msgstr " • librsvg2 (manuálna kontrola, pozri odkaz s pokynmi)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:869
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:879
 msgid ""
 " • language-pack-gnome-xx (Manual check see instructions link) for your "
 "Language <show locale here TBD>"
@@ -21380,49 +21917,49 @@ msgstr ""
 " • language-pack-gnome-xx (manuálna kontrola, pozri odkaz s pokynmi) pre váš "
 "jazyk <zobraziť lokalitu tu TBD>"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:907
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1348
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1356
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1798
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1807
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2021
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:917
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1358
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1366
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1808
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1817
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2031
 msgid " or greater installed.)"
 msgstr " alebo vyššiu nainštalovanú verziu.)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:915
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:925
 msgid " or greater)"
 msgstr " alebo vyššiu)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:948
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:958
 msgid "Graphviz not in system PATH"
 msgstr "Graphviz nie je v systémovom PATH"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1014
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1024
 msgid "Ghostscript not in system PATH"
 msgstr "Ghostscript nie je v systémovom PATH"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1032
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1042
 msgid " (Passed: version 0.5.x is installed.)"
 msgstr " (Úspešné: verzia 0.5.x je nainštalovaná.)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1035
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1045
 msgid " (Requires version 0.5.x)"
 msgstr " (Vyžaduje verziu 0.5.x)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1037
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1047
 msgid " • python-fontconfig not found, (Requires version 0.5.x)"
 msgstr " • python-fontconfig nenájdený, (Vyžaduje verziu 0.5.x)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1039
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1049
 msgid " • python-fontconfig installed, version unavailable"
 msgstr " • python-fontconfig nainštalovaný, verzia nedostupná"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1125
 #: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1135
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1145
 msgid " or greater installed.) (enchant module: "
 msgstr " alebo vyššia verzia je nainštalovaná.) (enchant modul: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1194
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1204
 #, python-format
 msgid ""
 " • rcs %s TBD (Passed: version %s or greater installed. If not on Microsoft "
@@ -21431,7 +21968,7 @@ msgstr ""
 " • rcs %s TBD (Úspešné: nainštalovaná verzia %s alebo vyššia. Ak nie v "
 "systéme Microsoft Windows)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1199
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1209
 #, python-format
 msgid ""
 " • rcs %s TBD (Requires version %s or greater installed. If not on Microsoft "
@@ -21440,22 +21977,22 @@ msgstr ""
 " • rcs %s TBD (vyžaduje nainštalovanú verziu %s alebo vyššiu. Ak nie v "
 "systéme Microsoft Windows)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1316
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1326
 msgid "exiv2 executable not installed, can't retrieve libexiv2 version."
 msgstr ""
 "Spustiteľný súbor exiv2 nie je nainštalovaný, nie je možné zistiť verziu "
 "knižnice libexiv2."
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1317
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1327
 #, python-format
 msgid "GExiv2 : %s (Exiv2 library : %s)"
 msgstr "GExiv2 : %s (knižnica Exiv2 : %s)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1394
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1404
 msgid "found another font"
 msgstr "nájdený iný font"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1403
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1413
 msgid ""
 "For addon Networkchart, font <a href=\"https://www.fontsquirrel.com/fonts/"
 "white-rabbit\">White Rabbit</a> provides an extremely readable result.\n"
@@ -21463,81 +22000,81 @@ msgstr ""
 "Pre doplnok Networkchart, písmo <a href=\"https://www.fontsquirrel.com/fonts/"
 "white-rabbit\">White Rabbit</a> poskytuje mimoriadne čitateľný výsledok.\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1447
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1505
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1516
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1527
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1457
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1515
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1526
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1537
 msgid "not installed"
 msgstr "nenainštalovaný"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1535
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1545
 msgid "     and one of either: (pydotplus: "
 msgstr "     a jeden z buď:(pydotplus: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1537
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1547
 msgid ") or (pygraphviz: "
 msgstr ") alebo (pygraphviz: "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1566
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1576
 msgid "Installed(MS-Windows)"
 msgstr "Nainštalovaný (MS-Windows)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1570
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1580
 msgid "Installed(Linux/Mac)"
 msgstr "Nainštalovaný (Linux/Mac)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1607
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1617
 msgid "not installed "
 msgstr "nenainštalovaný "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1664
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1860
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1862
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1863
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1952
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1959
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1674
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1870
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1872
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1873
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1962
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1969
 msgid "not found."
 msgstr "nenájdený."
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1690
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1700
 msgid "Standard. Passed: program installed - 32bit on 64bit Win OS."
 msgstr "Štandard. Úspšné: program nainštalovaný - 32bit na 64bit Win OS."
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1749
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1759
 msgid ") (Requires the gramps addon listed under 'Plugin lib')"
 msgstr ") (Vyžaduje doplnok gramps uvedený v časti 'Plugin lib')"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1785
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1795
 msgid "DBF installed"
 msgstr "DBF nainštalovaný"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1796
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1806
 msgid ".)(Requires version "
 msgstr ".)(Vyžaduje verziu "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1805
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1815
 msgid " installed.)(Passed: version "
 msgstr " nainštalovaný.)(Úspešné: verzia "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1962
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:1972
 #, python-format
 msgid "(OpenCV facedetection: %s)"
 msgstr "(OpenCV detekcia tváre: %s)"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2019
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2029
 msgid " (lxml: not found. Requires version "
 msgstr " (lxml:nenájdený. Vyžaduje verziu "
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2041
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2051
 msgid " • Requires: MongoDB TBD / pymongo TBD"
 msgstr " • Vyžaduje: MongoDB TBD / pymongo TBD"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2055
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2065
 #, python-format
 msgid " • Operating System: %s"
 msgstr " • Operačný systém: %s"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2078
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2088
 #, fuzzy
 msgid ""
 "<u><b><a href=\"https://gramps-project.org/wiki/index.php?"
@@ -21550,29 +22087,29 @@ msgstr ""
 "_Command_Line#LANG.2C_LANGUAGE.2C_LC_MESSAGE.2C_LC_TIME\">Locale Settings:</"
 "a></b></u>\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2086
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2087
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2088
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2089
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2150
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2151
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2152
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2153
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2096
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2097
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2098
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2099
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2160
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2161
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2162
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2163
 msgid "not set"
 msgstr "nenastavené"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2091
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2092
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2093
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2094
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2155
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2156
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2157
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2158
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2101
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2102
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2103
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2104
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2165
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2166
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2167
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2168
 msgid "not tested"
 msgstr "netestované"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2123
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2133
 msgid ""
 "\n"
 "Installed Locales\\Translations (If only English is listed please re-install "
@@ -21585,7 +22122,7 @@ msgstr ""
 "slovníky)\n"
 "\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2161
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2171
 msgid ""
 "\n"
 "Gramps Environment variables:\n"
@@ -21593,13 +22130,13 @@ msgstr ""
 "\n"
 "Premenné prostredia Gramps:\n"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2200
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2263
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2300
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2210
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2273
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2310
 msgid "found"
 msgstr "nájdené"
 
-#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2309
+#: PrerequisitesCheckerGramplet/PrerequisitesCheckerGramplet.py:2319
 msgid ""
 "Sphinx is a tool that builds the Gramps development documentation and man "
 "pages\n"
@@ -23340,11 +23877,15 @@ msgid ""
 msgstr ""
 "Priame importovanie zo súborov TMG nie je podporované\n"
 "doplnkom TMG Importer.\n"
+"\n"
 "Musíte použiť záložnú kópiu projektu TMG (*.sqz)\n"
+"\n"
 "Uistite sa, že váš projekt TMG bol vytvorený pomocou:\n"
 "TMG verzie 5.x alebo vyššej.\n"
+"\n"
 "Váš súbor:\n"
 "*.VER - Version Control File for TMG 1.2 and earlier\n"
+"\n"
 "Ďalšie informácie nájdete na:\n"
 "%(gramps_wiki_import_pjc_direct_url)s"
 
@@ -25286,26 +25827,71 @@ msgstr "Zobraziť stĺpce"
 msgid "Display Icons"
 msgstr "Zobraziť ikony"
 
-#: WordleGramplet/WordleGramplet.gpr.py:4
-#: WordleGramplet/WordleGramplet.gpr.py:10
-msgid "Wordle"
-msgstr "Wordle"
+#: WordClouds/WordClouds.gpr.py:24 WordClouds/WordClouds.gpr.py:32
+msgid "Given Name Word Cloud"
+msgstr "Oblak slov s danými (krstnými) menami"
 
-#: WordleGramplet/WordleGramplet.gpr.py:13
-msgid "Gramplet used to make word clouds with wordle.net"
-msgstr "Gramplet používaný na vytváranie oblakov slov s wordle.net"
+#: WordClouds/WordClouds.gpr.py:25
+msgid "Gramplet showing all given names as a word cloud"
+msgstr "Gramplet zobrazujúci všetky dané (krstné) mená ako oblak slov"
 
-#: WordleGramplet/WordleGramplet.py:126
-msgid "[Missing]"
-msgstr "Chýbajúci]"
+#: WordClouds/WordClouds.gpr.py:40 WordClouds/WordClouds.gpr.py:48
+msgid "Surname Word Cloud"
+msgstr "Oblak slov s priezviskami"
 
-#: WordleGramplet/WordleGramplet.py:140
-msgid "Number of font sizes"
-msgstr "Počet veľkostí písma"
+#: WordClouds/WordClouds.gpr.py:41
+msgid "Gramplet showing all surnames as a word cloud"
+msgstr "Gramplet zobrazujúci všetky priezviská ako oblak slov"
 
-#: WordleGramplet/WordleGramplet.py:144
-msgid "Select filter to restrict list"
-msgstr "Vyberte filter na vymedzenie zoznamu"
+#: WordClouds/WordClouds.gpr.py:56 WordClouds/WordClouds.gpr.py:64
+msgid "Place Word Cloud"
+msgstr "Oblak slov s miestami"
+
+#: WordClouds/WordClouds.gpr.py:57
+msgid "Gramplet showing all places as a word cloud"
+msgstr "Gramplet zobrazujúci všetky miesta ako oblak slov"
+
+#: WordClouds/cloudgramplet.py:147 WordClouds/cloudgramplet.py:225
+#, python-format
+msgid "Number of %s"
+msgstr "Počet od %s"
+
+#: WordClouds/cloudgramplet.py:149 WordClouds/cloudgramplet.py:227
+msgid "Color (low)"
+msgstr "Farba (slabá)"
+
+#: WordClouds/cloudgramplet.py:150 WordClouds/cloudgramplet.py:228
+msgid "Color (high)"
+msgstr "Farba (silná)"
+
+#: WordClouds/cloudgramplet.py:151 WordClouds/cloudgramplet.py:229
+msgid "Hover color"
+msgstr "Farba pri prechode kurzorom"
+
+#: WordClouds/cloudgramplet.py:152 WordClouds/cloudgramplet.py:230
+msgid "Layout quality"
+msgstr "Kvalita rozloženia"
+
+#: WordClouds/cloudgramplet.py:154 WordClouds/cloudgramplet.py:232
+msgid "Filter missing/unknown words"
+msgstr "Filtrovať chýbajúce/neznáme slová"
+
+#: WordClouds/cloudgramplet.py:207
+#, python-format
+msgid "[Missing %s]"
+msgstr "[Chýbajúce %s]"
+
+#: WordClouds/givennamewordcloudgramplet.py:50
+msgid "Click given name to view people with that given name"
+msgstr "Kliknutím na dané (krstné) meno zobrazíte ľudí s týmto daným menom"
+
+#: WordClouds/placewordcloudgramplet.py:53
+msgid "Click place name to view references"
+msgstr "Kliknutím na názov miesta zobrazíte odkazy"
+
+#: WordClouds/surnamewordcloudgramplet.py:49
+msgid "Click surname to view people with that surname"
+msgstr "Kliknutím na priezvisko zobrazíte ľudí s týmto priezviskom"
 
 #: libaccess/libaccess.gpr.py:34
 msgid "Provides a library for generic access to the database and gen.lib."
@@ -25761,6 +26347,46 @@ msgstr ""
 " \"%s\" \n"
 " do svojho preferovaného webového prehliadača ..."
 
+#~ msgid "Error accessing media object."
+#~ msgstr "Chyba prístupu k mediálnemu objektu."
+
+#~ msgid "Server authorization error."
+#~ msgstr "Chyba autorizácie servera."
+
+#~ msgid "Server authorization error: insufficient permissions."
+#~ msgstr "Chyba autorizácie servera: nedostatočné oprávnenia."
+
+#~ msgid "Error: URL not found."
+#~ msgstr "Chyba: Adresa URL sa nenašla."
+
+#, python-format
+#~ msgid "Error %s while connecting to server."
+#~ msgstr "Chyba %s pri pripájaní k serveru."
+
+#~ msgid "URL error while connecting to server."
+#~ msgstr "Chyba URL pri pripájaní k serveru."
+
+#~ msgid "Unable to synchronize changes to server."
+#~ msgstr "Zmeny sa nedajú synchronizovať so serverom."
+
+#~ msgid "Search"
+#~ msgstr "Vyhľadávanie"
+
+#~ msgid "Merge"
+#~ msgstr "Zlúčiť"
+
+#~ msgid "Wordle"
+#~ msgstr "Wordle"
+
+#~ msgid "Gramplet used to make word clouds with wordle.net"
+#~ msgstr "Gramplet používaný na vytváranie oblakov slov s wordle.net"
+
+#~ msgid "Number of font sizes"
+#~ msgstr "Počet veľkostí písma"
+
+#~ msgid "Select filter to restrict list"
+#~ msgstr "Vyberte filter na vymedzenie zoznamu"
+
 #, python-format
 #~ msgid "\\u2192 %s"
 #~ msgstr "\\u2192 %s"
@@ -25822,9 +26448,6 @@ msgstr ""
 #~ msgid "Export"
 #~ msgstr "Exportovať"
 
-#~ msgid "Overview"
-#~ msgstr "Prehľad"
-
 #~ msgid "No file parsed..."
 #~ msgstr "Nebol analyzovaný žiadny súbor..."
 
@@ -25850,9 +26473,6 @@ msgstr ""
 #, python-format
 #~ msgid "Cannot validate \"%(file)s\" !"
 #~ msgstr "Nemožno overiť \"%(file)s\" !"
-
-#~ msgid "Gramps version"
-#~ msgstr "Gramps verzia"
 
 #, python-format
 #~ msgid ""

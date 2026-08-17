@@ -19,7 +19,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import csv
-import ast
 import keyword
 import datetime
 from collections import defaultdict
@@ -34,6 +33,7 @@ import os
 from gi.repository import Gtk, Gdk, cairo, Pango
 
 from gramps.gen.db import DbTxn
+from gramps.gen import filters as gramps_filters
 from gramps.gen.plug import Gramplet
 from gramps.gen.display.name import displayer as name_displayer
 from gramps.gen.display.place import displayer as place_displayer
@@ -44,7 +44,8 @@ from gramps.gen.simple import SimpleAccess
 from gramps.gui.widgets.undoablebuffer import UndoableBuffer
 from gramps.gui.utils import match_primary_mask
 from gramps.gen.config import config as configman
-from gramps.gui.dialog import OkDialog, ErrorDialog
+from gramps.gui.dialog import OkDialog, ErrorDialog, SaveDialog
+from gramps.gui.display import display_help, display_url
 from gramps.gui.editors import (
     EditCitation,
     EditEvent,
@@ -57,6 +58,10 @@ from gramps.gui.editors import (
     EditSource,
 )
 from datadict2 import DataDict2, NoneData, set_sa
+from script_descriptions import SCRIPT_DESCRIPTIONS
+from script_utils import get_columns, extract_header_comment, SCRIPTS_DIR
+from namespace_builder import build_namespace
+from completion_popup import CompletionController
 
 _ = glocale.translation.gettext
 
@@ -73,18 +78,6 @@ def contains_any_none_data(args):
         return any(contains_any_none_data(arg) for arg in args)
     else:
         return not isinstance(args, NoneData)
-
-
-def get_columns(source, func_name):
-    try:
-        tree = ast.parse(source)
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Call):
-                if hasattr(node.func, "id") and node.func.id == func_name:
-                    return [ast.unparse(arg) for arg in node.args]
-    except Exception:
-        pass
-    return []
 
 
 class ScriptOpenFileChooserDialog(Gtk.FileChooserDialog):
@@ -115,6 +108,37 @@ class ScriptOpenFileChooserDialog(Gtk.FileChooserDialog):
         filter_all.set_name("All files")
         filter_all.add_pattern("*.*")
         self.add_filter(filter_all)
+
+        self.preview_label = Gtk.Label()
+        self.preview_label.set_line_wrap(True)
+        self.preview_label.set_xalign(0)
+        self.preview_label.set_yalign(0)
+        preview_scrolled = Gtk.ScrolledWindow()
+        preview_scrolled.set_size_request(220, -1)
+        preview_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        preview_scrolled.add(self.preview_label)
+        preview_scrolled.show_all()
+        self.set_preview_widget(preview_scrolled)
+        self.connect("update-preview", self.on_update_preview)
+
+    def on_update_preview(self, dialog):
+        filename = dialog.get_preview_filename()
+        text = ""
+        if filename and filename.endswith(".gram.py") and os.path.isfile(filename):
+            basename = os.path.basename(filename)
+            if basename in SCRIPT_DESCRIPTIONS:
+                title, description = SCRIPT_DESCRIPTIONS[basename]
+                text = "%s\n\n%s" % (title, description)
+            else:
+                try:
+                    text = extract_header_comment(open(filename).read())
+                except Exception:
+                    text = ""
+        if text:
+            self.preview_label.set_text(text)
+            dialog.set_preview_widget_active(True)
+        else:
+            dialog.set_preview_widget_active(False)
 
 
 class ScriptSaveFileChooserDialog(Gtk.FileChooserDialog):
@@ -255,6 +279,8 @@ class GrampyScript(Gramplet):
             "events",
             "selected",
             "filtered",
+            "custom_filter",
+            "delete",
         ]
         self.constants = [
             "True",
@@ -279,14 +305,14 @@ class GrampyScript(Gramplet):
         self.liststore = None
         self.text_length = 0
         self.chart_data = None
+        self.converting_tabs = False
         self.gui.WIDGET = self.build_gui()
         self.gui.get_container_widget().remove(self.gui.textview)
         self.gui.get_container_widget().add(self.gui.WIDGET)
+        self.update_filename_label()
         if os.path.exists(self.last_filename):
             self.ebuf.set_text(open(self.last_filename).read())
-            self.statusmsg.set_text("Loaded %r" % self.last_filename)
         else:
-            self.statusmsg.set_text("Current filename: %r" % self.last_filename)
             self.ebuf.set_text(
                 """# This is a sample script
 
@@ -294,6 +320,7 @@ for person in people():
     row(person)
 """
             )
+        self.ebuf.set_modified(False)
 
     def build_gui(self):
         """
@@ -309,15 +336,19 @@ for person in people():
         openitem = Gtk.MenuItem(label=_("Open..."))
         save_item = Gtk.MenuItem(label=_("Save"))
         save_as_item = Gtk.MenuItem(label=_("Save as..."))
+        help_item = Gtk.MenuItem(label=_("Help"))
         filemenu.append(newitem)
         filemenu.append(openitem)
         filemenu.append(save_item)
         filemenu.append(save_as_item)
+        filemenu.append(Gtk.SeparatorMenuItem())
+        filemenu.append(help_item)
         menubar.append(fileitem)
         newitem.connect("activate", self.new_script)
         openitem.connect("activate", self.open_script)
         save_as_item.connect("activate", self.save_as_script)
         save_item.connect("activate", self.save_script)
+        help_item.connect("activate", self.show_help)
 
         datamenu = Gtk.Menu()
         dataitem = Gtk.MenuItem(label=_("Data"))
@@ -352,6 +383,7 @@ for person in people():
 
         self.editor_textview.connect("key-press-event", self.on_key_press)
         self.editor_textview.connect("button-press-event", self.on_textview_click)
+        self.editor_textview.connect("focus-out-event", self.on_editor_focus_out)
         key, mods = Gtk.accelerator_parse("<Alt>c")
         self.editor_textview.add_accelerator(
             "copy-clipboard", self.accel_group, key, mods, Gtk.AccelFlags.VISIBLE
@@ -366,6 +398,8 @@ for person in people():
         )
         self.ebuf = UndoableBuffer()
         self.editor_textview.set_buffer(self.ebuf)
+        self.ebuf.connect_after("insert-text", self.on_insert_text_after)
+        self.ebuf.connect("modified-changed", self.on_modified_changed)
         self.keyword_tag = self.ebuf.create_tag(
             "keyword", foreground="blue", weight=700
         )
@@ -378,9 +412,30 @@ for person in people():
         self.comment_tag = self.ebuf.create_tag(
             "comment", foreground="gray", style=Pango.Style.ITALIC
         )
+        self.string_tag = self.ebuf.create_tag("string", foreground="brown")
         self.ebuf.connect("changed", self.on_buffer_changed)
+        self.completion = CompletionController(
+            self.editor_textview, get_namespace=lambda: build_namespace(self.dbstate.db)
+        )
 
         widget.pack_start(self.editor, True, True, 0)
+
+        bbox = Gtk.ButtonBox()
+        self.apply_button = Gtk.Button(label=_("Execute <Alt+Enter>"))
+        self.apply_button.connect("clicked", self.apply_clicked)
+        self.apply_button.set_tooltip_text(_("Execute the script"))
+        css = b"* {background: #00aa00; color: white}"
+        provider = Gtk.CssProvider()
+        try:
+            provider.load_from_data(css)
+            self.apply_button.get_style_context().add_provider(
+                provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
+        except:
+            pass
+
+        bbox.pack_start(self.apply_button, False, False, 6)
+        widget.pack_start(bbox, False, False, 6)
 
         self.notebook = Gtk.Notebook()
 
@@ -402,52 +457,109 @@ for person in people():
 
         widget.pack_start(self.notebook, True, True, 0)
 
-        bbox = Gtk.ButtonBox()
-        self.apply_button = Gtk.Button(label=_("Execute <Alt+Enter>"))
-        self.apply_button.connect("clicked", self.apply_clicked)
-        self.apply_button.set_tooltip_text(_("Execute the script"))
-        css = b"* {background: #00aa00; color: white}"
-        provider = Gtk.CssProvider()
-        try:
-            provider.load_from_data(css)
-            self.apply_button.get_style_context().add_provider(
-                provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-            )
-        except:
-            pass
-
-        bbox.pack_start(self.apply_button, False, False, 6)
-        widget.pack_start(bbox, False, False, 6)
-
-        self.statusmsg = Gtk.Label(_("Ready..."))
-        self.statusmsg.set_xalign(0)  # 0.0 for left, 0.5 for center, 1.0 for right
-        self.statusmsg.get_style_context().add_class('bordered-label')  #add a css class
         css = b"""
         .bordered-label {
             border: 1px solid gray;
             padding: 1px;
         }
+        .bold-label {
+            font-weight: bold;
+            padding: 1px;
+        }
         """
         provider = Gtk.CssProvider()
         provider.load_from_data(css)
+
+        self.filename_label = Gtk.Label()
+        self.filename_label.set_xalign(0)
+        self.filename_label.get_style_context().add_class('bold-label')
+        self.filename_label.get_style_context().add_provider(
+            provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        self.statusmsg = Gtk.Label(_("Ready... (Tab for completions)"))
+        self.statusmsg.set_xalign(0)  # 0.0 for left, 0.5 for center, 1.0 for right
+        # Some status messages embed the full path of the current file
+        # (e.g. "Loaded '/home/.../scripts/some_script.gram.py'"), which
+        # would otherwise force the whole gramplet wider than its
+        # container. Ellipsize and cap the natural width so it truncates
+        # instead -- max_width_chars is what actually bounds the natural
+        # size request; ellipsize alone only takes effect once allocated
+        # space is already smaller than that.
+        self.statusmsg.set_ellipsize(Pango.EllipsizeMode.MIDDLE)
+        self.statusmsg.set_max_width_chars(40)
+        self.statusmsg.get_style_context().add_class('bordered-label')  #add a css class
         self.statusmsg.get_style_context().add_provider(
             provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
-        widget.pack_start(self.statusmsg, False, False, 1)
+
+        status_box = Gtk.HBox()
+        status_box.pack_start(self.filename_label, False, False, 1)
+        status_box.pack_start(self.statusmsg, True, True, 10)
+        widget.pack_start(status_box, False, False, 1)
 
         widget.show_all()
         return widget
 
+    def update_filename_label(self):
+        name = os.path.basename(self.last_filename) if self.last_filename else _("Untitled")
+        if self.ebuf.get_modified():
+            name = "*" + name
+        self.filename_label.set_text(name)
+
+    def on_modified_changed(self, buffer):
+        self.update_filename_label()
+
+    def check_unsaved_changes(self, proceed):
+        """
+        If the script has unsaved changes, ask the user whether to save,
+        discard, or cancel before calling `proceed`. Otherwise call
+        `proceed` immediately.
+        """
+        if not self.ebuf.get_modified():
+            proceed()
+            return
+
+        def discard():
+            proceed()
+
+        def save_then_proceed():
+            self.save_script(None)
+            if not self.ebuf.get_modified():
+                proceed()
+
+        SaveDialog(
+            _("Save Changes?"),
+            _(
+                "If you continue without saving, the changes you have "
+                "made to this script will be lost."
+            ),
+            discard,
+            save_then_proceed,
+            parent=self.uistate.window,
+        )
+
     def new_script(self, widget):
         # type: (Any) -> None
+        self.check_unsaved_changes(self._do_new_script)
+
+    def _do_new_script(self):
         self.ebuf.set_text("")
-        self.statusmsg.set_text("Ready...")
+        self.ebuf.set_modified(False)
+        self.last_filename = ""
+        self.update_filename_label()
+        self.statusmsg.set_text(_("Ready... (Tab for completions)"))
 
     def open_script(self, widget):
         # type: (Gtk.Widget) -> None
+        self.check_unsaved_changes(self._do_open_script)
+
+    def _do_open_script(self):
         choose_file_dialog = ScriptOpenFileChooserDialog(self.uistate)
         if self.last_filename:
             choose_file_dialog.set_filename(self.last_filename)
+        elif os.path.isdir(SCRIPTS_DIR):
+            choose_file_dialog.set_current_folder(SCRIPTS_DIR)
 
         while True:
             response = choose_file_dialog.run()
@@ -458,11 +570,12 @@ for person in people():
             elif response == Gtk.ResponseType.OK:
                 filename = choose_file_dialog.get_filename()
                 self.ebuf.set_text(open(filename).read())
+                self.ebuf.set_modified(False)
                 self.statusmsg.set_text("Script loaded")
                 self.last_filename = filename
                 config.set("defaults.last_filename", filename)
                 config.save()
-                self.statusmsg.set_text("Loaded %r" % self.last_filename)
+                self.update_filename_label()
                 break
 
         choose_file_dialog.destroy()
@@ -473,7 +586,8 @@ for person in people():
             return
         with open(self.last_filename, "w") as fp:
             fp.write(self.get_text())
-        self.statusmsg.set_text("Saved %r" % self.last_filename)
+        self.ebuf.set_modified(False)
+        self.statusmsg.set_text("Saved")
 
     def save_as_script(self, widget):
         choose_file_dialog = ScriptSaveFileChooserDialog(self.uistate)
@@ -483,6 +597,8 @@ for person in people():
         choose_file_dialog.set_do_overwrite_confirmation(True)
         if self.last_filename:
             choose_file_dialog.set_filename(self.last_filename)
+        elif os.path.isdir(SCRIPTS_DIR):
+            choose_file_dialog.set_current_folder(SCRIPTS_DIR)
 
         while True:
             response = choose_file_dialog.run()
@@ -494,13 +610,22 @@ for person in people():
                 filename = choose_file_dialog.get_filename()
                 with open(filename, "w") as fp:
                     fp.write(self.get_text())
+                self.ebuf.set_modified(False)
                 self.last_filename = filename
                 config.set("defaults.last_filename", filename)
                 config.save()
-                self.statusmsg.set_text("Saved as %r (now current)" % self.last_filename)
+                self.update_filename_label()
+                self.statusmsg.set_text("Saved as (now current)")
                 break
 
         choose_file_dialog.destroy()
+
+    def show_help(self, widget):
+        help_url = self.gui.help_url
+        if help_url and help_url.startswith(("http://", "https://")):
+            display_url(help_url)
+        else:
+            display_help(help_url)
 
     def save_csv(self, widget):
         if self.liststore is None:
@@ -573,6 +698,22 @@ for person in people():
 
     def on_buffer_changed(self, buffer):
         self.highlight_syntax()
+        self.completion.on_buffer_changed()
+
+    def on_insert_text_after(self, buffer, text_iter, text, length):
+        if "\t" not in text or self.converting_tabs:
+            return
+        self.converting_tabs = True
+        try:
+            end_offset = text_iter.get_offset()
+            start_offset = end_offset - len(text)
+            start = buffer.get_iter_at_offset(start_offset)
+            end = buffer.get_iter_at_offset(end_offset)
+            new_text = text.replace("\t", "    ")
+            buffer.delete(start, end)
+            buffer.insert(buffer.get_iter_at_offset(start_offset), new_text)
+        finally:
+            self.converting_tabs = False
 
     def highlight_syntax(self):
         start_iter = self.ebuf.get_start_iter()
@@ -581,37 +722,56 @@ for person in people():
 
         text = self.ebuf.get_text(start_iter, end_iter, True)
 
+        def inside_span(match, spans):
+            start_offset = match.start()
+            end_offset = match.end()
+            for span_start, span_end in spans:
+                if start_offset >= span_start and end_offset <= span_end:
+                    return True
+            return False
+
+        # Strings are found first so that keywords/comments inside them (eg.
+        # "with" in a docstring, or a "#" in a quoted string) aren't
+        # mistaken for code.
+        string_pattern = (
+            r'"""[\s\S]*?"""'
+            r"|'''[\s\S]*?'''"
+            r'|"(?:[^"\\\n]|\\.)*"'
+            r"|'(?:[^'\\\n]|\\.)*'"
+        )
+        string_matches = []
+        for match in re.finditer(string_pattern, text):
+            start = self.ebuf.get_iter_at_offset(match.start())
+            end = self.ebuf.get_iter_at_offset(match.end())
+            self.ebuf.apply_tag(self.string_tag, start, end)
+            string_matches.append((match.start(), match.end()))
+
         comment_matches = []
         for match in re.finditer(r"#.*", text):
+            if inside_span(match, string_matches):
+                continue
             start = self.ebuf.get_iter_at_offset(match.start())
             end = self.ebuf.get_iter_at_offset(match.end())
             self.ebuf.apply_tag(self.comment_tag, start, end)
             comment_matches.append((match.start(), match.end()))
 
-        def inside_comment(match):
-            start_offset = match.start()
-            end_offset = match.end()
-            # Check if the keyword overlaps with a comment
-            for comment_start, comment_end in comment_matches:
-                if start_offset >= comment_start and end_offset <= comment_end:
-                    return True
-            return False
+        skip_spans = string_matches + comment_matches
 
         for keyword in self.keywords:
             for match in re.finditer(r"\b" + keyword + r"\b", text):
-                if not inside_comment(match):
+                if not inside_span(match, skip_spans):
                     start = self.ebuf.get_iter_at_offset(match.start())
                     end = self.ebuf.get_iter_at_offset(match.end())
                     self.ebuf.apply_tag(self.keyword_tag, start, end)
         for constant in self.constants:
             for match in re.finditer(r"\b" + constant + r"\b", text):
-                if not inside_comment(match):
+                if not inside_span(match, skip_spans):
                     start = self.ebuf.get_iter_at_offset(match.start())
                     end = self.ebuf.get_iter_at_offset(match.end())
                     self.ebuf.apply_tag(self.constant_tag, start, end)
         for function in self.functions:
             for match in re.finditer(r"\b" + function + r"\b", text):
-                if not inside_comment(match):
+                if not inside_span(match, skip_spans):
                     start = self.ebuf.get_iter_at_offset(match.start())
                     end = self.ebuf.get_iter_at_offset(match.end())
                     self.ebuf.apply_tag(self.function_tag, start, end)
@@ -786,38 +946,155 @@ for person in people():
             return str(item)
 
     def on_textview_click(self, widget, event):
+        self.completion.close()
         if event.button == 1:  # Left mouse button
             widget.grab_focus()
 
+    def on_editor_focus_out(self, widget, event):
+        self.completion.close()
+        return False
+
     def on_key_press(self, textview, event):
-        if event.keyval == Gdk.KEY_Tab:
+        keyval = event.keyval
+        shift_tab = keyval == Gdk.KEY_ISO_Left_Tab or (
+            keyval == Gdk.KEY_Tab and (event.state & Gdk.ModifierType.SHIFT_MASK)
+        )
+
+        if shift_tab:
+            self.dedent_selection()
+            return True
+
+        if keyval == Gdk.KEY_Tab and self.ebuf.get_has_selection():
+            self.indent_selection()
+            return True
+
+        if self.completion.on_key_press(event):
+            return True
+
+        if keyval == Gdk.KEY_Tab:
             # buffer = textview.get_buffer()
             iter_ = self.ebuf.get_iter_at_mark(self.ebuf.get_insert())
             self.ebuf.insert(iter_, "    ")  # Insert 4 spaces
             return True
 
-        elif event.keyval == Gdk.KEY_Return and (
-            event.state & Gdk.ModifierType.MOD1_MASK
-        ):
+        elif keyval == Gdk.KEY_Return and (event.state & Gdk.ModifierType.MOD1_MASK):
             self.apply_button.emit("clicked")
             return True
 
-        elif event.keyval == Gdk.KEY_c and (event.state & Gdk.ModifierType.MOD1_MASK):
+        elif keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+            self.insert_auto_indent_newline()
+            return True
+
+        elif keyval == Gdk.KEY_c and (event.state & Gdk.ModifierType.MOD1_MASK):
             self.copy_selected_text()
             return True
 
-        elif (Gdk.keyval_name(event.keyval) == "Z") and match_primary_mask(
+        elif (Gdk.keyval_name(keyval) == "Z") and match_primary_mask(
             event.get_state(), Gdk.ModifierType.SHIFT_MASK
         ):
             self.redo()
             return True
-        elif (Gdk.keyval_name(event.keyval) == "z") and match_primary_mask(
+        elif (Gdk.keyval_name(keyval) == "z") and match_primary_mask(
             event.get_state()
         ):
             self.undo()
             return True
 
+        elif keyval == Gdk.KEY_slash and match_primary_mask(event.get_state()):
+            self.toggle_comment_selection()
+            return True
+
         return False
+
+    def compute_indent_for_new_line(self, text_before_cursor):
+        stripped = text_before_cursor.rstrip()
+        indent = re.match(r"[ \t]*", text_before_cursor).group(0).replace("\t", "    ")
+        if stripped.endswith(":"):
+            indent += "    "
+        elif re.match(r"^[ \t]*(return|pass|break|continue|raise)\b", stripped):
+            if indent.endswith("    "):
+                indent = indent[:-4]
+        return indent
+
+    def insert_auto_indent_newline(self):
+        buf = self.ebuf
+        it = buf.get_iter_at_mark(buf.get_insert())
+        line_start = it.copy()
+        line_start.set_line_offset(0)
+        text_before_cursor = buf.get_text(line_start, it, True)
+        indent = self.compute_indent_for_new_line(text_before_cursor)
+        buf.insert_at_cursor("\n" + indent)
+
+    def selection_line_bounds(self):
+        buf = self.ebuf
+        if buf.get_has_selection():
+            sel_start, sel_end = buf.get_selection_bounds()
+        else:
+            it = buf.get_iter_at_mark(buf.get_insert())
+            sel_start = sel_end = it
+        start = buf.get_iter_at_line(sel_start.get_line())
+        end_line = sel_end.get_line()
+        if end_line > sel_start.get_line() and sel_end.get_line_offset() == 0:
+            # A drag-selection ending at column 0 of a line usually means
+            # the user didn't mean to touch that line.
+            end_line -= 1
+        end = buf.get_iter_at_line(end_line)
+        end.forward_to_line_end()
+        return start, end
+
+    def reindent_selection(self, transform):
+        buf = self.ebuf
+        start, end = self.selection_line_bounds()
+        start_offset = start.get_offset()
+        text = buf.get_text(start, end, True)
+        new_text = "\n".join(transform(line) for line in text.split("\n"))
+        if new_text == text:
+            return
+        buf.delete(start, end)
+        buf.insert(buf.get_iter_at_offset(start_offset), new_text)
+        new_start = buf.get_iter_at_offset(start_offset)
+        new_end = buf.get_iter_at_offset(start_offset + len(new_text))
+        buf.select_range(new_start, new_end)
+
+    def indent_selection(self):
+        self.reindent_selection(lambda line: "    " + line)
+
+    def dedent_selection(self):
+        def dedent(line):
+            if line.startswith("    "):
+                return line[4:]
+            if line.startswith("\t"):
+                return line[1:]
+            return line.lstrip(" ")
+
+        self.reindent_selection(dedent)
+
+    def toggle_comment_selection(self):
+        buf = self.ebuf
+        start, end = self.selection_line_bounds()
+        text = buf.get_text(start, end, True)
+        code_lines = [line for line in text.split("\n") if line.strip()]
+        all_commented = bool(code_lines) and all(
+            line.lstrip().startswith("#") for line in code_lines
+        )
+
+        def comment(line):
+            if not line.strip():
+                return line
+            stripped = line.lstrip(" ")
+            indent = line[: len(line) - len(stripped)]
+            return indent + "# " + stripped
+
+        def uncomment(line):
+            stripped = line.lstrip(" ")
+            indent = line[: len(line) - len(stripped)]
+            if stripped.startswith("# "):
+                return indent + stripped[2:]
+            if stripped.startswith("#"):
+                return indent + stripped[1:]
+            return line
+
+        self.reindent_selection(uncomment if all_commented else comment)
 
     def undo(self):
         self.ebuf.undo()
@@ -975,25 +1252,30 @@ for person in people():
                 min_val = min(data)
                 if max_val == min_val:
                     return
-                interval = (max_val - min_val) / self.chart_data[2]
-                buckets = [0] * (int(max_val / interval) + 1)
+                num_buckets = max(1, int(self.chart_data[2]))
+                interval = (max_val - min_val) / num_buckets
+                buckets = [0] * num_buckets
                 for value in data:
-                    if value > max_val:
-                        buckets[int(max_val / interval)] += 1
-                    else:
-                        buckets[int(value / interval)] += 1
+                    # Bucket index is the value's offset from min_val, not
+                    # the raw value -- otherwise negative or non-zero-based
+                    # data lands outside the buckets list. Clamp the top
+                    # edge (value == max_val) into the last bucket rather
+                    # than one past it.
+                    idx = int((value - min_val) / interval)
+                    if idx >= num_buckets:
+                        idx = num_buckets - 1
+                    buckets[idx] += 1
 
                 labels = []
                 decimal_places = self.chart_data[3].get("decimal_places", 0)
                 format = "%0." + str(decimal_places) + "f"
-                for i in range(int(max_val / interval)):
-                    begin = format % (i * interval)
-                    end = format % ((i + 1) * interval)
+                for i in range(num_buckets):
+                    begin = format % (min_val + i * interval)
+                    end = format % (min_val + (i + 1) * interval)
                     if begin != end:
                         labels.append(begin + "-" + end)
                     else:
                         labels.append(begin)
-                labels.append(format % ((i + 1) * interval,))
 
                 # Draw a bar chart with values
                 bar_width = width / (len(buckets) * 1.5)
@@ -1024,6 +1306,15 @@ for person in people():
         """Run code in the full GrampyScript scope and return stdout."""
         return self.execute_code(code)
 
+    def ensure_import_paths(self):
+        """Make helper .py files next to scripts importable via `import`."""
+        paths = [SCRIPTS_DIR]
+        if self.last_filename:
+            paths.append(os.path.dirname(os.path.abspath(self.last_filename)))
+        for path in paths:
+            if path and path not in sys.path:
+                sys.path.insert(0, path)
+
     def execute_filename(self, filename):
         if os.path.exists(filename):
             with open(filename) as file:
@@ -1044,11 +1335,12 @@ for person in people():
 
             self.CHANGING = True
             self.TRANSACTION = DbTxn(message, self.db)
-            self.db._txn_begin()
+            self.db.transaction_begin(self.TRANSACTION)
 
         def end_changes():
             if self.CHANGING:
-                self.db._txn_commit()
+                self.db.transaction_commit(self.TRANSACTION)
+                self.CHANGING = False
 
         def _iter_raw_person_data():
             for handle, data in self.db._iter_raw_person_data():
@@ -1109,7 +1401,7 @@ for person in people():
         active_source = self.get_active_data("Source")
         active_citation = self.get_active_data("Citation")
         active_place = self.get_active_data("Place")
-        active_event = self.get_active("Event")
+        active_event = self.get_active_data("Event")
 
         chart = self.chart
 
@@ -1139,6 +1431,24 @@ for person in people():
                     data = get_data(handle)
                     yield DataDict2(dict(data), callback=self.callback)
 
+        def custom_filter(name, namespace="Person"):
+            if gramps_filters.CustomFilters is None:
+                gramps_filters.reload_custom_filters()
+            filt = gramps_filters.CustomFilters.get_filters_dict(namespace).get(name)
+            if filt is None:
+                print(
+                    "Warning: no custom filter named %r for namespace %r"
+                    % (name, namespace)
+                )
+                return
+            get_data = self.db._get_table_func(namespace, "raw_func")
+            for handle in filt.apply(self.db):
+                yield DataDict2(dict(get_data(handle)), callback=self.callback)
+
+        def delete(obj):
+            del_func = self.db._get_table_func(obj["_class"], "del_func")
+            del_func(obj["handle"], self.TRANSACTION)
+
         database = self.db
 
         today = Date(
@@ -1156,6 +1466,7 @@ for person in people():
 
         self.TRANSACTION = None
         self.output_buffer.set_text("")
+        self.ensure_import_paths()
         # -----------------
         # User code
         # FIXME: don't use stdout?
