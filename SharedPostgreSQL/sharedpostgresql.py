@@ -24,6 +24,7 @@
 Backend for PostgreSQL database.
 """
 
+import hashlib
 import os
 import re
 from uuid import uuid4
@@ -53,6 +54,21 @@ psycopg2.paramstyle = "format"
 #
 # -------------------------------------------------------------------------
 class SharedPostgreSQL(SharedDBAPI):
+    dialect = "postgresql"
+
+    # Column names as they physically exist in shared PostgreSQL databases.
+    # "desc" is reserved in PostgreSQL and was renamed by the old blanket
+    # substring rewrite, which also caught "description" as a side effect.
+    # Both names are kept so existing databases stay readable.
+    _COLUMN_NAMES = {"desc": "desc_", "description": "desc_ription"}
+
+    def _quote_column(self, col):
+        return self._COLUMN_NAMES.get(col, col)
+
+    def _sql_type(self, schema_type, max_length):
+        result = super()._sql_type(schema_type, max_length)
+        return "bytea" if result == "BLOB" else result
+
     def get_summary(self):
         """
         Return a diction of information about this database
@@ -79,11 +95,7 @@ class SharedPostgreSQL(SharedDBAPI):
         config_mgr.register("tree.uuid", "")
 
         if not os.path.exists(config_file):
-            config_mgr.set("database.dbname", "gramps")
-            config_mgr.set("database.host", config.get("database.host"))
-            config_mgr.set("database.port", config.get("database.port"))
-            config_mgr.set("tree.uuid", uuid4().hex)
-            config_mgr.save()
+            self._create_settings(config_file, config_mgr, directory, username, password)
 
         config_mgr.load()
 
@@ -105,6 +117,37 @@ class SharedPostgreSQL(SharedDBAPI):
             self.dbapi = Connection(uuid=uuid, **dbkwargs)
         except psycopg2.OperationalError as msg:
             raise DbConnectionError(str(msg), config_file)
+
+    def _create_settings(self, config_file, config_mgr, directory, username, password):
+        """Create settings.ini for a tree that has not been initialized yet."""
+        host = config.get("database.host")
+        port = config.get("database.port")
+        dbkwargs = {"dbname": "gramps", "host": host, "port": port}
+        if username:
+            dbkwargs["user"] = username
+        if password:
+            dbkwargs["password"] = password
+        # Two processes opening a brand-new tree at the same time would each
+        # generate a UUID and overwrite each other's settings.ini. Serialize
+        # on the database, since the filesystem may not do so itself.
+        digest = hashlib.sha256(os.path.abspath(directory).encode()).digest()
+        lock_key = int.from_bytes(digest[:8], "big", signed=True)
+        try:
+            conn = psycopg2.connect(**dbkwargs)
+        except psycopg2.OperationalError as msg:
+            raise DbConnectionError(str(msg), config_file)
+        try:
+            conn.autocommit = True
+            # The lock is released when the connection closes.
+            conn.cursor().execute("SELECT pg_advisory_lock(%s)", [lock_key])
+            if not os.path.exists(config_file):
+                config_mgr.set("database.dbname", "gramps")
+                config_mgr.set("database.host", host)
+                config_mgr.set("database.port", port)
+                config_mgr.set("tree.uuid", uuid4().hex)
+                config_mgr.save()
+        finally:
+            conn.close()
 
 
 # -------------------------------------------------------------------------
@@ -179,18 +222,20 @@ class Connection:
         Checks that a collation exists and if not creates it.
 
         :param locale: Locale to be checked.
-        :param type: A GrampsLocale object.
+        :type locale: A GrampsLocale object.
         """
-        # Duplicating system collations works, but to delete them the schema
-        # must be specified, so get the current schema
         collation = locale.get_collation()
-        self.execute(
-            'CREATE COLLATION IF NOT EXISTS "%s"'
-            "(LOCALE = '%s')" % (collation, locale.collation)
-        )
+        # Use pg_collation to check existence rather than IF NOT EXISTS, which
+        # requires PostgreSQL 12+.
+        self.execute("SELECT 1 FROM pg_collation WHERE collname = %s", [collation])
+        if not self.fetchone():
+            self.execute(
+                "CREATE COLLATION \"%s\" (LOCALE = '%s')"
+                % (collation, locale.collation)
+            )
 
     def execute(self, *args, **kwargs):
-        sql = _hack_query(args[0])
+        sql = _translate_sql(args[0])
         if len(args) > 1:
             args = args[1]
         else:
@@ -279,7 +324,7 @@ class Cursor:
         :param kwargs: arguments to be passed to the sqlite3 execute statement
         :type kwargs: list
         """
-        sql = _hack_query(args[0])
+        sql = _translate_sql(args[0])
         if len(args) > 1:
             args = args[1]
         else:
@@ -297,25 +342,30 @@ class Cursor:
             return None
 
 
-def _hack_query(query):
-    query = query.replace("?", "%s")
-    query = query.replace("REGEXP", "~")
-    query = query.replace("desc", "desc_")
-    query = query.replace("BLOB", "bytea")
-    query = query.replace("INTEGER PRIMARY KEY", "SERIAL PRIMARY KEY")
-    ## LIMIT offset, count
-    ## count can be -1, for all
-    ## LIMIT -1
-    ## LIMIT offset, -1
-    query = query.replace("LIMIT -1", "LIMIT all")  ##
-    match = re.match(".* LIMIT (.*), (.*) ", query)
-    if match and match.groups():
-        offset, count = match.groups()
-        if count == "-1":
-            count = "all"
-        query = re.sub(
-            "(.*) LIMIT (.*), (.*) ",
-            "\\1 LIMIT %s OFFSET %s " % (count, offset),
-            query,
-        )
-    return query
+def _translate_sql(query):
+    """
+    Translate an SQLite-flavoured SQL statement to PostgreSQL.
+
+    :param query: the statement to translate.
+    :type query: str
+    :returns: the translated statement.
+    :rtype: str
+    """
+    sql = query.replace("?", "%s")  # qmark -> format paramstyle
+    sql = sql.replace(" REGEXP ", " ~ ")  # SQLite REGEXP -> PostgreSQL ~
+    # SQLite LIKE is case-insensitive (ASCII), PostgreSQL's is not; ILIKE is
+    # the case-insensitive equivalent. Its folding follows the connection
+    # locale, so non-ASCII patterns may fold differently than under SQLite.
+    sql = re.sub(r"\bLIKE\b", "ILIKE", sql, flags=re.IGNORECASE)
+    sql = sql.replace("INTEGER PRIMARY KEY", "SERIAL PRIMARY KEY")
+    sql = re.sub(r"\bBLOB\b", "BYTEA", sql)  # SQLite BLOB -> PostgreSQL BYTEA
+    # LIMIT offset, count -> LIMIT count OFFSET offset; a count of -1 means all
+    sql = re.sub(
+        r"\bLIMIT\s+(-?\d+)\s*,\s*(-?\d+)",
+        lambda m: f'LIMIT {"ALL" if m.group(2) == "-1" else m.group(2)}'
+        f" OFFSET {m.group(1)}",
+        sql,
+        flags=re.IGNORECASE,
+    )
+    sql = re.sub(r"\bLIMIT\s+-1\b", "LIMIT ALL", sql, flags=re.IGNORECASE)
+    return sql

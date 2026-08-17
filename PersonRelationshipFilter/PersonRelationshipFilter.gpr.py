@@ -1,8 +1,9 @@
 #
 # Gramps - a GTK+/GNOME based genealogy program
 #
-# Copyright (C) 2016 Douglas Blank <doug.blank@gmail.com>
-# Copyright (C) 2022 David Straub <straub@protonmail.com>
+# Copyright (C) 2015      Nick Hall
+# Copyright (C) 2024      Paul Womack (BugBear)
+# Copyright (C) 2026      Doug Blank
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,20 +18,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
+
 register(
-    DATABASE,
-    id="sharedpostgresql",
-    name=_("SharedPostgreSQL"),
-    name_accell=_("Shared _PostgreSQL Database"),
-    description=_("Shared PostgreSQL Database"),
-    version = '0.1.16',
+    GRAMPLET,
+    id="Person Relationship Filter",
+    name=_("Person Relationship Filter"),
+    description=_("Gramplet providing a person filter on relationships"),
+    version = '1.0.1',
     gramps_target_version="6.0",
     status=STABLE,
-    fname="sharedpostgresql.py",
-    databaseclass="SharedPostgreSQL",
-    authors=["Doug Blank", "David Straub"],
-    authors_email=["doug.blank@gmail.com", "straub@protonmail.com"],
-    requires_mod=["psycopg2"],
-    help_url="https://www.grampsweb.org/install_setup/postgres/",
+    fname="PersonRelationshipFilter.py",
+    height=200,
+    gramplet="PersonRelationshipFilter",
+    gramplet_title=_("Relationship Filter"),
+    navtypes=["Person"],
+    authors=["Paul Womack", "Doug Blank"],
+    authors_email=["doug.blank@gmail.com"],
+    help_url="Addon:PersonRelationshipFilter",
 )

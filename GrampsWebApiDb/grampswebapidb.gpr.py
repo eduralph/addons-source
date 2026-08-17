@@ -1,8 +1,7 @@
 #
 # Gramps - a GTK+/GNOME based genealogy program
 #
-# Copyright (C) 2016 Douglas Blank <doug.blank@gmail.com>
-# Copyright (C) 2022 David Straub <straub@protonmail.com>
+# Copyright (C) 2026 Douglas S. Blank <doug.blank@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,17 +19,19 @@
 #
 register(
     DATABASE,
-    id="sharedpostgresql",
-    name=_("SharedPostgreSQL"),
-    name_accell=_("Shared _PostgreSQL Database"),
-    description=_("Shared PostgreSQL Database"),
-    version = '0.1.16',
+    id="grampswebapidb",
+    status=BETA,
+    name=_("GrampsWebApiDb"),
+    name_accell=_("Gramps _Web API Database"),
+    description=_(
+        "Use a Gramps Web API server (e.g. gramps-connect or Gramps Web) "
+        "as a live database, mirrored locally for speed."
+    ),
+    version = '0.1.3',
     gramps_target_version="6.0",
-    status=STABLE,
-    fname="sharedpostgresql.py",
-    databaseclass="SharedPostgreSQL",
-    authors=["Doug Blank", "David Straub"],
-    authors_email=["doug.blank@gmail.com", "straub@protonmail.com"],
-    requires_mod=["psycopg2"],
-    help_url="https://www.grampsweb.org/install_setup/postgres/",
+    fname="grampswebapidb.py",
+    databaseclass="WebApiDB",
+    authors=["Doug Blank"],
+    authors_email=["doug.blank@gmail.com"],
+    help_url="Addon:GrampsWebApiDb",
 )

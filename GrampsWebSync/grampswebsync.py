@@ -1,6 +1,6 @@
 # Gramps - a GTK+/GNOME based genealogy program
 #
-# Copyright (C) 2021-2024       David Straub
+# Copyright (C) 2021-2026       David Straub
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,51 +17,62 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-"""Gramps addon to synchronize with a Gramps Web server."""
+"""Gramps addon to synchronize with a Gramps Web server.
+
+Provides :class:`GrampsWebSyncTool`, a dialog presenting a
+:class:`session.SyncSession` as four panes in a :class:`Gtk.Stack`.
+:data:`PANE_FOR_STATE` maps each :class:`session.State` to the pane that
+represents it and :func:`error_message` localizes a :class:`session.ErrorKind`.
+
+The synchronization itself lives in :mod:`session`, and everything the panes
+render is prepared in :mod:`presentation`.
+"""
 
 from __future__ import annotations
 
 import logging
-import os
-import threading
-from collections.abc import Callable
-from datetime import datetime
-from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+import time
 
-from const import (
-    C_ADD_LOC,
-    C_ADD_REM,
-    C_DEL_LOC,
-    C_DEL_REM,
-    C_UPD_BOTH,
-    C_UPD_LOC,
-    C_UPD_REM,
-    MODE_BIDIRECTIONAL,
-    MODE_MERGE,
-    MODE_RESET_TO_LOCAL,
-    MODE_RESET_TO_REMOTE,
-    Actions,
+from adapters import (
+    ConfigCredentialStore,
+    GLibTaskRunner,
+    GrampsMediaStore,
+    IoRunner,
+    SystemClock,
 )
-from diffhandler import (
-    WebApiSyncDiffHandler,
-    changes_to_actions,
-    has_local_actions,
-    has_remote_actions,
-)
-from gi.repository import GLib, Gtk
-from gramps.gen.config import config as configman
+from const import MODE_BIDIRECTIONAL, SYNC_MODES
+from diffhandler import changes_to_actions
+from gi.repository import GLib, Gtk, Pango
 from gramps.gen.const import GRAMPS_LOCALE as glocale
-from gramps.gen.db import DbTxn
-from gramps.gen.db.utils import import_as_dict
-from gramps.gen.errors import HandleError
-from gramps.gen.lib import Tag
-from gramps.gen.utils.file import media_path_full
 from gramps.gui.dialog import QuestionDialog2
+from gramps.gui.display import display_url
 from gramps.gui.managedwindow import ManagedWindow
 from gramps.gui.plug.tool import BatchTool, ToolOptions
-from webapihandler import WebApiHandler, transaction_to_json
+from presentation import (
+    ReviewModel,
+    build_review,
+    deletion_warning,
+    destination_label,
+    error_message,
+    context_lines,
+    format_last_synced,
+    insecure_warning,
+    is_insecure,
+    keyring_message,
+    media_label,
+    missing_both_notice,
+    mode_description,
+    mode_label,
+    outcome_summary,
+    sanitize_url,
+    state_label,
+    status_message,
+    transfer_message,
+    verb_label,
+    version_line,
+)
+from session import WORKING_STATES, State, SyncSession
+from webapihandler import WebApiHandler
 
 assert glocale is not None  # for type checker
 try:
@@ -69,694 +80,594 @@ try:
 except ValueError:
     _trans = glocale.translation
 _ = _trans.gettext
-ngettext = _trans.ngettext
 
 
 LOG = logging.getLogger("grampswebsync")
 
+#: Where the manual lives. Deliberately the English page rather than a
+#: localized one: the site declares its translations as ``hreflang`` alternates
+#: and renders a language switcher from them, so it always offers every
+#: language it currently has. Anything this addon hardcoded would be a guess
+#: that goes stale, and a wrong guess is a 404.
+#:
+#: ``gramps.gui.display.display_help`` must not be used to open it -- it
+#: appends the UI locale to whatever it is given, full URLs included.
+DOCUMENTATION_URL = "https://www.grampsweb.org/administration/sync/"
 
-def get_password(service: str, username: str) -> str | None:
-    """If keyring is installed, return the user's password or None."""
-    LOG.debug("Retrieving password for user %s", username)
-    try:
-        import keyring
-    except ImportError:
-        LOG.warning("Keyring is not installed, cannot retrieve password.")
-        return None
-    return keyring.get_password(service, username)
+#: Names of the stack's children.
+PANE_CONNECT = "connect"
+PANE_WORKING = "working"
+PANE_REVIEW = "review"
+PANE_RESULT = "result"
+
+#: The one place that knows how flow states correspond to panes. Four panes
+#: replace the eight assistant pages this tool used to have; the states that
+#: differ only in what work is running share the working pane, and both
+#: terminal states share the result pane.
+PANE_FOR_STATE: dict[State, str] = {
+    State.CONNECT: PANE_CONNECT,
+    State.CONNECTING: PANE_WORKING,
+    State.COMPARING: PANE_WORKING,
+    State.REVIEW: PANE_REVIEW,
+    State.APPLYING: PANE_WORKING,
+    State.TRANSFERRING: PANE_WORKING,
+    State.DONE: PANE_RESULT,
+    State.FAILED: PANE_RESULT,
+}
+
+#: States in which the tool has begun writing. The server may not be swapped
+#: underneath a run that has already committed something, and abandoning one
+#: would leave no record of how far it got.
+WRITING_STATES = (State.APPLYING, State.TRANSFERRING)
+
+#: Response ids for the buttons the dialog adds itself.
+RESPONSE_CONNECT = 1
+RESPONSE_APPLY = 2
+RESPONSE_RETRY = 3
+
+#: Names of the phase markers, as children of each row's marker stack.
+MARK_DONE = "done"
+MARK_ACTIVE = "active"
+MARK_PENDING = "pending"
+
+#: Themed icon standing for a finished phase. A symbolic icon follows the
+#: theme's foreground colour and its dark variant, which neither a text glyph
+#: nor a bundled SVG would; the theme is also already a Gramps dependency.
+DONE_ICON = "emblem-ok-symbolic"
+
+#: How often the working pane is refreshed. A progress bar in pulse mode only
+#: moves when it is told to, so this is the pulse rate as well as the rate the
+#: elapsed clock is checked at.
+TICK_INTERVAL_MS = 120
+
+#: Column of the review tree holding the object name: free text of unbounded
+#: length, and the only one that gives way when the window is too narrow.
+NAME_COLUMN = 1
+
+#: How narrow the name column may get before the tree scrolls instead.
+NAME_MIN_WIDTH = 180
+
+#: How wide the progress bar is allowed to get. Left to fill the pane it
+#: stretches the width of the window and reads as a divider rather than a bar.
+PROGRESS_WIDTH = 380
 
 
-def set_password(service: str, username: str, password: str) -> None:
-    """If keyring is installed, store the user's password."""
-    try:
-        import keyring
-    except ImportError:
-        return None
-    LOG.debug("Storing password for user %s", username)
-    keyring.set_password(service, username, password)
+def _dim(text: str) -> str:
+    """Return markup rendering ``text`` as secondary."""
+    return f"<small>{GLib.markup_escape_text(text)}</small>"
 
 
+def _label(text: str = "", *, xalign: float = 0.0, wrap: bool = True) -> Gtk.Label:
+    """Return a left-aligned label with sensible wrapping defaults."""
+    label = Gtk.Label(label=text)
+    label.set_xalign(xalign)
+    if wrap:
+        label.set_line_wrap(True)
+        label.set_max_width_chars(60)
+    return label
+
+
+# ------------------------------------------------------------
+#
+# The tool
+#
+# ------------------------------------------------------------
 class GrampsWebSyncTool(BatchTool, ManagedWindow):
-    """Main class for the Gramps Web Sync tool."""
+    """Dialog presenting a :class:`session.SyncSession` to the user."""
 
     def __init__(self, dbstate, user, options_class, name, *args, **kwargs) -> None:
-        """Initialize GUI."""
+        """Build the dialog and the session behind it."""
         LOG.debug("Initializing Gramps Web Sync addon.")
         BatchTool.__init__(self, dbstate, user, options_class, name)
+        if self.fail:
+            # The user declined the undo-history warning; honour that instead
+            # of opening the dialog anyway.
+            LOG.debug("Undo history warning declined; not opening the tool.")
+            return
         ManagedWindow.__init__(self, user.uistate, [], self.__class__)
 
         self.dbstate = dbstate
-        self.callback = self.uistate.pulse_progressbar
+        self._timer_id: int | None = None
+        self._phase_started = time.monotonic()
 
-        self.config = configman.register_manager("webapisync")
-        self.config.register("credentials.url", "")
-        self.config.register("credentials.username", "")
-        self.config.register("credentials.timestamp", 0)
-        self.config.load()
-
-        self.assistant = Gtk.Assistant()
-        self.set_window(self.assistant, None, _("Gramps Web Sync"))
-        self.setup_configs("interface.webapisync", 780, 600)
-
-        self.assistant.connect("close", self.do_close)
-        self.assistant.connect("cancel", self.do_close)
-        self.assistant.connect("apply", self.apply)
-        self.assistant.connect("prepare", self.prepare)
-
-        self.intro = IntroductionPage(self.assistant)
-        self.add_page(self.intro, Gtk.AssistantPageType.INTRO, _("Introduction"))
-
-        self.url = self.config.get("credentials.url")
-        self.username = self.config.get("credentials.username")
-        self.password = self.get_password()
-        self.loginpage = LoginPage(
-            self.assistant,
-            url=self.url,
-            username=self.username,
-            password=self.password,
-        )
-        self.add_page(self.loginpage, Gtk.AssistantPageType.CONTENT, _("Login"))
-
-        self.diff_progress_page = DiffProgressPage(self.assistant)
-        self.add_page(
-            self.diff_progress_page,
-            Gtk.AssistantPageType.PROGRESS,
-            _("Progress Information"),
+        self.credentials = ConfigCredentialStore(tree_id=dbstate.db.get_dbid())
+        self.session = SyncSession(
+            db=dbstate.db,
+            user=self._user,
+            backend_factory=self._make_backend,
+            credentials=self.credentials,
+            media=GrampsMediaStore(dbstate.db),
+            runner=GLibTaskRunner(),
+            io_runner=IoRunner(),
+            clock=SystemClock(),
+            listener=self,
         )
 
-        self.confirmation = ConfirmationPage(self.assistant)
-        self.add_page(
-            self.confirmation, Gtk.AssistantPageType.CONFIRM, _("Final confirmation")
-        )
-
-        self.sync_progress_page = SyncProgressPage(self.assistant)
-        self.add_page(
-            self.sync_progress_page,
-            Gtk.AssistantPageType.PROGRESS,
-            _("Summary"),
-        )
-
-        self.file_confirmation = FileConfirmationPage(self.assistant)
-        self.add_page(
-            self.file_confirmation,
-            Gtk.AssistantPageType.CONFIRM,
-            _("Media Files"),
-        )
-
-        self.file_progress_page = FileProgressPage(self.assistant)
-        self.add_page(
-            self.file_progress_page,
-            Gtk.AssistantPageType.PROGRESS,
-            _("Progress Information"),
-        )
-
-        self.conclusion = ConclusionPage(self.assistant)
-        self.add_page(self.conclusion, Gtk.AssistantPageType.SUMMARY, _("Summary"))
-
+        self._build_window()
         self.show()
-        self.assistant.set_forward_page_func(self.forward_page, None)
+        self._start()
 
-        self._api: WebApiHandler | None = None
+    # --------------------------------------------------------
+    # Window construction
+    # --------------------------------------------------------
+    def _build_window(self) -> None:
+        """Assemble the dialog: context strip, pane stack, footer, buttons."""
+        self.dialog = Gtk.Dialog()
+        self.set_window(self.dialog, None, _("Gramps Web Sync"))
+        # A new key deliberately. The old one holds whatever size suited the
+        # eight-page assistant, and a window that shares almost nothing with it
+        # should not inherit a geometry chosen for the other one.
+        self.setup_configs("interface.grampswebsync", 820, 640)
 
-        self.db1 = dbstate.db
-        self.db2 = None
-        self._closing = False
-        self._download_timestamp = 0
-        self._changes: Actions | None = None
-        self._sync: WebApiSyncDiffHandler | None = None
-        self.files_missing_local: list[tuple[str, str]] = []
-        self.files_missing_remote: list[tuple[str, str]] = []
-        self.uploaded: dict[str, bool] = {}
-        self.downloaded: dict[str, bool] = {}
+        content = self.dialog.get_content_area()
+        content.set_spacing(0)
 
-    @property
-    def api(self) -> WebApiHandler:
-        if self._api is None:
-            raise ValueError("No WebApiHandler found")  # shouldn't happen!
-        return self._api
+        self.context = ContextStrip(on_change_server=self._on_change_server)
+        content.pack_start(self.context, False, False, 0)
+        content.pack_start(
+            Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 0
+        )
 
-    @property
-    def sync(self) -> WebApiSyncDiffHandler:
-        if self._sync is None:
-            raise ValueError("No WebApiSyncDiffHandler found")  # shouldn't happen!
-        return self._sync
+        self.stack = Gtk.Stack()
+        self.stack.set_transition_type(Gtk.StackTransitionType.NONE)
+        self.stack.set_border_width(12)
+        self.connect_pane = ConnectPane(
+            on_changed=self._on_connect_fields_changed, on_forget=self._on_forget
+        )
+        self.working_pane = WorkingPane()
+        self.review_pane = ReviewPane()
+        self.result_pane = ResultPane()
+        self.stack.add_named(self.connect_pane, PANE_CONNECT)
+        self.stack.add_named(self.working_pane, PANE_WORKING)
+        self.stack.add_named(self.review_pane, PANE_REVIEW)
+        self.stack.add_named(self.result_pane, PANE_RESULT)
+        content.pack_start(self.stack, True, True, 0)
 
-    @property
-    def changes(self) -> Actions:
-        if self._changes is None:
-            raise ValueError("No change actions found")  # shouldn't happen!
-        return self._changes
+        self.version_label = _label(wrap=False)
+        self.version_label.set_margin_start(12)
+        self.version_label.set_margin_bottom(6)
+        self.version_label.set_markup(_dim(version_line(None)))
+        content.pack_start(self.version_label, False, False, 0)
+
+        self._build_buttons()
+        self.dialog.connect("response", self._on_response)
+
+    def _build_buttons(self) -> None:
+        """Add every button once; visibility follows the state."""
+        self.button_cancel = self.dialog.add_button(
+            _("_Cancel"), Gtk.ResponseType.CANCEL
+        )
+        self.button_close = self.dialog.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
+        self.button_retry = self.dialog.add_button(_("_Try again"), RESPONSE_RETRY)
+        self.button_connect = self.dialog.add_button(_("C_onnect"), RESPONSE_CONNECT)
+        self.button_apply = self.dialog.add_button(_("_Apply"), RESPONSE_APPLY)
+        for button in self._buttons():
+            button.set_can_default(True)
+            button.set_no_show_all(True)
+            button.hide()
+
+    def _buttons(self) -> tuple[Gtk.Button, ...]:
+        """Return every button in the action area."""
+        return (
+            self.button_cancel,
+            self.button_close,
+            self.button_retry,
+            self.button_connect,
+            self.button_apply,
+        )
 
     def build_menu_names(self, obj):  # type: ignore
         """Override :class:`.ManagedWindow` method."""
         return (_("Gramps Web Sync"), None)
 
-    def do_close(self, assistant):
-        """Close the assistant."""
-        LOG.debug("Closing Gramps Web Sync addon.")
-        self._closing = True
-        if self.db2 is not None:
-            LOG.debug("Closing in-memory remote database.")
-            self.db2.close()
-            self.db2 = None
-        # Clear the diff handler which holds references to both db1 and db2
-        self._sync = None
-        self._changes = None
-        position = self.window.get_position()  # crock
-        self.assistant.hide()
-        self.window.move(position[0], position[1])
-        self.close()
+    def _make_backend(self, url: str, username: str, password: str) -> WebApiHandler:
+        """Build the real Web API handler. Injected into the session."""
+        return WebApiHandler(url, username, password, None)
 
-    def forward_page(self, page, data):
-        """Specify the next page to be displayed."""
-        LOG.debug(f"Moving to next page from page {page}.")
-        if self.conclusion.error:
-            LOG.debug("Skipping to last page due to error.")
-            return 7
-        if page == 2 and self._changes is not None and len(self.changes) == 0:
-            LOG.debug("Skipping to media sync as databases are in sync.")
-            return 4
-        if page == 5 and self.conclusion.unchanged:
-            LOG.debug("Skipping to last page as media files are in sync.")
-            return 7
-        return page + 1
+    # --------------------------------------------------------
+    # Lifecycle
+    # --------------------------------------------------------
+    def _start(self) -> None:
+        """Show the stored server, and connect if it belongs to the open tree.
 
-    def add_page(self, page, page_type, title=""):
-        """Add a page to the assistant."""
-        page.show_all()
-        self.assistant.append_page(page)
-        self.assistant.set_page_title(page, title)
-        self.assistant.set_page_type(page, page_type)
-
-    def handle_done_syncing_dbs(self):
-        """Handle the completion of syncing the databases."""
-        self.save_timestamp()
-        self.sync_progress_page.handle_done_syncing_dbs()
-        self.files_missing_local = self.get_missing_files_local()
-        self.assistant.next_page()
-
-    def prepare(self, assistant, page):
-        """Run page preparation code."""
-        page.update_complete()
-        if page == self.diff_progress_page:
-            # Clear any previous login error when starting fresh
-            self.loginpage.clear_error()
-
-            # Try to connect and authenticate
-            self.save_credentials()
-            url, username, password = self.get_credentials()
-            if not self.test_connection(url, username, password):
-                # Connection failed, go back to login page
-                self.assistant.set_current_page(1)  # Login page index
-                return None
-
-            if "ViewPrivate" not in self.api.get_permissions():
-                self.loginpage.show_error(
-                    _(
-                        "Your user does not have sufficient server permissions to use sync."
-                    )
-                )
-                self.assistant.set_current_page(1)  # Go back to login page
-                return None
-
-            self.diff_progress_page.label.set_text(_("Fetching remote data..."))
-            t = threading.Thread(target=self.async_compare_dbs)
-            t.start()
-        elif page == self.confirmation:
-            self.confirmation.prepare(self.changes)
-        elif page == self.sync_progress_page:
-            self.assistant.commit()  # just erases the visited page history
-            actions = changes_to_actions(self.changes, self.confirmation.sync_mode)
-            self.sync_progress_page.prepare(actions)
-            if len(actions) == 0:
-                self.handle_done_syncing_dbs()
-            else:
-                try:
-                    self.commit_all_actions(actions)
-                except Exception as e:
-                    self.handle_error(
-                        _("Unexpected error while applying changes.") + f" {e}"
-                    )
-
-            # now, get missing media files
-        elif page == self.file_confirmation:
-            if self.files_missing_local:
-                LOG.debug(
-                    "The following media files are missing on the local side: %s",
-                    ", ".join([gramps_id for gramps_id, _ in self.files_missing_local]),
-                )
-            else:
-                LOG.debug("No files missing locally.")
-            self.files_missing_remote = self.get_missing_files_remote()
-            if self.files_missing_remote:
-                LOG.debug(
-                    "The following media files are missing on the remote side: %s",
-                    ", ".join(
-                        [gramps_id for gramps_id, _ in self.files_missing_remote]
-                    ),
-                )
-            else:
-                LOG.debug("No files missing remotely.")
-            if not self.files_missing_local and not self.files_missing_remote:
-                self.handle_files_unchanged()
-            else:
-                self.file_confirmation.prepare(
-                    self.files_missing_local, self.files_missing_remote
-                )
-        elif page == self.file_progress_page:
-            self.file_progress_page.prepare(
-                self.files_missing_local, self.files_missing_remote
-            )
-            t = threading.Thread(target=self.async_transfer_media)
-            t.start()
-        elif page == self.conclusion:
-            if self.conclusion.error:
-                pass
-            elif self.conclusion.unchanged:
-                text = _("Media files are in sync.")
-                self.conclusion.label.set_text(text)
-                LOG.info("Media files are in sync.")
-            else:
-                text = ""
-                if self.downloaded:
-                    ok = sum([b for gid, b in self.downloaded.items()])
-                    nok = sum([not b for gid, b in self.downloaded.items()])
-                    if ok:
-                        text += _("Successfully downloaded %s media files.") % ok
-                        text += " "
-                    if nok:
-                        text += _("Encountered %s errors during download.") % nok
-                        text += " "
-                if self.uploaded:
-                    ok = sum([b for gid, b in self.uploaded.items()])
-                    nok = sum([not b for gid, b in self.uploaded.items()])
-                    if ok:
-                        text += _("Successfully uploaded %s media files.") % ok
-                        text += " "
-                    if nok:
-                        text += _("Encountered %s errors during upload.") % nok
-                self.conclusion.label.set_text(text)
-
-            self.conclusion.set_complete()
-
-    def test_connection(self, url: str, username: str, password: str) -> bool:
-        """Test the connection and authentication. Return True if successful."""
-        try:
-            # Try to create API handler
-            self._api = WebApiHandler(url, username, password, None)
-
-            # Test the connection by making a simple API call
-            self.api.get_permissions()
-            return True
-
-        except HTTPError as exc:
-            if exc.code == 401:
-                self.loginpage.show_error(
-                    _("Authentication failed. Please check your username and password.")
-                )
-            elif exc.code == 403:
-                self.loginpage.show_error(
-                    _("Access forbidden. Please check username and password.")
-                )
-            elif exc.code == 404:
-                self.loginpage.show_error(
-                    _("GrampsWeb service not found. Please check the URL.")
-                )
-            elif exc.code == 429:
-                self.loginpage.show_error(
-                    _("Too many requests, please try again in a few seconds.")
-                )
-            elif exc.code == 503:
-                self.loginpage.show_error(_("GrampsWeb tree is disabled."))
-            else:
-                self.loginpage.show_error(
-                    _("Server error %s. Please check your connection.") % exc.code
-                )
-            return False
-        except URLError:
-            self.loginpage.show_error(
-                _(
-                    "Connection failed. Please check the URL and your internet connection."
-                )
-            )
-            return False
-        except ValueError:
-            self.loginpage.show_error(
-                _("Invalid server response. Please check the URL.")
-            )
-            return False
-        except Exception as e:
-            self.loginpage.show_error(_("Unexpected error: %s") % str(e))
-            return False
-
-    def handle_files_unchanged(self):
-        self.conclusion.unchanged = True
-        self.assistant.next_page()
-
-    def apply(self, assistant):
-        """Apply the changes."""
-        page_number = assistant.get_current_page()
-        page = assistant.get_nth_page(page_number)
-        if page == self.confirmation:
-            pass
-        elif page == self.file_confirmation:
-            pass
-
-    def download_files(self):
-        """Download media files missing locally."""
-        if not self.files_missing_local:
-            return
-        res = {}
-        for gramps_id, handle in self.files_missing_local:
-            LOG.debug("Downloading file %s", gramps_id)
-            self.downloaded[gramps_id] = self._download_file(handle)
-            self._update_file_progress()
-        return res
-
-    def _update_file_progress(self):
-        """Update the file progress bars."""
-        self.file_progress_page.update_progress(
-            self.files_missing_local,
-            self.files_missing_remote,
-            self.downloaded,
-            self.uploaded,
+        Where the tree cannot be established the credentials are still offered,
+        but the user presses Connect.
+        """
+        # Connecting unprompted is only safe for the tree the entry was synced
+        # from: against another one the two share nothing, every object falls
+        # the wrong side of the baseline, and a bidirectional run proposes
+        # deleting both trees.
+        url = self.credentials.get_url()
+        username = self.credentials.get_username()
+        password = self.credentials.get_password() or ""
+        self.connect_pane.set_credentials(url, username, password)
+        self.connect_pane.set_notices(self._connect_notices())
+        self.connect_pane.set_can_forget(bool(url))
+        self.connect_pane.set_remember_password(
+            self.credentials.get_remember_password()
         )
-        # force updating progress bar
+        self._refresh_password_storage()
+        if url and username and password and self.credentials.is_for_open_tree():
+            self._submit()
+        else:
+            self._render(self.session.state)
+
+    def clean_up(self) -> None:
+        """Release the session and stop the clock when the window goes away."""
+        self._stop_timer()
+        self.session.cancel()
+        super().clean_up()
+
+    def _on_response(self, _dialog, response: int) -> None:
+        """Act on a button in the action area."""
+        if response == Gtk.ResponseType.DELETE_EVENT:
+            # ManagedWindow already closed us from its own delete-event
+            # handler; acting again would only warn about a double close.
+            return
+        if response == RESPONSE_CONNECT:
+            self._submit()
+        elif response == RESPONSE_APPLY:
+            self.session.confirm(
+                self.review_pane.sync_mode, self.review_pane.transfer_media
+            )
+        elif response == RESPONSE_RETRY:
+            self.session.retry()
+        else:
+            LOG.debug("Closing Gramps Web Sync addon (response=%s).", response)
+            self.close()
+
+    def _on_change_server(self, _button) -> None:
+        """Stop whatever is running and return to the connect pane.
+
+        Reachable while connecting and comparing, so that switching servers
+        does not first cost a whole download of the one being left.
+        """
+        self.session.abandon()
+
+    def _on_forget(self, _button) -> None:
+        """Remove the stored server, after asking.
+
+        The password can be retyped; the baseline cannot be recovered, and
+        losing it turns the next run into a full comparison. That is worth a
+        confirmation.
+        """
+        url = self.connect_pane.url.get_text()
+        username = self.connect_pane.username.get_text()
+        question = QuestionDialog2(
+            _("Forget this server?"),
+            _(
+                "The address, user name and password stored for this server "
+                "will be removed, along with the record of when this family "
+                "tree last synchronized with it. The next synchronization "
+                "will compare the two trees from scratch."
+            ),
+            _("Forget"),
+            _("Cancel"),
+            parent=self.window,
+        )
+        if not question.run():
+            return
+        LOG.info("Forgetting the stored server.")
+        self.credentials.forget(url, username)
+        self.connect_pane.set_credentials("", "", "")
+        # Also drops the session's copy of the connection, which the context
+        # strip and the version footer are rendered from.
+        self.session.abandon()
+
+    def _submit(self) -> None:
+        """Hand what the connect pane holds to the session."""
+        url = sanitize_url(self.connect_pane.url.get_text())
+        self.connect_pane.set_url(url)
+        self.session.submit_credentials(
+            url,
+            self.connect_pane.username.get_text(),
+            self.connect_pane.password.get_text(),
+            self.connect_pane.remember_password,
+        )
+
+    # --------------------------------------------------------
+    # SessionListener
+    # --------------------------------------------------------
+    def on_state_changed(self, state: State) -> None:
+        """Follow the session to the pane representing ``state``."""
+        self._render(state)
+
+    def on_progress(self, kind: str, fraction: float) -> None:
+        """Render a progress update from the session."""
+        detail = transfer_message(kind)
+        if detail:
+            self.working_pane.set_detail(detail)
+        self.working_pane.set_fraction(fraction)
+        self._pump()
+
+    def on_status(self, stage: str) -> None:
+        """Render a status update from the session."""
+        self.working_pane.set_detail(status_message(stage))
+        self._pump()
+
+    @staticmethod
+    def _pump() -> None:
+        """Redraw now.
+
+        The steps that touch a database run on the main loop, so without this
+        the pane would not repaint until the whole step finished.
+        """
         while Gtk.events_pending():
             Gtk.main_iteration()
 
-    def _download_file(self, handle):
-        """Download a single media file."""
-        try:
-            obj = self.db1.get_media_from_handle(handle)
-        except HandleError:
-            self.handle_error(_("Error accessing media object."))
-            return False
-        path = media_path_full(self.db1, obj.get_path())
-        try:
-            return self.api.download_media_file(handle=handle, path=path)
-        except Exception as e:
-            LOG.warning(f"Failed to download media file {obj.gramps_id}: {e}")
-            return False
+    # --------------------------------------------------------
+    # Rendering
+    # --------------------------------------------------------
+    def _render(self, state: State) -> None:
+        """Show the pane for ``state`` and bring the rest of the shell in line."""
+        self._prepare_pane(state)
+        self.stack.set_visible_child_name(PANE_FOR_STATE[state])
+        self._update_buttons(state)
+        self._update_context(state)
+        self._update_timer(state)
+        self.version_label.set_markup(_dim(version_line(self.session.api_version)))
 
-    def upload_files(self):
-        """Upload media files missing remotely."""
-        if not self.files_missing_remote:
-            return
-        res = {}
-        for gramps_id, handle in self.files_missing_remote:
-            LOG.debug("Uploading file %s", gramps_id)
-            self.uploaded[gramps_id] = self._upload_file(handle)
-            self._update_file_progress()
-        return res
-
-    def _upload_file(self, handle):
-        """Upload a single media file."""
-        try:
-            obj = self.db1.get_media_from_handle(handle)
-        except HandleError:
-            self.handle_error(_("Error accessing media object."))
-            return
-        path = media_path_full(self.db1, obj.get_path())
-        return self.api.upload_media_file(handle=handle, path=path)
-
-    def get_password(self):
-        """Get a stored password."""
-        url = self.config.get("credentials.url")
-        username = self.config.get("credentials.username")
-        if not url or not username:
-            return None
-        return get_password(url, username)
-
-    def handle_error(self, message):
-        """Handle an error message during sync."""
-        LOG.warning(message)
-        self.conclusion.error = True
-        self.assistant.next_page()
-        self.conclusion.label.set_text(message)
-        self.conclusion.set_complete()
-
-    def handle_unchanged(self):
-        """Return a message if nothing has changed."""
-        self.save_timestamp()
-        self.assistant.next_page()
-
-    def async_compare_dbs(self):
-        """Download the remote data and import it to an in-memory database."""
-        # store timestamp just before downloading the XML
-        self._download_timestamp = datetime.now().timestamp()
-        GLib.idle_add(self.get_diff_actions)
-
-    def get_diff_actions(self) -> None:
-        """Download the remote data, import it and compare it to local."""
-        if self._closing:
-            return
-        LOG.info("Downloading Gramps XML file.")
-        path = self.handle_server_errors(self.api.download_xml)
-        if path is None:
-            return
-        LOG.debug(f"The file name of the downloaded file is: {path}")
-        LOG.debug("Importing Gramps XML file.")
-        db2 = import_as_dict(str(path), self._user)
-        if db2 is None:
-            self.handle_error(_("Failed importing downloaded XML file."))
-            return
-        LOG.debug("Successfully imported Gramps XML file.")
-        path.unlink()  # delete temporary file
-        self.db2 = db2
-        self.diff_progress_page.label.set_text(_("Comparing local and remote data..."))
-        LOG.info("Comparing local and remote data...")
-        timestamp = self.config.get("credentials.timestamp") or None
-        from datetime import datetime
-
-        LOG.debug(
-            "Loading last sync timestamp from config: %s (%s)",
-            timestamp,
-            (
-                datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S %Z")
-                if timestamp
-                else "None"
-            ),
-        )
-        self._sync = WebApiSyncDiffHandler(
-            self.db1, self.db2, user=self._user, last_synced=timestamp
-        )
-        self._changes = self.sync.get_changes()
-        self.diff_progress_page.label.set_text("")
-        self.diff_progress_page.set_complete()
-        if len(self.changes) == 0:
-            LOG.info("Databases are in sync.")
-            self.handle_unchanged()
-        else:
-            self.assistant.next_page()
-
-    def async_transfer_media(self):
-        """Upload/download media files."""
-        GLib.idle_add(self._async_transfer_media)
-
-    def _async_transfer_media(self):
-        """Upload/download media files."""
-        if self._closing:
-            return
-        self.handle_server_errors(self.download_files)
-        if self.conclusion.error:
-            return
-        self.handle_server_errors(self.upload_files)
-        if self.conclusion.error:
-            return
-        self.file_progress_page.set_complete()
-        self.assistant.next_page()
-
-    def handle_server_errors(self, callback: Callable, *args) -> None:
-        """Handle server errors while executing a function."""
-        try:
-            return callback(*args)
-        except HTTPError as exc:
-            if exc.code == 401:
-                self.handle_error(_("Server authorization error."))
-            elif exc.code == 403:
-                self.handle_error(
-                    _("Server authorization error: insufficient permissions.")
-                )
-            elif exc.code == 404:
-                self.handle_error(_("Error: URL not found."))
-            elif exc.code == 409:
-                self.handle_error(
-                    _(
-                        "Unable to synchronize changes to server: objects have been modified."
-                    )
-                )
+    def _prepare_pane(self, state: State) -> None:
+        """Fill the pane for ``state`` with what the session now holds."""
+        if state is State.CONNECT:
+            error = self.session.login_error
+            if error is None:
+                self.connect_pane.clear_error()
             else:
-                self.handle_error(_("Error %s while connecting to server.") % exc.code)
-            return None
-        except URLError:
-            self.handle_error(_("URL error while connecting to server."))
-            return None
-        except ValueError as exc:
-            self.handle_error(
-                f"{_('Unable to synchronize changes to server.')} ({exc})"
-            )
-            return None
+                self.connect_pane.show_error(
+                    error_message(error.kind, error.detail)
+                )
+            self.connect_pane.set_notices(self._connect_notices())
+            self.connect_pane.set_can_forget(bool(self.credentials.get_url()))
+            self._refresh_password_storage()
+        elif state in WORKING_STATES:
+            self.working_pane.set_state(state)
+        elif state is State.REVIEW:
+            self.review_pane.prepare(self.session)
+        else:
+            self.result_pane.prepare(self.session)
+            # A keyring write happens after a successful connect, so its
+            # failure can land once the user has left the connect pane.
+            problem = self.credentials.keyring_error()
+            if problem is not None:
+                self.result_pane.show_notice(keyring_message(problem))
 
-    def save_credentials(self) -> None:
-        """Save the login credentials."""
-        url = self.loginpage.url.get_text()
-        url = self.sanitize_url(url)
-        if url is None:
-            self.handle_error("No URL provided")
-            return
-        username = self.loginpage.username.get_text()
-        password = self.loginpage.password.get_text()
-        if url != self.config.get("credentials.url"):
-            # if URL changed, clear last sync timestamp
-            self.config.set("credentials.timestamp", 0)
-        self.config.set("credentials.url", url)
-        self.config.set("credentials.username", username)
-        set_password(url, username, password)
-        self.config.save()
+    def _update_buttons(self, state: State) -> None:
+        """Show the buttons that make sense in ``state``, and pick the default."""
+        terminal = state in (State.DONE, State.FAILED)
+        self.button_cancel.set_visible(not terminal)
+        self.button_close.set_visible(terminal)
+        self.button_retry.set_visible(
+            state is State.FAILED and self.session.can_retry
+        )
+        self.button_connect.set_visible(state is State.CONNECT)
+        self.button_apply.set_visible(state is State.REVIEW)
+        if state is State.CONNECT:
+            self._on_connect_fields_changed()
+            self.button_connect.grab_default()
+        elif state is State.REVIEW:
+            self.button_apply.grab_default()
 
-    def sanitize_url(self, url: str) -> str | None:
-        """Warn if http and prepend https if missing."""
-        parsed_url = urlparse(url)
-        if parsed_url.scheme == "":
-            # if no httpX given, prepend https!
-            url = f"https://{url}"
-        elif parsed_url.scheme == "http":
-            question = QuestionDialog2(
-                _("Continue without transport encryption?"),
+    def _update_context(self, state: State) -> None:
+        """Say which tree is being synced, and when it last was."""
+        url = self.session.url or self.credentials.get_url()
+        username = self.session.username or self.credentials.get_username()
+        title, subtitle = context_lines(
+            url,
+            username,
+            self.session.tree_name,
+            format_last_synced(self.credentials.get_timestamp(url, username)),
+        )
+        self.context.update(title, subtitle)
+        self.context.set_busy(state in WRITING_STATES)
+
+    def _connect_notices(self) -> list[str]:
+        """Return everything worth saying on the connect pane, in order.
+
+        An unusable keyring is reported rather than swallowed: without it the
+        password field is simply empty every run and nothing explains why.
+        """
+        notices = []
+        if self.credentials.is_from_another_tree():
+            notices.append(
                 _(
-                    "You have specified a URL with http scheme. "
-                    "If you continue, your password will be sent "
-                    "in clear text over the network. "
-                    "Use only for local testing!"
-                ),
-                _("Continue with HTTP"),
-                _("Use HTTPS"),
-                parent=self.window,
+                    "These credentials were last used with a different family "
+                    "tree. Check the server before continuing."
+                )
             )
-            if not question.run():
-                return url.replace("http", "https")
-        return url
+        problem = self.credentials.keyring_error()
+        if problem is not None:
+            notices.append(keyring_message(problem))
+        return notices
 
-    def get_credentials(self):
-        """Get a tuple of URL, username, and password."""
-        return (
-            self.config.get("credentials.url"),
-            self.config.get("credentials.username"),
-            self.loginpage.password.get_text(),
+    def _refresh_password_storage(self) -> None:
+        """Offer to remember the password only where that can be honoured."""
+        problem = self.credentials.keyring_error()
+        self.connect_pane.set_keyring_available(
+            problem is None, "" if problem is None else keyring_message(problem)
         )
 
-    def commit_all_actions(self, actions: Actions) -> None:
-        """Commit all changes to the databases."""
-        LOG.info("Committing all changes to the databases.")
-        msg = "Apply Gramps Web Sync changes"
-        with DbTxn(msg, self.sync.db1) as trans1:
-            with DbTxn(msg, self.sync.db2) as trans2:
-                if has_local_actions(actions):
-                    LOG.debug("Committing changes to local database.")
-                else:
-                    LOG.debug("No changes to apply to local database.")
-                self.sync.commit_actions(actions, trans1, trans2)
-                self.sync_progress_page.handle_local_sync_complete(actions)
-                # force the sync for all modes: the server-side "object has changed"
-                # check compares against the XML-round-tripped object, which often
-                # differs from the live server object due to serialization artifacts,
-                # causing false-positive 409 conflicts even when no real concurrent
-                # edit has occurred.
-                force = True
-                lang = self.api.get_lang()
-                payload = transaction_to_json(trans2, lang)
-        GLib.idle_add(self.async_commit_actions_to_remote, payload, force)
+    def _on_connect_fields_changed(self) -> None:
+        """Keep the Connect button in step with the entries."""
+        self.button_connect.set_sensitive(self.connect_pane.complete)
 
-    def async_commit_actions_to_remote(
-        self, payload: dict[str, "Any"], force: bool
-    ) -> None:
-        """Commit all changes to the remote database."""
-        GLib.idle_add(self._async_commit_actions_to_remote, payload, force)
+    # --------------------------------------------------------
+    # Elapsed time
+    # --------------------------------------------------------
+    def _update_timer(self, state: State) -> None:
+        """Run a one-second clock for as long as a phase is running.
 
-    def _async_commit_actions_to_remote(
-        self, payload: dict[str, "Any"], force: bool
-    ) -> None:
-        """Upload/download media files."""
-        if self._closing:
-            return
-        LOG.debug("Committing changes to remote database.")
-        self.handle_server_errors(
-            self.api.commit,
-            payload,
-            force,
-            self.sync_progress_page.update_api_progress,
+        A progress bar that can only pulse -- which is what the server's task
+        endpoint gives us for most of an apply -- reads as a hang without one.
+        """
+        if state in WORKING_STATES:
+            self._phase_started = time.monotonic()
+            self.working_pane.set_elapsed(0)
+            if self._timer_id is None:
+                self._timer_id = GLib.timeout_add(TICK_INTERVAL_MS, self._tick)
+        else:
+            self._stop_timer()
+
+    def _stop_timer(self) -> None:
+        """Stop the elapsed-time clock, if it is running."""
+        if self._timer_id is not None:
+            GLib.source_remove(self._timer_id)
+            self._timer_id = None
+
+    def _tick(self) -> bool:
+        """Animate the progress bar and update the elapsed-time readout."""
+        self.working_pane.pulse()
+        self.working_pane.set_elapsed(int(time.monotonic() - self._phase_started))
+        return True
+
+
+# ------------------------------------------------------------
+#
+# Shell widgets
+#
+# ------------------------------------------------------------
+class ContextStrip(Gtk.Box):
+    """Names the tree being synced, where from, and when it last was.
+
+    The sync baseline governs the entire conflict classification, and until now
+    nothing in the interface revealed it, or even which server was about to be
+    written to -- let alone which tree on it.
+
+    :param on_change_server: Called when the user wants a different server.
+    """
+
+    def __init__(self, on_change_server) -> None:
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        self.set_border_width(12)
+
+        text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.server_label = _label(wrap=False)
+        self.server_label.set_ellipsize(Pango.EllipsizeMode.MIDDLE)
+        self.synced_label = _label(wrap=False)
+        text.pack_start(self.server_label, False, False, 0)
+        text.pack_start(self.synced_label, False, False, 0)
+        self.pack_start(text, True, True, 0)
+
+        self.change_button = Gtk.Button(label=_("Change server…"))
+        self.change_button.set_valign(Gtk.Align.CENTER)
+        self.change_button.connect("clicked", on_change_server)
+        self.pack_start(self.change_button, False, False, 0)
+
+    def update(self, title: str, subtitle: str) -> None:
+        """Show what is being synced, and where from.
+
+        :param title: The remote tree's name once known, else the account.
+        :param subtitle: The line below it.
+        """
+        self.server_label.set_markup(f"<b>{GLib.markup_escape_text(title)}</b>")
+        self.synced_label.set_markup(_dim(subtitle))
+
+    def set_busy(self, busy: bool) -> None:
+        """Block a server switch while a sync is running."""
+        self.change_button.set_sensitive(not busy)
+
+
+class ConnectPane(Gtk.Box):
+    """Server URL, user name and password, plus what used to be the intro page.
+
+    :param on_changed: Called whenever an entry changes.
+    :param on_forget: Called when the user asks to remove the stored server.
+    """
+
+    def __init__(self, on_changed, on_forget) -> None:
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self._on_changed = on_changed
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(6)
+        grid.set_column_spacing(12)
+        self.pack_start(grid, False, False, 0)
+
+        self.url = self._entry(grid, _("Server URL:"), 0)
+        self.url.set_input_purpose(Gtk.InputPurpose.URL)
+        self.username = self._entry(grid, _("Username:"), 1)
+        self.password = self._entry(grid, _("Password:"), 2)
+        self.password.set_visibility(False)
+        self.password.set_input_purpose(Gtk.InputPurpose.PASSWORD)
+
+        self.remember_check = Gtk.CheckButton(label=_("Remember password"))
+        self.remember_check.set_active(True)
+        self.pack_start(self.remember_check, False, False, 0)
+
+        self.scheme_label = self._hidden_label()
+        self.pack_start(self.scheme_label, False, False, 0)
+        self.error_label = self._hidden_label()
+        self.error_label.get_style_context().add_class("error")
+        self.pack_start(self.error_label, False, False, 0)
+        self.notice_label = self._hidden_label()
+        self.pack_start(self.notice_label, False, False, 0)
+
+        self.forget_button = Gtk.Button(label=_("Forget this server"))
+        self.forget_button.set_halign(Gtk.Align.START)
+        self.forget_button.connect("clicked", on_forget)
+        self.pack_start(self.forget_button, False, False, 0)
+
+        self.pack_start(self._about(), False, False, 0)
+
+    def _entry(self, grid: Gtk.Grid, text: str, row: int) -> Gtk.Entry:
+        """Add one labelled entry to ``grid`` and return it."""
+        grid.attach(_label(text, wrap=False), 0, row, 1, 1)
+        entry = Gtk.Entry()
+        entry.set_hexpand(True)
+        entry.set_activates_default(True)
+        entry.connect("changed", self._on_entry_changed)
+        grid.attach(entry, 1, row, 1, 1)
+        return entry
+
+    @staticmethod
+    def _hidden_label() -> Gtk.Label:
+        """Return a label that stays hidden until it has something to say."""
+        label = _label()
+        label.set_no_show_all(True)
+        label.hide()
+        return label
+
+    def _about(self) -> Gtk.Expander:
+        """Return the collapsed introduction, with a link to the wiki page.
+
+        Four paragraphs of preconditions matter on first use and are friction
+        on run fifty, so they fold away instead of occupying a page of their own.
+        """
+        expander = Gtk.Expander(label=_("About this tool"))
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        box.set_margin_top(6)
+        box.pack_start(_label(self._intro_text()), False, False, 0)
+        help_button = Gtk.Button(label=_("Open the online manual"))
+        help_button.set_halign(Gtk.Align.START)
+        help_button.connect(
+            "clicked", lambda *_a: display_url(DOCUMENTATION_URL)
         )
-        if self.conclusion.error:
-            return
-        self.handle_done_syncing_dbs()
+        box.pack_start(help_button, False, False, 0)
+        expander.add(box)
+        return expander
 
-    def save_timestamp(self):
-        """Save last sync timestamp."""
-        # self.config.set("credentials.timestamp", self._download_timestamp)
-        timestamp = datetime.now().timestamp()
-        LOG.debug(
-            "Saving current time stamp (%s) as last successful sync time (%s).",
-            timestamp,
-            datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S %Z"),
-        )
-        self.config.set("credentials.timestamp", timestamp)
-        self.config.save()
-
-    def get_missing_files_local(self) -> list[tuple[str, str]]:
-        """Get a list of media files missing locally."""
-        return [
-            (media.gramps_id, media.handle)
-            for media in self.db1.iter_media()
-            if not os.path.exists(media_path_full(self.db1, media.get_path()))
-        ]
-
-    def get_missing_files_remote(self):
-        """Get a list of media files missing remotely."""
-        missing_files = self.handle_server_errors(self.api.get_missing_files) or []
-        return [(media["gramps_id"], media["handle"]) for media in missing_files]
-
-
-class Page(Gtk.Box):
-    """Page base class."""
-
-    def __init__(self, assistant: Gtk.Assistant):
-        """Initialize self."""
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
-        self.assistant = assistant
-        self._complete = False
-
-    def set_complete(self):
-        """Set as complete."""
-        self._complete = True
-        self.update_complete()
-
-    @property
-    def complete(self):
-        return self._complete
-
-    def update_complete(self):
-        """Set the current page's complete status."""
-        page_number = self.assistant.get_current_page()
-        current_page = self.assistant.get_nth_page(page_number)
-        if current_page is not None:
-            self.assistant.set_page_complete(current_page, self.complete)
-
-
-class IntroductionPage(Page):
-    """A page containing introductory text."""
-
-    def __init__(self, assistant):
-        super().__init__(assistant)
-        label = Gtk.Label(label=self.__get_intro_text())
-        label.set_line_wrap(True)
-        label.set_use_markup(True)
-        label.set_max_width_chars(60)
-
-        self.pack_start(label, False, False, 0)
-        self._complete = True
-
-    def __get_intro_text(self):
+    @staticmethod
+    def _intro_text() -> str:
         """Return the introductory text."""
         return _(
             "This tool allows to synchronize the currently opened "
@@ -773,397 +684,474 @@ class IntroductionPage(Page):
             "Tool instead."
         )
 
-
-class LoginPage(Page):
-    """A page to provide server credentials."""
-
-    def __init__(self, assistant, url, username, password):
-        super().__init__(assistant)
-        self.set_spacing(12)
-
-        grid = Gtk.Grid()
-        grid.set_row_spacing(6)
-        grid.set_column_spacing(6)
-        self.add(grid)
-
-        label = Gtk.Label(label=_("Server URL: "))
-        grid.attach(label, 0, 0, 1, 1)
-        self.url = Gtk.Entry()
-        if url:
-            self.url.set_text(url)
-        self.url.set_hexpand(True)
-        self.url.set_input_purpose(Gtk.InputPurpose.URL)
-        grid.attach(self.url, 1, 0, 1, 1)
-
-        label = Gtk.Label(label=_("Username: "))
-        grid.attach(label, 0, 1, 1, 1)
-        self.username = Gtk.Entry()
-        if username:
-            self.username.set_text(username)
-        self.username.set_hexpand(True)
-        grid.attach(self.username, 1, 1, 1, 1)
-
-        label = Gtk.Label(label=_("Password: "))
-        grid.attach(label, 0, 2, 1, 1)
-        self.password = Gtk.Entry()
-        if password:
-            self.password.set_text(password)
-        self.password.set_hexpand(True)
-        self.password.set_visibility(False)
-        self.password.set_input_purpose(Gtk.InputPurpose.PASSWORD)
-        grid.attach(self.password, 1, 2, 1, 1)
-
-        # Error message label - initially hidden
-        self.error_label = Gtk.Label()
-        self.error_label.set_line_wrap(True)
-        self.error_label.set_max_width_chars(60)
-        self.error_label.get_style_context().add_class("error")
-        self.error_label.set_no_show_all(True)  # Don't show when show_all() is called
-        self.error_label.hide()
-        grid.attach(self.error_label, 0, 3, 2, 1)
-
-        # Connect entry change events
-        self.url.connect("changed", self.on_entry_changed)
-        self.username.connect("changed", self.on_entry_changed)
-        self.password.connect("changed", self.on_entry_changed)
-
-    def show_error(self, message: str):
-        """Display an error message on the login page."""
-        self.error_label.set_markup(f"<b>Error:</b> {message}")
-        self.error_label.show()
-        self.update_complete()
-
-    def clear_error(self):
-        """Clear any displayed error message."""
-        self.error_label.hide()
-        self.update_complete()
+    # --------------------------------------------------------
+    # Contents
+    # --------------------------------------------------------
+    def set_credentials(self, url: str, username: str, password: str) -> None:
+        """Pre-fill the entries from the credential store."""
+        self.url.set_text(url or "")
+        self.username.set_text(username or "")
+        self.password.set_text(password or "")
 
     @property
-    def complete(self):
-        url = self.url.get_text()
-        username = self.username.get_text()
-        password = self.password.get_text()
-        if url and username and password:
-            return True
-        return False
+    def remember_password(self) -> bool:
+        """Whether the user is willing to have the password stored."""
+        return self.remember_check.get_active()
 
-    def on_entry_changed(self, widget):
-        """Handle changes to entry fields."""
-        # Clear error when user starts typing
-        if self.error_label.get_visible():
-            self.clear_error()
-        self.update_complete()
+    def set_remember_password(self, remember: bool) -> None:
+        """Reflect the choice stored for this server."""
+        self.remember_check.set_active(remember)
 
+    def set_keyring_available(self, available: bool, reason: str = "") -> None:
+        """Withdraw the offer when there is nowhere to store a password.
 
-class DiffProgressPage(Page):
-    """A progress page."""
+        Left checked but inert, the box would promise something that cannot
+        happen; the reason goes on the tooltip so the state is explicable.
+        """
+        self.remember_check.set_sensitive(available)
+        if not available:
+            self.remember_check.set_active(False)
+        self.remember_check.set_tooltip_text(reason or None)
 
-    def __init__(self, assistant):
-        super().__init__(assistant)
-        label = Gtk.Label(label="")
-        label.set_line_wrap(True)
-        label.set_use_markup(True)
-        label.set_max_width_chars(60)
-        self.label = label
-        self.pack_start(self.label, False, False, 0)
+    def set_can_forget(self, can_forget: bool) -> None:
+        """Offer removal only when there is something stored to remove."""
+        self.forget_button.set_sensitive(can_forget)
 
+    def set_url(self, url: str) -> None:
+        """Show the URL that will actually be used.
 
-class ConfirmationPage(Page):
-    """Page showing the differences before applying them."""
+        The scheme is completed before connecting, and leaving the entry
+        showing something else would misreport what the tool just did.
+        """
+        if self.url.get_text() != url:
+            self.url.set_text(url)
 
-    def __init__(self, assistant):
-        super().__init__(assistant)
-        self.sync_mode = MODE_BIDIRECTIONAL
-        self.store = Gtk.TreeStore(str, str)
-
-        # tree view
-        self.tree_view = Gtk.TreeView(model=self.store)
-
-        for i, col in enumerate(["ID", "Content"]):
-            renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(col, renderer, text=i)
-            self.tree_view.append_column(column)
-
-        # scrolled window
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.add(self.tree_view)
-
-        self.sync_label = Gtk.Label()
-        self.sync_label.set_text("Sync mode")
-
-        # Box for radio buttons
-        self.radio_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-
-        # Radio buttons
-        option_name = _("Bidirectional Synchronization")
-        self.radio_button1 = Gtk.RadioButton.new_with_label_from_widget(
-            None, option_name
+    @property
+    def complete(self) -> bool:
+        """Whether all three fields have something in them."""
+        return bool(
+            self.url.get_text()
+            and self.username.get_text()
+            and self.password.get_text()
         )
-        self.radio_button1.connect(
-            "toggled", self.on_radio_button_toggled, MODE_BIDIRECTIONAL
+
+    def show_error(self, message: str) -> None:
+        """Display an error.
+
+        The message is escaped: it can carry server or exception text, and an
+        unescaped ``&`` or ``<`` would break the markup or swallow the message.
+        """
+        label = GLib.markup_escape_text(_("Error:"))
+        self.error_label.set_markup(
+            f"<b>{label}</b> {GLib.markup_escape_text(message)}"
         )
-        self.radio_box.pack_start(self.radio_button1, False, False, 0)
+        self.error_label.show()
 
-        option_name = _("Reset remote to local")
-        self.radio_button2 = Gtk.RadioButton.new_from_widget(self.radio_button1)
-        self.radio_button2.set_label(option_name)
-        self.radio_button2.connect(
-            "toggled", self.on_radio_button_toggled, MODE_RESET_TO_LOCAL
-        )
-        self.radio_box.pack_start(self.radio_button2, False, False, 0)
+    def clear_error(self) -> None:
+        """Clear any displayed error message."""
+        self.error_label.hide()
 
-        option_name = _("Reset local to remote")
-        self.radio_button3 = Gtk.RadioButton.new_from_widget(self.radio_button1)
-        self.radio_button3.set_label(option_name)
-        self.radio_button3.connect(
-            "toggled", self.on_radio_button_toggled, MODE_RESET_TO_REMOTE
-        )
-        self.radio_box.pack_start(self.radio_button3, False, False, 0)
-
-        option_name = _("Merge")
-        self.radio_button4 = Gtk.RadioButton.new_from_widget(self.radio_button1)
-        self.radio_button4.set_label(option_name)
-        self.radio_button4.connect("toggled", self.on_radio_button_toggled, MODE_MERGE)
-        self.radio_box.pack_start(self.radio_button4, False, False, 0)
-
-        # Box to hold the label and radio buttons
-        self.label_radio_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
-        self.label_radio_box.pack_start(self.sync_label, False, False, 0)
-        self.label_radio_box.pack_start(self.radio_box, False, False, 0)
-
-        self.outer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.outer_box.pack_start(scrolled_window, True, True, 0)
-        self.outer_box.pack_start(self.label_radio_box, False, False, 10)
-
-        self.pack_start(self.outer_box, True, True, 0)
-
-    def on_radio_button_toggled(self, button, name):
-        """Callback for radio buttons setting sync mode."""
-        if button.get_active():
-            self.sync_mode = int(name)
-
-    def prepare(self, changes: Actions):
-        """Convert the changes list to a tree store."""
-        change_labels = {
-            _("Local changes"): {
-                _("Added"): C_ADD_LOC,
-                _("Deleted"): C_DEL_LOC,
-                _("Modified"): C_UPD_LOC,
-            },
-            _("Remote changes"): {
-                _("Added"): C_ADD_REM,
-                _("Deleted"): C_DEL_REM,
-                _("Modified"): C_UPD_REM,
-            },
-            _("Simultaneous changes"): {_("Modified"): C_UPD_BOTH},
-        }
-
-        for label1, v1 in change_labels.items():
-            iter1 = self.store.append(None, [label1, ""])
-            for label2, change_type in v1.items():
-                rows = []
-                for change in changes:
-                    _type, handle, class_name, obj1, obj2 = change
-                    if _type == change_type:
-                        if obj1 is not None:
-                            if class_name == "Tag":
-                                assert isinstance(obj1, Tag)  # for type checker
-                                gid = obj1.name
-                            else:
-                                gid = obj1.gramps_id
-                        else:
-                            assert obj2  # for type checker
-                            if class_name == "Tag":
-                                assert isinstance(obj2, Tag)  # for type checker
-                                gid = obj2.name
-                            else:
-                                gid = obj2.gramps_id
-                        obj_details = [class_name, gid]
-                        rows.append(obj_details)
-                if rows:
-                    label2 = f"{label2} ({len(rows)})"
-                    iter2 = self.store.append(iter1, [label2, ""])
-                    for row in rows:
-                        self.store.append(iter2, row)
-
-        # expand first level
-        for i, row in enumerate(self.store):
-            self.tree_view.expand_row(Gtk.TreePath(i), False)
-
-        self.set_complete()
-
-
-class SyncProgressPage(Page):
-    """Page showing database sync progress."""
-
-    def __init__(self, assistant):
-        super().__init__(assistant)
-        label = Gtk.Label(label="")
-        label.set_line_wrap(True)
-        label.set_use_markup(True)
-        label.set_max_width_chars(60)
-        self.label = label
-        self.pack_start(self.label, False, False, 0)
-
-        self.label_progressbar_api = Gtk.Label(label="")
-        self.label_progressbar_api.set_margin_top(50)
-        self.pack_start(self.label_progressbar_api, False, False, 20)
-
-        self.progressbar_api = Gtk.ProgressBar()
-        self.pack_start(self.progressbar_api, False, False, 20)
-
-        media_label = Gtk.Label(label=_("Fetching information about media files..."))
-        media_label.set_line_wrap(True)
-        media_label.set_use_markup(True)
-        media_label.set_max_width_chars(60)
-        self.media_label = media_label
-        self.media_label.set_margin_top(50)
-        self.pack_start(self.media_label, False, False, 0)
-
-    def update_api_progress(self, progress: float) -> None:
-        """Update the progress bar for the API transaction endpoint."""
-        if progress >= 0:
-            self.progressbar_api.set_fraction(progress)
-        else:
-            self.progressbar_api.pulse()
-        # force updating progress bar
-        while Gtk.events_pending():
-            Gtk.main_iteration()
-
-    def prepare(self, actions: Actions):
-        if len(actions) == 0:
-            self.label.set_text(_("Both trees are the same."))
-            self.label_progressbar_api.hide()
-            self.progressbar_api.hide()
-        else:
-            self.media_label.hide()
-        if has_local_actions(actions):
-            self.label.set_text(_("Applying changes to local database ..."))
-        else:
-            self.label.set_text(_("No changes to apply to local database."))
-        if has_remote_actions(actions):
-            self.label_progressbar_api.show()
-            self.label_progressbar_api.set_text(
-                _("Applying changes to remote database ...")
-            )
-            self.progressbar_api.show()
-        else:
-            self.label_progressbar_api.set_text(
-                _("No changes to apply to remote database.")
-            )
-            self.progressbar_api.hide()
-
-    def handle_local_sync_complete(self, actions: Actions) -> None:
-        """Handle completion of local sync."""
-        if not has_local_actions(actions):
+    def set_notices(self, messages: list[str]) -> None:
+        """Display non-fatal notices, or hide the label when there are none."""
+        if not messages:
+            self.notice_label.hide()
             return
-        self.label.set_text(_("Successfully applied changes to local database."))
+        self.notice_label.set_markup(
+            "\n".join(
+                f"<i>{GLib.markup_escape_text(message)}</i>" for message in messages
+            )
+        )
+        self.notice_label.show()
 
-    def handle_done_syncing_dbs(self) -> None:
-        """Handle completion of syncing the databases."""
-        self.media_label.show()
+    def _on_entry_changed(self, _widget) -> None:
+        """Clear a stale error, warn about http, and report the change on."""
+        self.clear_error()
+        if is_insecure(self.url.get_text()):
+            self.scheme_label.set_markup(
+                f"<b>{GLib.markup_escape_text(_('Warning:'))}</b> "
+                f"{GLib.markup_escape_text(insecure_warning())}"
+            )
+            self.scheme_label.show()
+        else:
+            self.scheme_label.hide()
+        self._on_changed()
 
 
-class FileConfirmationPage(Page):
-    """File sync confirmation page."""
+class PhaseRow:
+    """One line of the working pane's phase list: a marker and a name.
 
-    def __init__(self, assistant):
-        super().__init__(assistant)
-        self.store = Gtk.TreeStore(str)
+    The marker is a themed symbolic icon or a spinner rather than a character,
+    so it neither depends on the interface font carrying the glyph nor stays
+    the wrong colour in a dark theme.
 
-        # tree view
+    :param state: The phase this row stands for.
+    """
+
+    def __init__(self, state: State) -> None:
+        self.marker = Gtk.Stack()
+        self.marker.set_valign(Gtk.Align.CENTER)
+        self.spinner = Gtk.Spinner()
+        self.marker.add_named(Gtk.Box(), MARK_PENDING)
+        self.marker.add_named(self.spinner, MARK_ACTIVE)
+        self.marker.add_named(self._done_icon(), MARK_DONE)
+        self.label = _label(state_label(state), wrap=False)
+        # A stack has no visible child until its children are shown, and would
+        # then ignore being told which one to display.
+        self.marker.show_all()
+        self.set_marker(MARK_PENDING)
+
+    @staticmethod
+    def _done_icon() -> Gtk.Widget:
+        """Return the finished marker, falling back if the theme lacks it."""
+        if Gtk.IconTheme.get_default().has_icon(DONE_ICON):
+            return Gtk.Image.new_from_icon_name(DONE_ICON, Gtk.IconSize.MENU)
+        return Gtk.Label(label="\u2713")
+
+    def set_marker(self, marker: str) -> None:
+        """Show this row as pending, running or finished.
+
+        :param marker: One of the ``MARK_*`` names.
+        """
+        self.marker.set_visible_child_name(marker)
+        if marker == MARK_ACTIVE:
+            self.spinner.start()
+        else:
+            self.spinner.stop()
+        name = GLib.markup_escape_text(self.label.get_text())
+        self.label.set_markup(
+            f"<b>{name}</b>" if marker == MARK_ACTIVE else name
+        )
+
+
+class WorkingPane(Gtk.Box):
+    """A phase list, a detail line, a progress bar and an elapsed-time clock.
+
+    One pane covers every long-running stage. The phase list is what tells the
+    user where in the run they are; the clock is what distinguishes slow from
+    stuck while the progress bar can only pulse.
+    """
+
+    def __init__(self) -> None:
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, spacing=24)
+        self.set_valign(Gtk.Align.CENTER)
+        # Filling the width would space the phase list and the bar far apart.
+        self.set_halign(Gtk.Align.CENTER)
+
+        #: Whether the running phase has reported a real fraction. Until it
+        #: does the bar is pulsed; afterwards pulsing would fight the value.
+        self._measurable = False
+        self._elapsed_text = ""
+
+        self._rows: dict[State, PhaseRow] = {}
+        phases = Gtk.Grid()
+        phases.set_row_spacing(8)
+        phases.set_column_spacing(12)
+        for index, state in enumerate(WORKING_STATES):
+            row = PhaseRow(state)
+            phases.attach(row.marker, 0, index, 1, 1)
+            phases.attach(row.label, 1, index, 1, 1)
+            self._rows[state] = row
+        self.pack_start(phases, False, False, 0)
+
+        # Grouped, so the detail line reads as belonging to the bar below it
+        # rather than to the phase list above.
+        progress = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.detail_label = _label(xalign=0.5)
+        progress.pack_start(self.detail_label, False, False, 0)
+        self.progressbar = Gtk.ProgressBar()
+        self.progressbar.set_size_request(PROGRESS_WIDTH, -1)
+        progress.pack_start(self.progressbar, False, False, 0)
+        self.elapsed_label = _label(xalign=0.5, wrap=False)
+        progress.pack_start(self.elapsed_label, False, False, 0)
+        self.pack_start(progress, False, False, 0)
+
+    def set_state(self, state: State) -> None:
+        """Mark ``state`` as the phase now running.
+
+        Phases the run skipped are marked done rather than left pending: they
+        are behind the user either way, and a list that never fills in reads as
+        something having gone wrong.
+        """
+        current = WORKING_STATES.index(state)
+        for index, phase in enumerate(WORKING_STATES):
+            if index < current:
+                mark = MARK_DONE
+            elif index == current:
+                mark = MARK_ACTIVE
+            else:
+                mark = MARK_PENDING
+            self._rows[phase].set_marker(mark)
+        self._measurable = False
+        self.progressbar.set_fraction(0)
+
+    def set_detail(self, text: str) -> None:
+        """Show what the running phase is doing right now."""
+        self.detail_label.set_text(text)
+
+    def set_fraction(self, fraction: float) -> None:
+        """Advance the progress bar, or pulse it when nothing is measurable."""
+        if fraction >= 0:
+            self._measurable = True
+            self.progressbar.set_fraction(min(fraction, 1.0))
+        else:
+            self.progressbar.pulse()
+
+    def pulse(self) -> None:
+        """Advance the bar while the running phase reports no fraction.
+
+        Downloading the remote tree reports none at all, so without a caller
+        on a timer the bar moved one step and then stood still for the longest
+        phase of the run.
+        """
+        if not self._measurable:
+            self.progressbar.pulse()
+
+    def set_elapsed(self, seconds: int) -> None:
+        """Show how long the current phase has been running."""
+        text = "" if seconds < 3 else f"{seconds // 60}:{seconds % 60:02d}"
+        if text != self._elapsed_text:
+            self._elapsed_text = text
+            self.elapsed_label.set_markup(_dim(text))
+
+
+class ReviewPane(Gtk.Box):
+    """The one screen that matters: what will happen, and to which tree.
+
+    The list is regenerated from the selected mode, so it shows the *actions*
+    that mode produces rather than the raw differences. Media transfers are a
+    checkbox here rather than a second confirmation page of their own.
+
+    """
+
+    def __init__(self) -> None:
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self._session: SyncSession | None = None
+        self.sync_mode = MODE_BIDIRECTIONAL
+
+        self.mode_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        self.mode_box.set_no_show_all(True)
+        self.mode_box.pack_start(
+            _label(_("Sync mode:"), wrap=False), False, False, 0
+        )
+        first = None
+        for mode in SYNC_MODES:
+            if first is None:
+                button = Gtk.RadioButton.new_with_label_from_widget(
+                    None, mode_label(mode)
+                )
+                first = button
+            else:
+                button = Gtk.RadioButton.new_with_label_from_widget(
+                    first, mode_label(mode)
+                )
+            button.connect("toggled", self._on_mode_toggled, mode)
+            self.mode_box.pack_start(button, False, False, 0)
+        self.description_label = _label()
+        self.description_label.set_margin_start(24)
+        self.mode_box.pack_start(self.description_label, False, False, 0)
+        self.pack_start(self.mode_box, False, False, 0)
+
+        self.warning_label = _label()
+        self.warning_label.set_no_show_all(True)
+        self.warning_label.hide()
+        self.pack_start(self.warning_label, False, False, 0)
+
+        self.store = Gtk.TreeStore(str, str, str)
         self.tree_view = Gtk.TreeView(model=self.store)
-
-        for i, col in enumerate(["ID"]):
+        for index, title in enumerate(
+            (_("Change"), _("Name"), _("ID"))
+        ):
             renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(col, renderer, text=i)
+            column = Gtk.TreeViewColumn(title, renderer, text=index)
+            column.set_resizable(True)
+            if index == NAME_COLUMN:
+                # An ellipsizing renderer reports a minimum width of almost
+                # nothing, so only the column that should absorb the shortfall
+                # gets one. Setting it on all three let every column collapse
+                # to its minimum, and cut off the group headings, which sit in
+                # column 0 and are longer than any leaf value in it.
+                renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+                column.set_expand(True)
+                column.set_min_width(NAME_MIN_WIDTH)
             self.tree_view.append_column(column)
+        self.scrolled = Gtk.ScrolledWindow()
+        self.scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.scrolled.set_shadow_type(Gtk.ShadowType.IN)
+        self.scrolled.set_no_show_all(True)
+        self.scrolled.add(self.tree_view)
+        self.pack_start(self.scrolled, True, True, 0)
 
-        # scrolled window
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.add(self.tree_view)
+        self.media_check = Gtk.CheckButton(label="")
+        self.media_check.set_active(True)
+        self.media_check.set_no_show_all(True)
+        self.pack_start(self.media_check, False, False, 0)
 
-        self.pack_start(scrolled_window, True, True, 0)
+        self.media_notice = _label()
+        self.media_notice.set_margin_start(24)
+        self.media_notice.set_no_show_all(True)
+        self.media_notice.hide()
+        self.pack_start(self.media_notice, False, False, 0)
 
-    def prepare(self, missing_local, missing_remote):
-        iter_local = self.store.append(None, [_("Missing locally")])
-        for gramps_id, handle in missing_local:
-            self.store.append(iter_local, [gramps_id])
-        iter_remote = self.store.append(None, [_("Missing remotely")])
-        for gramps_id, handle in missing_remote:
-            self.store.append(iter_remote, [gramps_id])
+    @property
+    def transfer_media(self) -> bool:
+        """Whether the user wants the missing media files moved."""
+        return self.media_check.get_active()
 
-        # expand first level
-        for i, row in enumerate(self.store):
-            self.tree_view.expand_row(Gtk.TreePath(i), False)
+    def prepare(self, session: SyncSession) -> None:
+        """Render what ``session`` found, for the mode now selected."""
+        self._session = session
+        # A run with nothing but media to move has no mode to choose and no
+        # object list to show, so neither is offered.
+        self.mode_box.set_visible(bool(session.changes))
+        self.scrolled.set_visible(bool(session.changes))
+        self.tree_view.show_all()
+        self._render_media(session)
+        self._render_changes()
 
-        self.set_complete()
+    def _on_mode_toggled(self, button: Gtk.RadioButton, mode: int) -> None:
+        """Re-render the list, because the mode reinterprets every row."""
+        if not button.get_active():
+            return
+        self.sync_mode = mode
+        self._render_changes()
 
+    def _render_changes(self) -> None:
+        """Rebuild the tree from the actions the selected mode produces."""
+        self.store.clear()
+        self.description_label.set_text(mode_description(self.sync_mode))
+        session = self._session
+        if session is None or not session.changes:
+            self.warning_label.hide()
+            return
+        actions = changes_to_actions(session.changes, self.sync_mode)
+        model = build_review(actions, session.db1, session.db2)
+        self._fill(model)
+        self._render_warning(model)
 
-class FileProgressPage(Page):
-    """A file progress page."""
+    def _fill(self, model: ReviewModel) -> None:
+        """Write ``model`` into the tree store and expand the headings."""
+        for destination in model.destinations:
+            parent = self.store.append(
+                None, [destination_label(destination.where, destination.count), "", ""]
+            )
+            for group in destination.groups:
+                node = self.store.append(
+                    parent, [verb_label(group.verb, group.count), "", ""]
+                )
+                for row in group.rows:
+                    self.store.append(node, [row.type_label, row.name, row.gramps_id])
+        self.tree_view.expand_all()
 
-    def __init__(self, assistant):
-        """Initialize page."""
-        super().__init__(assistant)
-        self.label1 = Gtk.Label(label="Media file download")
-        self.pack_start(self.label1, False, False, 20)
+    def _render_warning(self, model: ReviewModel) -> None:
+        """Show what will be deleted, if anything will be."""
+        text = deletion_warning(model)
+        if not text:
+            self.warning_label.hide()
+            return
+        self.warning_label.set_markup(
+            f"<b>{GLib.markup_escape_text(_('Warning:'))}</b> "
+            f"{GLib.markup_escape_text(text)}"
+        )
+        self.warning_label.show()
 
-        self.progressbar1 = Gtk.ProgressBar()
-        self.pack_start(self.progressbar1, False, False, 20)
-
-        self.label2 = Gtk.Label(label="Media file upload")
-        self.pack_start(self.label2, False, False, 20)
-
-        self.progressbar2 = Gtk.ProgressBar()
-        self.pack_start(self.progressbar2, False, False, 20)
-
-    def prepare(self, files_missing_local, files_missing_remote):
-        """Prepare."""
-        n_down = len(files_missing_local)
-        if not n_down:
-            self.label1.hide()
-            self.progressbar1.hide()
+    def _render_media(self, session: SyncSession) -> None:
+        """Offer the media transfer, and name the files nothing can be done for."""
+        if session.has_missing_files:
+            self.media_check.set_label(
+                media_label(len(session.missing_local), len(session.missing_remote))
+            )
+            self.media_check.show()
         else:
-            self.label1.show()
-            self.progressbar1.show()
-            self.label1.set_text(_("Downloading %s media file(s)") % n_down)
-        n_up = len(files_missing_remote)
-        if not n_up:
-            self.label2.hide()
-            self.progressbar2.hide()
+            self.media_check.hide()
+        if session.missing_both:
+            self.media_notice.set_markup(
+                _dim(missing_both_notice(len(session.missing_both)))
+            )
+            self.media_notice.show()
         else:
-            self.label2.show()
-            self.progressbar2.show()
-            self.label2.set_text(_("Uploading %s media file(s)") % n_up)
-
-    def update_progress(
-        self, files_missing_local, files_missing_remote, downloaded, uploaded
-    ):
-        """Update the progress bar."""
-        n_down = len(files_missing_local)
-        n_up = len(files_missing_remote)
-        i_down = len(downloaded)
-        i_up = len(uploaded)
-        if n_down:
-            self.progressbar1.set_fraction(i_down / n_down)
-        if n_up:
-            self.progressbar2.set_fraction(i_up / n_up)
+            self.media_notice.hide()
 
 
-class ConclusionPage(Page):
-    """The conclusion page."""
+class ResultPane(Gtk.Box):
+    """Reports the outcome: a title, the error if there was one, and a summary."""
 
-    def __init__(self, assistant):
-        super().__init__(assistant)
-        self.error = False
-        self.unchanged = False
-        label = Gtk.Label(label="")
-        label.set_line_wrap(True)
-        label.set_use_markup(True)
-        label.set_max_width_chars(60)
-        self.label = label
-        self.pack_start(self.label, False, False, 0)
+    def __init__(self) -> None:
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.set_valign(Gtk.Align.CENTER)
+
+        self.title_label = _label(xalign=0.5)
+        self.pack_start(self.title_label, False, False, 0)
+
+        self.message_label = _label(xalign=0.5)
+        self.pack_start(self.message_label, False, False, 0)
+
+        self.summary_label = _label(xalign=0.5)
+        self.pack_start(self.summary_label, False, False, 0)
+
+        self.notice_label = _label(xalign=0.5)
+        self.notice_label.set_no_show_all(True)
+        self.notice_label.hide()
+        self.pack_start(self.notice_label, False, False, 0)
+
+        self.details = Gtk.Expander(label=_("Details"))
+        self.details.set_no_show_all(True)
+        self.details.hide()
+        details_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.details_label = _label()
+        self.details_label.set_selectable(True)
+        details_box.pack_start(self.details_label, False, False, 0)
+        copy_button = Gtk.Button(label=_("Copy"))
+        copy_button.set_halign(Gtk.Align.START)
+        copy_button.connect("clicked", self._on_copy)
+        details_box.pack_start(copy_button, False, False, 0)
+        self.details.add(details_box)
+        self.pack_start(self.details, False, False, 0)
+
+        self._details_text = ""
+
+    def prepare(self, session: SyncSession) -> None:
+        """Render the outcome of ``session``."""
+        error = session.error
+        if error is None:
+            self.title_label.set_markup(
+                f"<big><b>{GLib.markup_escape_text(_('Synchronization complete'))}"
+                "</b></big>"
+            )
+            self.message_label.set_text("")
+            self._set_details("")
+        else:
+            self.title_label.set_markup(
+                f"<big><b>{GLib.markup_escape_text(_('Synchronization failed'))}"
+                "</b></big>"
+            )
+            self.message_label.set_text(error_message(error.kind, error.detail))
+            self._set_details(
+                f"{error.kind.name}: {error.detail}"
+                if error.detail
+                else error.kind.name
+            )
+        self.summary_label.set_text(outcome_summary(session))
+
+    def show_notice(self, message: str) -> None:
+        """Show a non-fatal notice alongside the outcome."""
+        self.notice_label.set_markup(f"<i>{GLib.markup_escape_text(message)}</i>")
+        self.notice_label.show()
+
+    def _set_details(self, text: str) -> None:
+        """Offer the raw failure text, for pasting into a bug report."""
+        self._details_text = text
+        if text:
+            self.details_label.set_text(text)
+            self.details.show()
+        else:
+            self.details.hide()
+
+    def _on_copy(self, _button) -> None:
+        """Put the details on the clipboard."""
+        from gi.repository import Gdk
+
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(self._details_text, -1)
 
 
 class GrampsWebSyncOptions(ToolOptions):
